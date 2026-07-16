@@ -705,6 +705,90 @@ clickclick preview ./examples/card.html --css ./examples/card.css --watch
 Add `--debug-dir ./debug-render` to template or recipe renders to write the source HTML/CSS and a
 manifest with modifications and warnings.
 
+### Preview and Config Authoring
+
+Generate a one-shot preview while editing an HTML/CSS template:
+
+```bash
+clickclick preview examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --out-dir .clickclick-preview \
+  --width 1200 \
+  --height 630
+```
+
+The preview command writes `.clickclick-preview/preview.png`. Use watch mode for the local authoring
+loop:
+
+```bash
+clickclick preview examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --out-dir .clickclick-preview \
+  --watch
+```
+
+List templates registered in a config file:
+
+```bash
+clickclick config templates examples/use-cases/clickclick.config.json
+```
+
+Expected output:
+
+```text
+product
+```
+
+Render a recipe with CLI overrides:
+
+```bash
+clickclick config recipe examples/use-cases/clickclick.config.json release \
+  --modify-json '[{"name":"title","text":"Recipe override"},{"name":"badge","text":"CLI"}]' \
+  --out examples/use-cases/config-recipe.png \
+  --width 1200 \
+  --height 630
+```
+
+Render a template set into an output directory:
+
+```bash
+clickclick config set examples/use-cases/clickclick.config.json social \
+  --out-dir examples/use-cases/config-set
+```
+
+Results:
+
+![Config recipe override result](./examples/use-cases/config-recipe.png)
+
+![Config set wide result](./examples/use-cases/config-set/wide.png)
+
+![Config set square result](./examples/use-cases/config-set/square.png)
+
+Library equivalents:
+
+```ts
+import { listConfigTemplates, renderRecipe, renderTemplateSet } from "@maurogoncalo/clickclick";
+
+const templates = await listConfigTemplates("examples/use-cases/clickclick.config.json");
+
+await renderRecipe("examples/use-cases/clickclick.config.json", "release", {
+  modifications: [
+    { name: "title", text: "Recipe override" },
+    { name: "badge", text: "API" },
+  ],
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/config-recipe.png" },
+});
+
+await renderTemplateSet(
+  "examples/use-cases/clickclick.config.json",
+  "social",
+  "examples/use-cases/config-set",
+);
+
+console.log(templates);
+```
+
 ## Package Release
 
 The npm package is prepared as `@maurogoncalo/clickclick` with MIT licensing, public npm access,

@@ -1137,7 +1137,7 @@ Use small deterministic HTML/CSS fixtures and include resulting images where vis
 ---
 
 ## CC-029 · Add README examples for preview and config authoring workflows
-type: Task | status: Backlog | priority: Low
+type: Task | status: Done | priority: Low
 blocks: [] | blocked_by: []
 tags: [area.docs, examples, preview, config, readme-examples-coverage]
 
@@ -1173,3 +1173,7 @@ Include equivalent library examples for `listConfigTemplates`, `renderRecipe`, a
 
 ### History
 - created · 2026-07-16T14:56:19Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:32:54Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:33:37Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:33:37Z · mauro.goncalo@gmail.com
+  Added README preview/config authoring examples for one-shot preview, watch mode, config templates output, recipe overrides, config set outputs, and library equivalents. Verified config templates output and npm run check passed.
