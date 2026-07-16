@@ -1,7 +1,7 @@
 ---
 prefix: CC
 format_version: 2
-groups: [renderer-core, preset-and-cli, project-foundation, quality-gate, release-publishing, template-core, local-workflows, authoring-diagnostics, screenshot-api, template-library]
+groups: [renderer-core, preset-and-cli, project-foundation, quality-gate, release-publishing, template-core, local-workflows, authoring-diagnostics, screenshot-api, template-library, preset-media-foundation, brand-presets, photo-presets, media-preset-docs, readme-examples-coverage]
 ---
 
 ## CC-001 · Scaffold TypeScript package and CLI shell
@@ -769,3 +769,376 @@ Ensure imported templates include enough sample recipe/modification data for use
 - Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
 - handoff · 2026-07-16T14:18:14Z · mauro.goncalo@gmail.com
   implemented on main; verified npm run check, npm run build, and npm test (44 tests)
+
+---
+
+## CC-021 · Add shared media options for built-in presets
+type: Task | status: Backlog | priority: High
+blocks: [CC-022, CC-023] | blocked_by: []
+tags: [area.presets, media, api, preset-media-foundation]
+
+## What & why
+
+Built-in presets need a shared media layer so new presets can use background photos, logos, corner marks, and watermarks consistently instead of each preset hand-rolling unsafe CSS strings. This is the foundation for adding many more visually rich presets while keeping the library API predictable and safe.
+
+The current presets are mostly CSS-only. The next generation should support media without requiring users to write their own HTML templates for common branded cards.
+
+## Where
+
+Preset option types, preset utilities, built-in preset implementations, CLI preset wiring, and preset tests.
+
+## How
+
+Introduce shared preset media option shapes and utilities that can be reused by existing and new presets. Cover at least:
+
+- background photo URL or data URI with fit/position/opacity/overlay controls;
+- logo image URL or data URI with corner placement, size, opacity, and optional alt text where meaningful;
+- watermark image URL or text with opacity, scale, rotation, and placement;
+- safe escaping/serialization of text and URL-like values before embedding them into generated HTML/CSS.
+
+Apply the shared media options to at least a couple of existing presets where it is a natural fit, such as `solid`, `gradient`, `announcement`, or `quote`, without breaking current calls. Keep defaults backward-compatible.
+
+Add tests that prove user-authored text is escaped, media URLs are serialized safely, old preset calls still work, and new media options produce expected HTML/CSS markers.
+
+## Acceptance criteria
+
+- [ ] Shared TypeScript types/utilities exist for preset background photos, logos, and watermarks.
+- [ ] Existing preset APIs remain backward-compatible.
+- [ ] At least two existing presets accept and render the new media options.
+- [ ] Unsafe text and media inputs are escaped or serialized safely.
+- [ ] CLI commands expose matching media flags for presets that support the new options.
+- [ ] Tests cover default behavior, media option rendering, escaping, and metadata consistency.
+
+### History
+- created · 2026-07-16T14:53:46Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-022 · Add photo-forward social image presets
+type: Task | status: Backlog | priority: High
+blocks: [CC-024] | blocked_by: [CC-021]
+tags: [area.presets, media, photos, photo-presets]
+
+## What & why
+
+Add a set of new built-in presets where a background photo or product image is the primary visual element. Users should be able to create polished social images for blog posts, changelogs, launches, events, and case studies without authoring custom HTML/CSS.
+
+These presets should make ClickClick feel much richer than the current mostly-flat cards while staying scriptable from both the library and CLI.
+
+## Where
+
+Preset modules, preset exports/metadata, CLI `preset` commands, preset tests, and generated README example assets.
+
+## How
+
+Build several photo-forward presets using the shared media utilities from the media foundation ticket. Suggested presets:
+
+- `photoHero`: full-bleed background photo with readable overlay, title, subtitle, label, and optional logo corner.
+- `editorialFeature`: magazine-style layout with cropped media panel, headline, byline/meta, and optional watermark.
+- `eventPoster`: event or launch poster with background image, date/meta block, CTA, and optional sponsor/logo treatment.
+- `caseStudy`: image-backed customer/story card with logo, quote or result metric, and branded overlay.
+
+Each preset should expose a focused option type, library export, metadata entry, CLI command, and tests. Use text fitting for long titles where appropriate. Keep generated HTML/CSS self-contained and deterministic.
+
+Avoid remote network dependencies in tests. For docs/examples, use checked-in local assets or stable data URIs unless a live URL screenshot is specifically needed.
+
+## Acceptance criteria
+
+- [ ] At least four new photo-forward presets are exported from the library.
+- [ ] Each new preset has CLI support with documented flags for image URL/path-like values, overlay, text, and optional logo/watermark controls.
+- [ ] Each new preset has tests for default size, escaping, media option rendering, and metadata listing.
+- [ ] Presets produce nonblank images in browser-level rendering tests or targeted CLI smoke tests.
+- [ ] Long titles use ClickClick text fitting where layout requires it.
+- [ ] Existing presets and preset list ordering remain stable except for the intentional additions.
+
+### History
+- created · 2026-07-16T14:53:58Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-023 · Add brand, logo, and watermark presets
+type: Task | status: Backlog | priority: High
+blocks: [CC-024] | blocked_by: [CC-021]
+tags: [area.presets, media, branding, brand-presets]
+
+## What & why
+
+Add built-in presets that are explicitly designed for branded assets: logos in corners, large faint logo marks in the background, watermark overlays, and repeatable brand announcement layouts. This addresses use cases like partner announcements, release banners, sponsorship cards, hiring posts, and branded quote cards.
+
+The goal is to make common branded social-image patterns available without custom templates.
+
+## Where
+
+Preset modules, shared preset media utilities, preset exports/metadata, CLI `preset` commands, tests, and README generated examples.
+
+## How
+
+Build several brand-focused presets using the shared media utilities. Suggested presets:
+
+- `brandAnnouncement`: title/subtitle/CTA with logo in a corner and optional faint logo watermark behind the content.
+- `logoBackdrop`: large centered or tiled background logo watermark with foreground headline and metadata.
+- `partnerCard`: two-logo layout for integrations, partnerships, or co-marketing posts.
+- `watermarkQuote`: quote or testimonial card with text watermark or logo watermark treatment.
+- `badgeGrid`: repeated logo or badge pattern background with foreground announcement copy.
+
+Expose options for logo source, logo placement, watermark opacity, watermark scale, background/text/accent colors, and typography. Keep defaults visually distinct from existing flat presets.
+
+Add CLI commands and tests for each preset. Tests should prove that logos/watermarks are included safely and that text content remains escaped.
+
+## Acceptance criteria
+
+- [ ] At least five brand/logo/watermark-oriented presets are exported from the library.
+- [ ] Each preset has CLI command coverage and preset metadata.
+- [ ] Options include logo placement and watermark controls where appropriate.
+- [ ] Tests cover escaping, media serialization, metadata ordering, and representative option combinations.
+- [ ] Rendered outputs are visually distinct from the existing `solid`, `gradient`, `minimal`, and `quote` presets.
+- [ ] The implementation reuses the shared media utilities rather than duplicating CSS/string-building logic per preset.
+
+### History
+- created · 2026-07-16T14:54:10Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-024 · Document media-rich presets with rendered examples
+type: Task | status: Backlog | priority: Medium
+blocks: [] | blocked_by: [CC-022, CC-023]
+tags: [area.docs, media, presets, media-preset-docs]
+
+## What & why
+
+The README is expected to stay complete for built-in presets: every preset should include an example CLI command, example library usage, and the resulting image. Once the media-rich presets land, the documentation must be expanded so users can see the photo, logo, corner-mark, and watermark use cases immediately.
+
+This ticket keeps the package documentation aligned with the richer preset surface and avoids repeating the earlier gap where useful workflows existed but were not illustrated.
+
+## Where
+
+README, examples directory, generated preset images, and any lightweight checked-in media assets needed for deterministic docs renders.
+
+## How
+
+After the media foundation, photo presets, and brand presets are implemented, update the README preset section and use-case gallery. For every built-in preset, including all new media-rich presets, include:
+
+- a CLI command;
+- equivalent library usage;
+- the resulting image checked into the repository.
+
+Add a dedicated section for media-bearing presets that shows background photos, corner logos, logo backdrops, and watermarks. Use checked-in example assets or generated placeholder assets so docs can be regenerated without relying on remote URLs. If a live URL screenshot is needed, use `https://www.anthropic.com/` as the screenshot target.
+
+Ensure generated images are stable dimensions, nonblank, and reasonably compressed. Keep README examples accurate against the real CLI flags and exported option names.
+
+## Acceptance criteria
+
+- [ ] README lists every built-in preset currently exported by the library.
+- [ ] Every preset has a CLI example, library example, and checked-in resulting image.
+- [ ] Media-rich examples visibly include background photos, corner logos, logo backdrops, and watermarks.
+- [ ] The examples directory includes any local media assets needed to regenerate the images deterministically.
+- [ ] README URL screenshot examples use `https://www.anthropic.com/` if a live site capture is included.
+- [ ] `npm run build`, `npm run check`, and `npm test` pass after the docs/examples update.
+
+### History
+- created · 2026-07-16T14:54:24Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-025 · Add README examples for advanced output modes
+type: Task | status: Backlog | priority: Medium
+blocks: [] | blocked_by: []
+tags: [area.docs, examples, output, readme-examples-coverage]
+
+## What & why
+
+The README examples show basic PNG rendering, but the tool also supports JPEG output, JPEG quality, selector-only screenshots, full-page URL screenshots, transparent PNG backgrounds, locale selection, wait events, and render delays. These features are currently mentioned mostly as flag lists, which makes them easy to miss and hard to copy.
+
+Add example coverage so users can see when and how to use each output mode.
+
+## Where
+
+README use-case gallery, examples directory, generated output images, and any small local HTML/CSS fixtures needed to produce deterministic results.
+
+## How
+
+Add a README section with CLI and library examples for advanced output/capture modes. Cover at least:
+
+- JPEG output with `--format jpeg` and `--quality`, plus library `output.format` and `quality`;
+- selector-only rendering with `render.selector` / `--selector`;
+- URL selector screenshots and full-page screenshots;
+- transparent PNG capture using `omitBackground` / `--omit-background`;
+- `waitUntil`, `delay`, and `locale` on URL screenshots.
+
+Use local HTML/data URLs for deterministic examples where possible. If a live URL screenshot is needed, use `https://www.anthropic.com/`. Include resulting images for the examples that produce visual output.
+
+## Acceptance criteria
+
+- [ ] README includes copy-pasteable CLI examples for JPEG quality, selector screenshots, full-page screenshots, and transparent PNG output.
+- [ ] README includes equivalent library examples for the same features.
+- [ ] Resulting images are checked into the examples directory and referenced from README.
+- [ ] Examples avoid network dependency except for any intentionally included Anthropic screenshot.
+- [ ] The documented commands run successfully against the current CLI.
+
+### History
+- created · 2026-07-16T14:55:26Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-026 · Add README examples for renderer lifecycle APIs
+type: Task | status: Backlog | priority: Medium
+blocks: [] | blocked_by: []
+tags: [area.docs, examples, library, readme-examples-coverage]
+
+## What & why
+
+The README briefly mentions `createRenderer()`, but it does not show the library-only workflows that make ClickClick useful in real automation: reusing one browser for many renders, passing an externally managed Playwright browser, using the `beforeScreenshot` hook, reading the returned buffer, and handling structured warnings/errors.
+
+These are important API features that are not represented by the current examples section.
+
+## Where
+
+README library/use-case examples and any examples scripts added for documentation validation.
+
+## How
+
+Add a library-focused examples section that covers:
+
+- `createRenderer()` for batch rendering multiple images in one process, including `close()`;
+- passing an externally managed Playwright `Browser` so ClickClick does not own browser shutdown;
+- `beforeScreenshot` to mutate or wait on the page before capture;
+- rendering without `output.path` and using the returned `buffer`, `format`, dimensions, path, and warnings;
+- catching `ClickClickError` and checking stable error codes;
+- warning handling for `TEXT_FIT_OVERFLOW`.
+
+Prefer concise TypeScript examples over long prose. Where an example produces an image, include a checked-in result if it belongs in the visual gallery. For nonvisual examples like error handling, a code snippet is enough.
+
+## Acceptance criteria
+
+- [ ] README shows a complete `createRenderer()` batch rendering example.
+- [ ] README shows an externally managed Playwright browser example.
+- [ ] README shows `beforeScreenshot` usage.
+- [ ] README shows buffer-return usage when no output path is provided.
+- [ ] README shows structured warning and `ClickClickError` handling.
+- [ ] Examples compile conceptually against the exported public types and current API names.
+
+### History
+- created · 2026-07-16T14:55:38Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-027 · Add README examples for advanced template features
+type: Task | status: Backlog | priority: Medium
+blocks: [] | blocked_by: []
+tags: [area.docs, examples, templates, readme-examples-coverage]
+
+## What & why
+
+The README shows a basic template modification, but many template features are only listed in prose: `modify-file`, image layers, effects, hide/show, arbitrary attributes/styles, positioning, custom fonts, missing/duplicate layer warning behavior, `--strict`, and debug bundle generation.
+
+Users need concrete examples for these features because they are the closest equivalent to Bannerbear-style template workflows.
+
+## Where
+
+README template/use-case examples, examples directory, local template fixtures, generated images, and debug-output documentation snippets.
+
+## How
+
+Add a richer template examples section with CLI and library usage covering:
+
+- `--modify-file` and a checked-in modifications JSON file;
+- image layer updates via `src` / `image_url`, `fit`, and `anchor`;
+- effects such as `grayscale`, `blur`, or `invert`;
+- `hide`/`show`, `style`, `className`, `attributes`, `x`, `y`, `border`, and `shadow` where practical;
+- custom fonts through `--font "Family=path-or-url"` and library/config `fonts`;
+- `--on-missing-layer`, `--on-duplicate-layer`, and `--strict` warning behavior;
+- `--debug-dir` output and what files it writes.
+
+Keep the examples deterministic with local assets. Include rendered images for visual template examples and concise output snippets for warning/debug examples.
+
+## Acceptance criteria
+
+- [ ] README includes a `modify-file` example with a checked-in JSON file.
+- [ ] README includes at least one rendered example using an image layer plus fit/anchor.
+- [ ] README includes at least one rendered example using a CSS effect or visibility change.
+- [ ] README includes a custom font example for CLI and library/config usage.
+- [ ] README documents warning modes, strict behavior, and debug bundle output through concrete examples.
+- [ ] Generated example images and fixtures are checked in and paths are accurate.
+
+### History
+- created · 2026-07-16T14:55:51Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-028 · Add README examples for fit-text edge cases
+type: Task | status: Backlog | priority: Medium
+blocks: [] | blocked_by: []
+tags: [area.docs, examples, fit-text, readme-examples-coverage]
+
+## What & why
+
+The README shows the `data-clickclick-fit` attribute, but it does not fully demonstrate programmatic `fitText` targets, min/max font size controls, overflow warning versus error behavior, or how the CLI `--strict` flag changes warning handling.
+
+Text fitting is a core differentiator for social image generation with variable copy, so the examples should make the failure modes and controls obvious.
+
+## Where
+
+README text-fitting section, use-case gallery, examples directory, and rendered fit-text fixtures.
+
+## How
+
+Expand the text-fitting examples with both HTML attribute and programmatic API coverage. Include:
+
+- `data-clickclick-fit`, `data-clickclick-min-font-size`, and `data-clickclick-on-overflow` examples;
+- library `fitText: [{ selector, minFontSize, maxFontSize, onOverflow }]` example;
+- one example that fits successfully and one deliberately long-copy example that produces a `TEXT_FIT_OVERFLOW` warning;
+- CLI `--strict` behavior for warnings where applicable;
+- a short explanation that the fitter changes font size only, not text, box size, line height, or transforms.
+
+Use small deterministic HTML/CSS fixtures and include resulting images where visual comparison helps.
+
+## Acceptance criteria
+
+- [ ] README includes programmatic `fitText` usage with selector, min/max font size, and overflow mode.
+- [ ] README includes attribute-based overflow mode usage.
+- [ ] README shows how to inspect or handle `TEXT_FIT_OVERFLOW` warnings.
+- [ ] README shows CLI strict behavior for renderer warnings.
+- [ ] At least one rendered fit-text example image is checked in and linked.
+
+### History
+- created · 2026-07-16T14:56:02Z · mauro.goncalo@gmail.com
+
+---
+
+## CC-029 · Add README examples for preview and config authoring workflows
+type: Task | status: Backlog | priority: Low
+blocks: [] | blocked_by: []
+tags: [area.docs, examples, preview, config, readme-examples-coverage]
+
+## What & why
+
+The README mentions `clickclick preview`, `config templates`, `config recipe`, and `config set`, but the examples section does not show the authoring workflow end to end: preview an HTML/CSS template while editing it, list registered templates, override recipe output/modifications from the CLI, and render a set into a target directory.
+
+These workflows are useful for local template development and CI integration, and they deserve concrete examples.
+
+## Where
+
+README config/preview sections, examples directory, config fixture, and any generated preview/config outputs used by the docs.
+
+## How
+
+Add examples that show:
+
+- `clickclick preview <html> --css <css> --out-dir ...` for a one-shot preview;
+- `clickclick preview ... --watch` as the local authoring loop, documented without requiring the example test command to run forever;
+- `clickclick config templates` output for a sample config;
+- `clickclick config recipe` with CLI overrides such as `--modify-json`, `--out`, `--width`, and `--height`;
+- `clickclick config set --out-dir` and the resulting generated paths.
+
+Include equivalent library examples for `listConfigTemplates`, `renderRecipe`, and `renderTemplateSet`. Use checked-in fixtures and rendered images where the workflow produces visual output.
+
+## Acceptance criteria
+
+- [ ] README includes one-shot preview and watch-mode examples with expected output path behavior.
+- [ ] README includes config template listing with a sample output snippet.
+- [ ] README includes recipe override examples for CLI and library usage.
+- [ ] README includes template-set output directory examples with resulting image links.
+- [ ] Examples are deterministic and avoid long-running commands in automated verification.
+
+### History
+- created · 2026-07-16T14:56:19Z · mauro.goncalo@gmail.com
