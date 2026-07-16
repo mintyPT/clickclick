@@ -443,7 +443,7 @@ clickclick preset gradient \
   --to "#f97316" \
   --accent "rgba(255,255,255,0.35)" \
   --align left \
-  --out og-gradient-launch.png
+  --out examples/presets/gradient-launch.png
 ```
 
 Library:
@@ -461,9 +461,13 @@ await renderImage({
     accentColor: "rgba(255,255,255,0.35)",
     align: "left",
   }),
-  output: { path: "og-gradient-launch.png" },
+  output: { path: "examples/presets/gradient-launch.png" },
 });
 ```
+
+Result:
+
+![Gradient launch variation result](./examples/presets/gradient-launch.png)
 
 ### Minimal Centered Article
 
@@ -477,7 +481,7 @@ clickclick preset minimal \
   --align center \
   --background "#f8fafc" \
   --accent "#0f766e" \
-  --out og-minimal-article.png
+  --out examples/presets/minimal-article.png
 ```
 
 Library:
@@ -494,9 +498,13 @@ await renderImage({
     backgroundColor: "#f8fafc",
     accentColor: "#0f766e",
   }),
-  output: { path: "og-minimal-article.png" },
+  output: { path: "examples/presets/minimal-article.png" },
 });
 ```
+
+Result:
+
+![Minimal article variation result](./examples/presets/minimal-article.png)
 
 ### Split Product Update
 
@@ -511,7 +519,7 @@ clickclick preset split \
   --background "#ffffff" \
   --panel-color "#0f172a" \
   --accent "#eab308" \
-  --out og-split-product.png
+  --out examples/presets/split-product.png
 ```
 
 Library:
@@ -529,9 +537,13 @@ await renderImage({
     panelColor: "#0f172a",
     accentColor: "#eab308",
   }),
-  output: { path: "og-split-product.png" },
+  output: { path: "examples/presets/split-product.png" },
 });
 ```
+
+Result:
+
+![Split product variation result](./examples/presets/split-product.png)
 
 ### Terminal Install Card
 
@@ -546,7 +558,7 @@ clickclick preset terminal \
   --output-text "added 1 package" \
   --accent "#38bdf8" \
   --command-color "#ffffff" \
-  --out og-terminal-install.png
+  --out examples/presets/terminal-install.png
 ```
 
 Library:
@@ -564,9 +576,13 @@ await renderImage({
     accentColor: "#38bdf8",
     commandColor: "#ffffff",
   }),
-  output: { path: "og-terminal-install.png" },
+  output: { path: "examples/presets/terminal-install.png" },
 });
 ```
+
+Result:
+
+![Terminal install variation result](./examples/presets/terminal-install.png)
 
 ### Compare Migration Card
 
@@ -582,7 +598,7 @@ clickclick preset compare \
   --before-color "#fee2e2" \
   --after-color "#dbeafe" \
   --accent "#2563eb" \
-  --out og-compare-migration.png
+  --out examples/presets/compare-migration.png
 ```
 
 Library:
@@ -601,9 +617,13 @@ await renderImage({
     afterColor: "#dbeafe",
     accentColor: "#2563eb",
   }),
-  output: { path: "og-compare-migration.png" },
+  output: { path: "examples/presets/compare-migration.png" },
 });
 ```
+
+Result:
+
+![Compare migration variation result](./examples/presets/compare-migration.png)
 
 ## PNG and JPEG
 
