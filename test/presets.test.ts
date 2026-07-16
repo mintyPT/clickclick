@@ -63,6 +63,11 @@ describe("solid preset", () => {
 describe("new social presets", () => {
   it.each([
     ["announcement", presets.announcement({ title: "Hello", subtitle: "World", badge: "New", meta: "Today", cta: "Read more" })],
+    ["brandAnnouncement", presets.brandAnnouncement({ title: "Hello", subtitle: "World", cta: "Read more" })],
+    ["logoBackdrop", presets.logoBackdrop({ title: "Hello", subtitle: "World", meta: "New" })],
+    ["partnerCard", presets.partnerCard({ title: "Hello", subtitle: "World", partnerName: "Acme" })],
+    ["watermarkQuote", presets.watermarkQuote({ quote: "Hello", attribution: "Ada" })],
+    ["badgeGrid", presets.badgeGrid({ title: "Hello", subtitle: "World", badge: "New" })],
     ["checkerboard", presets.checkerboard({ title: "Hello", subtitle: "World", label: "New" })],
     ["compare", presets.compare({ title: "Hello", beforeTitle: "Before", beforeText: "Slow", afterTitle: "After", afterText: "Fast" })],
     ["gradient", presets.gradient({ title: "Hello", subtitle: "World" })],
@@ -82,6 +87,11 @@ describe("new social presets", () => {
 
   it("escapes user-authored text in new presets", () => {
     expect(presets.announcement({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.brandAnnouncement({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.logoBackdrop({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.partnerCard({ title: "<script>alert(1)</script>", partnerLogo: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.watermarkQuote({ quote: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.badgeGrid({ title: "<script>alert(1)</script>", badgeLogo: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
     expect(presets.checkerboard({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
     expect(presets.compare({ beforeTitle: "<script>alert(1)</script>", afterTitle: "Safe" }).document.html).not.toContain("<script>");
     expect(presets.gradient({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
@@ -103,6 +113,11 @@ describe("new social presets", () => {
     expect(presets.editorialFeature({ title: "Hello", image: "photo.png", watermark: { text: "Draft" } }).document.html).toContain("Draft");
     expect(presets.eventPoster({ title: "Hello", image: "photo.png", logo: { src: "logo.png" } }).document.html).toContain("preset-media-logo");
     expect(presets.caseStudy({ title: "Hello", image: "photo.png", watermark: { src: "mark.png" } }).document.css).toContain("mark.png");
+    expect(presets.brandAnnouncement({ title: "Hello", logo: { src: "logo.png" } }).document.html).toContain("preset-media-logo");
+    expect(presets.logoBackdrop({ title: "Hello", watermark: { src: "logo.png", opacity: 0.2 } }).document.css).toContain("opacity: 0.2");
+    expect(presets.partnerCard({ title: "Hello", logo: { src: "a.png" }, partnerLogo: "b.png" }).document.html).toContain("b.png");
+    expect(presets.watermarkQuote({ quote: "Hello", watermark: { text: "Brand" } }).document.html).toContain("Brand");
+    expect(presets.badgeGrid({ title: "Hello", badgeLogo: "badge.png" }).document.html).toContain("badge.png");
     expect(presets.quote({ quote: "Hello", mark: ">>", align: "center" }).document.html).toContain("&gt;&gt;");
     expect(presets.split({ title: "Hello", panelSide: "left" }).document.css).toContain("grid-template-columns: 1fr 1.45fr");
     expect(presets.terminal({ title: "Hello", command: "npm test", prompt: ">", output: "done" }).document.html).toContain("done");
@@ -111,6 +126,11 @@ describe("new social presets", () => {
   it("has internal CLI metadata for every exported preset", () => {
     expect(presetMetadata.map((preset) => preset.name)).toEqual([
       "announcement",
+      "brandAnnouncement",
+      "logoBackdrop",
+      "partnerCard",
+      "watermarkQuote",
+      "badgeGrid",
       "checkerboard",
       "compare",
       "gradient",

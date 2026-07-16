@@ -19,6 +19,11 @@ describe("CLI", () => {
     const result = await runCli(["preset", "list"]);
 
     expect(result.stdout).toContain("announcement");
+    expect(result.stdout).toContain("brandAnnouncement");
+    expect(result.stdout).toContain("logoBackdrop");
+    expect(result.stdout).toContain("partnerCard");
+    expect(result.stdout).toContain("watermarkQuote");
+    expect(result.stdout).toContain("badgeGrid");
     expect(result.stdout).toContain("checkerboard");
     expect(result.stdout).toContain("compare");
     expect(result.stdout).toContain("gradient");
@@ -131,6 +136,11 @@ describe("CLI", () => {
 
   it.each([
     ["announcement", ["--title", "Hello", "--badge", "New"]],
+    ["brand-announcement", ["--title", "Hello", "--logo", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"]],
+    ["logo-backdrop", ["--title", "Hello", "--watermark-text", "Brand"]],
+    ["partner-card", ["--title", "Hello", "--partner-logo", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"]],
+    ["watermark-quote", ["--quote", "Hello", "--watermark-text", "Brand"]],
+    ["badge-grid", ["--title", "Hello", "--badge-logo", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"]],
     ["checkerboard", ["--title", "Hello", "--label", "New"]],
     ["compare", ["--before-title", "Before", "--after-title", "After"]],
     ["gradient", ["--title", "Hello"]],

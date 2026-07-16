@@ -210,6 +210,201 @@ preset.command("list").description("List built-in presets").action(() => {
 });
 
 preset
+  .command("brand-announcement")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--cta <text>", "Call-to-action text")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.brandAnnouncement({
+        title: options.title,
+        subtitle: options.subtitle,
+        cta: options.cta,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("logo-backdrop")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--meta <text>", "Meta text")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.logoBackdrop({
+        title: options.title,
+        subtitle: options.subtitle,
+        meta: options.meta,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("partner-card")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--partner-name <text>", "Partner name")
+  .option("--logo <src>", "Primary logo image URL, path, or data URI")
+  .option("--partner-logo <src>", "Partner logo image URL, path, or data URI")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.partnerCard({
+        title: options.title,
+        subtitle: options.subtitle,
+        partnerName: options.partnerName,
+        logo: parseLogoOption(options),
+        partnerLogo: options.partnerLogo,
+        watermark: parseWatermarkOption(options),
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("watermark-quote")
+  .requiredOption("--quote <text>", "Quote text")
+  .option("--attribution <text>", "Attribution text")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.watermarkQuote({
+        quote: options.quote,
+        attribution: options.attribution,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("badge-grid")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--badge <text>", "Badge text")
+  .option("--badge-logo <src>", "Repeated badge/logo image URL, path, or data URI")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.badgeGrid({
+        title: options.title,
+        subtitle: options.subtitle,
+        badge: options.badge,
+        badgeLogo: options.badgeLogo,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
   .command("announcement")
   .requiredOption("--title <text>", "Title text")
   .option("--subtitle <text>", "Subtitle text")

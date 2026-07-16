@@ -865,7 +865,7 @@ Avoid remote network dependencies in tests. For docs/examples, use checked-in lo
 ---
 
 ## CC-023 · Add brand, logo, and watermark presets
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-024] | blocked_by: [CC-021]
 tags: [area.presets, media, branding, brand-presets]
 
@@ -904,6 +904,10 @@ Add CLI commands and tests for each preset. Tests should prove that logos/waterm
 
 ### History
 - created · 2026-07-16T14:54:10Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:10:52Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:15:40Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:15:40Z · mauro.goncalo@gmail.com
+  Added brandAnnouncement, logoBackdrop, partnerCard, watermarkQuote, and badgeGrid presets with CLI commands and tests. npm run build and npm test passed.
 
 ---
 

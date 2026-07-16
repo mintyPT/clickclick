@@ -1,4 +1,5 @@
 import { announcement } from "./announcement.js";
+import { badgeGrid, brandAnnouncement, logoBackdrop, partnerCard, watermarkQuote } from "./brand.js";
 import { checkerboard } from "./checkerboard.js";
 import { compare } from "./compare.js";
 import { gradient } from "./gradient.js";
@@ -9,6 +10,7 @@ import { solid } from "./solid.js";
 import { split } from "./split.js";
 import { terminal } from "./terminal.js";
 export type { AnnouncementPresetOptions } from "./announcement.js";
+export type { BadgeGridPresetOptions, BrandAnnouncementPresetOptions, LogoBackdropPresetOptions, PartnerCardPresetOptions, WatermarkQuotePresetOptions } from "./brand.js";
 export type { CheckerboardPresetOptions } from "./checkerboard.js";
 export type { ComparePresetOptions } from "./compare.js";
 export type { GradientPresetOptions } from "./gradient.js";
@@ -22,6 +24,11 @@ export type { PresetBackgroundMediaOptions, PresetLogoOptions, PresetMediaOption
 
 export const presets = {
   announcement,
+  brandAnnouncement,
+  logoBackdrop,
+  partnerCard,
+  watermarkQuote,
+  badgeGrid,
   checkerboard,
   compare,
   gradient,
@@ -40,6 +47,26 @@ export const presetMetadata = [
   {
     name: "announcement",
     description: "Launch or event announcement image with badge, meta, subtitle, and CTA.",
+  },
+  {
+    name: "brandAnnouncement",
+    description: "Branded announcement image with logo corner and faint watermark mark.",
+  },
+  {
+    name: "logoBackdrop",
+    description: "Centered headline over a large logo watermark backdrop.",
+  },
+  {
+    name: "partnerCard",
+    description: "Two-logo partnership or integration announcement card.",
+  },
+  {
+    name: "watermarkQuote",
+    description: "Quote card with logo or text watermark treatment.",
+  },
+  {
+    name: "badgeGrid",
+    description: "Announcement card with repeated logo or badge pattern background.",
   },
   {
     name: "checkerboard",
