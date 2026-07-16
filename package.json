@@ -1,0 +1,53 @@
+{
+  "name": "clickclick",
+  "version": "0.1.0",
+  "description": "Generate social images by screenshotting HTML with Playwright.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mintyPT/clickclick.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mintyPT/clickclick/issues"
+  },
+  "homepage": "https://github.com/mintyPT/clickclick#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "clickclick": "./dist/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check": "tsc --noEmit",
+    "dev": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "pack:dry": "npm pack --dry-run"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "playwright": "^1.45.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/pngjs": "^6.0.5",
+    "execa": "^9.3.0",
+    "pngjs": "^7.0.0",
+    "tsup": "^8.1.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.4"
+  }
+}
