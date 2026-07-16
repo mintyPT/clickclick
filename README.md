@@ -160,3 +160,23 @@ npm run check
 npm run build
 npm run pack:dry
 ```
+
+## Release
+
+CI runs on pushes to `main` and on pull requests across Node 20, 22, and 24. Each run installs
+dependencies, installs Playwright Chromium, typechecks, builds, runs tests, and verifies the npm
+package contents with `npm pack --dry-run`.
+
+Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow when a GitHub release is
+published or when the workflow is manually dispatched. The workflow uses npm trusted publishing with
+GitHub Actions OIDC, so npm must be configured with a trusted publisher for:
+
+- Package: `@mintypt/clickclick`
+- Repository: `mintyPT/clickclick`
+- Workflow file: `.github/workflows/publish.yml`
+
+The publish job runs the same checks as CI and then publishes with provenance:
+
+```bash
+npm publish --access public --provenance
+```
