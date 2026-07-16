@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ClickClickError, renderImage } from "../src/index.js";
+import { ClickClickError, renderImage, screenshotUrl } from "../src/index.js";
 
 let tempDir: string;
 
@@ -54,6 +54,51 @@ describe("browser rendering", () => {
     ).rejects.toMatchObject({ code: "MISSING_SELECTOR" satisfies ClickClickError["code"] });
   });
 
+  it("screenshots a URL selector", async () => {
+    const url = toDataUrl(`
+      <main>URL</main>
+      <style>
+        html,body{margin:0;background:#ffffff;}
+        main{width:50px;height:40px;background:#0000ff;}
+      </style>
+    `);
+
+    const result = await screenshotUrl({
+      url,
+      viewport: { width: 80, height: 60 },
+      render: { selector: "main", waitUntil: "load" },
+      output: { omitBackground: true },
+      locale: "en-US",
+    });
+
+    expect(result.buffer.subarray(1, 4).toString()).toBe("PNG");
+    const png = PNG.sync.read(result.buffer);
+    expect(png.width).toBe(50);
+    expect(png.height).toBe(40);
+    expect([...png.data.subarray(0, 3)]).toEqual([0, 0, 255]);
+  });
+
+  it("screenshots the full URL page", async () => {
+    const result = await screenshotUrl({
+      url: toDataUrl("<main></main><style>html,body{margin:0;}main{height:140px;background:#00ff00;}</style>"),
+      viewport: { width: 40, height: 50 },
+      render: { fullPage: true },
+    });
+
+    const png = PNG.sync.read(result.buffer);
+    expect(png.width).toBe(40);
+    expect(png.height).toBe(140);
+  });
+
+  it("rejects URL full-page screenshots with a selector", async () => {
+    await expect(
+      screenshotUrl({
+        url: toDataUrl("<main>Hello</main>"),
+        render: { selector: "main", fullPage: true },
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_INPUT" satisfies ClickClickError["code"] });
+  });
+
   it("shrinks marked text", async () => {
     const result = await renderImage({
       document: {
@@ -93,3 +138,7 @@ describe("browser rendering", () => {
     ).rejects.toMatchObject({ code: "TEXT_FIT_OVERFLOW" satisfies ClickClickError["code"] });
   });
 });
+
+function toDataUrl(html: string): string {
+  return `data:text/html,${encodeURIComponent(html)}`;
+}

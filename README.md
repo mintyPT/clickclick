@@ -8,12 +8,12 @@ Playwright. It can be used as a library or as the `clickclick` CLI.
 The v1 surface is intentionally small:
 
 - render user-authored HTML/CSS to PNG or JPEG;
+- screenshot arbitrary URLs to PNG or JPEG;
 - render built-in social image presets;
 - opt in to text fitting for elements that should shrink to fit;
 - report structured warnings and stable error codes.
 
-It does not render arbitrary URLs, manage user preset registries, read config files, or publish
-anything externally.
+It does not manage user preset registries or publish anything externally.
 
 ## Setup
 
@@ -36,7 +36,7 @@ npx clickclick preset solid --title "Hello from ClickClick" --out og.png
 ## Library
 
 ```ts
-import { renderImage, presets } from "@maurogoncalo/clickclick";
+import { renderImage, presets, screenshotUrl } from "@maurogoncalo/clickclick";
 
 await renderImage({
   document: {
@@ -55,6 +55,14 @@ await renderImage({
   }),
   output: { path: "solid.png" },
 });
+
+await screenshotUrl({
+  url: "https://example.com",
+  viewport: { width: 1200, height: 630 },
+  render: { fullPage: true, waitUntil: "networkidle" },
+  output: { path: "example.png", format: "png" },
+  locale: "en-US",
+});
 ```
 
 Use `createRenderer()` when rendering many images in one process. It reuses the browser while still
@@ -67,6 +75,12 @@ Render an HTML file:
 
 ```bash
 clickclick render ./examples/card.html --css ./examples/card.css --out og.png
+```
+
+Screenshot a URL:
+
+```bash
+clickclick screenshot-url https://example.com --out example.png --width 1200 --height 630 --full-page
 ```
 
 Generate a built-in preset:
@@ -82,7 +96,85 @@ clickclick preset list
 ```
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
-`--wait-until`, `--delay`, and `--strict`. `--out` and `--output` are aliases.
+`--wait-until`, `--delay`, and `--strict`. URL screenshots also support `--full-page`,
+`--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+
+## Local Templates
+
+Templates are normal HTML and CSS. Mark editable elements with `data-layer` names, then render them
+directly or apply Bannerbear-style local modifications.
+
+CLI:
+
+```bash
+clickclick template ./examples/card.html \
+  --css ./examples/card.css \
+  --modify-json '[{"name":"title","text":"Local launch"},{"name":"card","background":"#f8fafc"}]' \
+  --out examples/templates/local-template.png
+```
+
+Library:
+
+```ts
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  html: '<main data-layer="card"><h1 data-layer="title">Old</h1></main>',
+  css: "main{width:1200px;height:630px;background:white}",
+  modifications: [
+    { name: "title", text: "Local launch", color: "#111827", alignment: "center" },
+    { name: "card", background: "#f8fafc", shadow: "0 24px 80px rgba(15,23,42,.18)" },
+  ],
+  output: { path: "template.png" },
+});
+```
+
+Result:
+
+![Local template result](./examples/templates/local-template.png)
+
+Supported modification fields include `text`, `html`, `src`, `image_url`, `color`, `background`,
+`font_family`, `alignment`, `hide`, `show`, `style`, `className`, `attributes`, `x`, `y`, `border`,
+`shadow`, `fit`, `anchor`, and `effect`. Effects are CSS-only: `grayscale`, `sepia`, `blur`,
+`grayscale-blur`, `flip-horizontal`, `flip-vertical`, `invert`, and `negate`.
+
+Register fonts with `--font "Family=./font.woff2"` in the CLI or with `fonts` in the library/config
+API. ClickClick injects `@font-face` rules before capture and waits for browser font readiness.
+
+## Config, Recipes, and Sets
+
+Use a JSON config file to register reusable templates, named recipes, and multi-output sets:
+
+```json
+{
+  "templates": {
+    "card": { "htmlPath": "./examples/card.html", "cssPath": "./examples/card.css" }
+  },
+  "recipes": {
+    "launch": {
+      "template": "card",
+      "output": { "path": "launch.png", "width": 1200, "height": 630 },
+      "modifications": [{ "name": "title", "text": "Launch" }]
+    }
+  },
+  "templateSets": {
+    "social": [
+      { "name": "square", "template": "card", "output": { "width": 1080, "height": 1080 } },
+      { "name": "wide", "template": "card", "output": { "width": 1200, "height": 630 } }
+    ]
+  }
+}
+```
+
+```bash
+clickclick config templates ./clickclick.config.json
+clickclick config recipe ./clickclick.config.json launch
+clickclick config set ./clickclick.config.json social --out-dir ./dist/images
+clickclick preview ./examples/card.html --css ./examples/card.css --watch
+```
+
+Add `--debug-dir ./debug-render` to template or recipe renders to write the source HTML/CSS and a
+manifest with modifications and warnings.
 
 ## Package Release
 

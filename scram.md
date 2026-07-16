@@ -386,7 +386,7 @@ Do not perform this ticket until a human confirms the target GitHub repo, npm ac
 ---
 
 ## CC-011 · Add local HTML template rendering with named layers
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-012, CC-013] | blocked_by: []
 tags: [template-core]
 
@@ -418,11 +418,15 @@ Expose the feature through both interfaces: a library API such as renderTemplate
 
 ### History
 - created · 2026-07-16T13:54:06Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:17:54Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-012 · Add hybrid Bannerbear-style layer modifications
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-014, CC-017] | blocked_by: [CC-011]
 tags: [template-core]
 
@@ -455,11 +459,15 @@ Expose the same modification capability through the library API and CLI JSON inp
 
 ### History
 - created · 2026-07-16T13:54:18Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:17:54Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-013 · Add font registry support for local template rendering
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [CC-014] | blocked_by: [CC-011]
 tags: [template-core]
 
@@ -489,11 +497,15 @@ Expose registry configuration in the library API and CLI. Later config-file supp
 
 ### History
 - created · 2026-07-16T13:54:27Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:17:54Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-014 · Add local render recipes and project config
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-015, CC-016, CC-018] | blocked_by: [CC-012, CC-013]
 tags: [local-workflows]
 
@@ -523,11 +535,15 @@ Expose config and recipe loading through both library helpers and CLI commands. 
 
 ### History
 - created · 2026-07-16T13:54:37Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:04Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-015 · Add template sets for multi-output collections
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-016] | blocked_by: [CC-014]
 tags: [local-workflows]
 
@@ -557,11 +573,15 @@ Expose template-set rendering in the CLI and allow recipes/config to reference s
 
 ### History
 - created · 2026-07-16T13:54:46Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:04Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-016 · Add CLI commands for templates recipes and template sets
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-020] | blocked_by: [CC-014, CC-015]
 tags: [local-workflows]
 
@@ -591,11 +611,15 @@ Ensure README updates cover command examples alongside equivalent library usage,
 
 ### History
 - created · 2026-07-16T13:54:55Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:04Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-017 · Add debug bundle diagnostics for local renders
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: [CC-012]
 tags: [authoring-diagnostics]
 
@@ -624,11 +648,15 @@ Expose debug bundle configuration through both library options and CLI flags/con
 
 ### History
 - created · 2026-07-16T13:55:05Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:04Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-018 · Add local preview and watch command for templates
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: [CC-014]
 tags: [authoring-diagnostics]
 
@@ -658,11 +686,15 @@ Expose any reusable preview/watch primitives in the library only if they are use
 
 ### History
 - created · 2026-07-16T13:55:14Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:14Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-019 · Add first-class URL screenshot helper
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: []
 tags: [screenshot-api]
 
@@ -691,11 +723,15 @@ Keep this independent from template rendering: no template modifications, recipe
 
 ### History
 - created · 2026-07-16T13:55:24Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:14Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)
 
 ---
 
 ## CC-020 · Add local template registry and import flow
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: [CC-016]
 tags: [template-library]
 
@@ -726,3 +762,7 @@ Ensure imported templates include enough sample recipe/modification data for use
 
 ### History
 - created · 2026-07-16T13:55:33Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T14:17:36Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T14:17:41Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:18:14Z · mauro.goncalo@gmail.com
+  implemented on main; verified npm run check, npm run build, and npm test (44 tests)

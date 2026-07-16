@@ -45,6 +45,86 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("renders a template with layer modifications", async () => {
+    const htmlPath = join(tempDir, "template.html");
+    const out = join(tempDir, "template.png");
+
+    await writeFile(htmlPath, '<main data-layer="card"><h1 data-layer="title">Old</h1></main>');
+
+    await runCli([
+      "template",
+      htmlPath,
+      "--modify-json",
+      JSON.stringify([{ name: "card", background: "#00ff00" }, { name: "title", text: "New" }]),
+      "--out",
+      out,
+      "--width",
+      "64",
+      "--height",
+      "64",
+    ]);
+
+    await expect(readFile(out)).resolves.toHaveProperty("length");
+  });
+
+  it("lists config templates and renders a config recipe", async () => {
+    const htmlPath = join(tempDir, "config-template.html");
+    const configPath = join(tempDir, "clickclick.config.json");
+    const out = join(tempDir, "config-recipe.png");
+
+    await writeFile(htmlPath, '<main data-layer="card">Recipe</main>');
+    await writeFile(configPath, JSON.stringify({
+      templates: {
+        card: {
+          htmlPath,
+          css: "html,body,main{margin:0;width:100%;height:100%;background:#ff0000}",
+        },
+      },
+      recipes: {
+        card: {
+          template: "card",
+          output: { path: out },
+          modifications: [{ name: "card", text: "Changed" }],
+        },
+      },
+    }));
+
+    const list = await runCli(["config", "templates", configPath]);
+    expect(list.stdout).toContain("card");
+    await runCli(["config", "recipe", configPath, "card", "--width", "64", "--height", "64"]);
+
+    await expect(readFile(out)).resolves.toHaveProperty("length");
+  });
+
+  it("screenshots a URL", async () => {
+    const out = join(tempDir, "url.png");
+    const url = `data:text/html,${encodeURIComponent("<main>URL</main><style>html,body{margin:0;}main{width:32px;height:24px;background:#ff0000;}</style>")}`;
+
+    await runCli([
+      "screenshot-url",
+      url,
+      "--out",
+      out,
+      "--width",
+      "64",
+      "--height",
+      "48",
+      "--selector",
+      "main",
+      "--wait-until",
+      "load",
+      "--delay",
+      "0",
+      "--format",
+      "png",
+      "--omit-background",
+      "--locale",
+      "en-US",
+    ]);
+
+    await expect(readFile(out)).resolves.toHaveProperty("length");
+  });
+
   it.each([
     ["announcement", ["--title", "Hello", "--badge", "New"]],
     ["checkerboard", ["--title", "Hello", "--label", "New"]],

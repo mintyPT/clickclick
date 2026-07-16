@@ -44,14 +44,29 @@ export interface RenderImageInput {
   fitText?: FitTextTarget[];
 }
 
+export interface ScreenshotUrlLifecycleOptions extends RenderLifecycleOptions {
+  fullPage?: boolean;
+}
+
+export interface ScreenshotUrlInput {
+  url: string;
+  viewport?: Partial<ViewportSize>;
+  output?: RenderOutputOptions;
+  render?: ScreenshotUrlLifecycleOptions;
+  locale?: string;
+}
+
 export interface RendererOptions {
   browser?: Browser;
   launchOptions?: LaunchOptions;
+  fonts?: FontRegistryEntry[];
 }
 
 export interface RenderImageOptions extends RendererOptions {}
 
-export interface RenderWarning {
+export interface ScreenshotUrlOptions extends RendererOptions {}
+
+export interface TextFitWarning {
   code: "TEXT_FIT_OVERFLOW";
   message: string;
   selector: string;
@@ -61,6 +76,14 @@ export interface RenderWarning {
   widthOverflow: boolean;
   heightOverflow: boolean;
 }
+
+export interface TemplateWarning {
+  code: "MISSING_LAYER" | "DUPLICATE_LAYER";
+  message: string;
+  layer: string;
+}
+
+export type RenderWarning = TextFitWarning | TemplateWarning;
 
 export interface RenderImageResult {
   buffer: Buffer;
@@ -73,5 +96,82 @@ export interface RenderImageResult {
 
 export interface ClickClickRenderer {
   render(input: RenderImageInput): Promise<RenderImageResult>;
+  screenshotUrl(input: ScreenshotUrlInput): Promise<RenderImageResult>;
   close(): Promise<void>;
+}
+
+export interface FontRegistryEntry {
+  family: string;
+  source: string | string[];
+  weight?: string | number;
+  style?: string;
+  display?: "auto" | "block" | "swap" | "fallback" | "optional";
+}
+
+export type LayerEffect =
+  | "grayscale"
+  | "sepia"
+  | "blur"
+  | "grayscale-blur"
+  | "flip-horizontal"
+  | "flip-vertical"
+  | "invert"
+  | "negate";
+
+export interface LayerModification {
+  name: string;
+  text?: string;
+  html?: string;
+  src?: string;
+  image_url?: string;
+  color?: string;
+  background?: string;
+  font_family?: string;
+  alignment?: "left" | "center" | "right" | "justify";
+  hide?: boolean;
+  show?: boolean;
+  style?: Record<string, string | number>;
+  className?: string;
+  attributes?: Record<string, string | number | boolean | null>;
+  x?: number;
+  y?: number;
+  border?: string;
+  shadow?: string;
+  effect?: LayerEffect;
+  fit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+  anchor?: string;
+}
+
+export interface TemplateInput {
+  html?: string;
+  css?: string;
+  htmlPath?: string;
+  cssPath?: string;
+  baseUrl?: string;
+  modifications?: LayerModification[];
+  fonts?: FontRegistryEntry[];
+  onMissingLayer?: "warn" | "error" | "ignore";
+  onDuplicateLayer?: "warn" | "error" | "ignore";
+  debugDir?: string;
+  viewport?: Partial<ViewportSize>;
+  output?: RenderOutputOptions;
+  render?: RenderLifecycleOptions;
+  fitText?: FitTextTarget[];
+}
+
+export interface TemplateRecipe {
+  template: string;
+  output?: RenderOutputOptions & { width?: number; height?: number };
+  modifications?: LayerModification[];
+}
+
+export interface TemplateSetItem extends TemplateRecipe {
+  name: string;
+}
+
+export interface ClickClickConfig {
+  templates?: Record<string, Omit<TemplateInput, "output" | "viewport">>;
+  recipes?: Record<string, TemplateRecipe>;
+  templateSets?: Record<string, TemplateSetItem[]>;
+  fonts?: FontRegistryEntry[];
 }
