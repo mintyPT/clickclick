@@ -1,5 +1,5 @@
 {
-  "name": "clickclick",
+  "name": "@mintypt/clickclick",
   "version": "0.1.0",
   "description": "Generate social images by screenshotting HTML with Playwright.",
   "type": "module",

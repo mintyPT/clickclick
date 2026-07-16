@@ -20,7 +20,7 @@ anything externally.
 Use Node 20 or newer.
 
 ```bash
-npm install
+npm install @mintypt/clickclick
 npx playwright install chromium
 ```
 
@@ -29,7 +29,7 @@ If Chromium cannot start, install the system dependencies requested by Playwrigh
 ## Library
 
 ```ts
-import { renderImage, presets } from "clickclick";
+import { renderImage, presets } from "@mintypt/clickclick";
 
 await renderImage({
   document: {
@@ -102,7 +102,7 @@ clickclick preset solid \
 Library:
 
 ```ts
-import { presets, renderImage } from "clickclick";
+import { presets, renderImage } from "@mintypt/clickclick";
 
 await renderImage({
   ...presets.solid({
