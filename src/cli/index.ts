@@ -4,7 +4,8 @@ import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { ClickClickError, listConfigTemplates, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
-import type { ImageFormat, LayerModification, RenderImageInput, RenderOutputOptions, RenderWarning, TemplateInput, WaitUntil } from "../types.js";
+import type { LayerModification, RenderImageInput, RenderWarning, TemplateInput } from "../types.js";
+import { parseInteger, parseOutputOptions, parseRenderOptions } from "./options.js";
 import { registerPresetCommands } from "./presets.js";
 
 const program = new Command();
@@ -203,9 +204,6 @@ program
 
 registerPresetCommands(program.command("preset").description("Render built-in presets."), {
   runRender,
-  parseOutputOptions,
-  parseInteger,
-  parseNumber,
 });
 
 program.parseAsync().catch((error: unknown) => {
@@ -239,31 +237,6 @@ async function readFileChecked(path: string, label: string): Promise<string> {
   } catch {
     throw new ClickClickError("INVALID_INPUT", `${label} file could not be read: ${path}`);
   }
-}
-
-function parseInteger(value: string): number {
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed)) {
-    throw new Error(`Expected an integer, received ${value}`);
-  }
-  return parsed;
-}
-
-function parseNumber(value: string): number {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) {
-    throw new Error(`Expected a number, received ${value}`);
-  }
-  return parsed;
-}
-
-function parseOutputOptions(options: Record<string, unknown>): RenderOutputOptions {
-  return {
-    path: typeof options.output === "string" ? options.output : undefined,
-    format: parseFormat(options.format),
-    quality: typeof options.quality === "number" ? options.quality : undefined,
-    omitBackground: Boolean(options.omitBackground),
-  };
 }
 
 async function parseModifications(options: Record<string, unknown>): Promise<LayerModification[] | undefined> {
@@ -311,26 +284,6 @@ function parseLayerBehavior(value: unknown): "warn" | "error" | "ignore" | undef
   if (value === undefined) return undefined;
   if (value === "warn" || value === "error" || value === "ignore") return value;
   throw new ClickClickError("INVALID_INPUT", "Layer behavior must be warn, error, or ignore.");
-}
-
-function parseRenderOptions(options: Record<string, unknown>) {
-  return {
-    selector: typeof options.selector === "string" ? options.selector : undefined,
-    waitUntil: parseWaitUntil(options.waitUntil),
-    delayMs: typeof options.delay === "number" ? options.delay : undefined,
-  };
-}
-
-function parseFormat(value: unknown): ImageFormat | undefined {
-  if (value === undefined) return undefined;
-  if (value === "png" || value === "jpeg") return value;
-  throw new ClickClickError("INVALID_INPUT", "Format must be png or jpeg.");
-}
-
-function parseWaitUntil(value: unknown): WaitUntil | undefined {
-  if (value === undefined) return undefined;
-  if (value === "load" || value === "domcontentloaded" || value === "networkidle" || value === "commit") return value;
-  throw new ClickClickError("INVALID_INPUT", "wait-until must be load, domcontentloaded, networkidle, or commit.");
 }
 
 function reportError(error: unknown) {

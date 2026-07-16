@@ -2,13 +2,11 @@ import type { Command } from "commander";
 import { ClickClickError, presets } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
-import type { RenderImageInput, RenderOutputOptions } from "../types.js";
+import type { RenderImageInput } from "../types.js";
+import { parseInteger, parseNumber, parseOutputOptions } from "./options.js";
 
 interface PresetCliDependencies {
   runRender: (input: RenderImageInput, strict: boolean) => Promise<void>;
-  parseOutputOptions: (options: Record<string, unknown>) => RenderOutputOptions;
-  parseInteger: (value: string) => number;
-  parseNumber: (value: string) => number;
 }
 
 interface PresetCommandOption {
@@ -223,11 +221,11 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
 function registerLegacyPresetCommands(parent: Command, dependencies: PresetCliDependencies) {
   for (const definition of legacyPresetCommandDefinitions()) {
     let command = addCommandOptions(parent.command(definition.command), definition.options);
-    command = addPresetRenderOptions(command, dependencies);
+    command = addPresetRenderOptions(command);
     command.action(async (options) => {
       await dependencies.runRender({
         ...definition.render(options),
-        output: dependencies.parseOutputOptions(options),
+        output: parseOutputOptions(options),
       }, Boolean(options.strict));
     });
   }
@@ -432,13 +430,13 @@ function richMediaPresetCommandDefinitions(): PresetCommandDefinition[] {
 function registerBrandPresetCommands(parent: Command, dependencies: PresetCliDependencies) {
   for (const definition of brandPresetCommandDefinitions()) {
     let command = addCommandOptions(parent.command(definition.command), definition.options);
-    command = addLogoWatermarkOptions(command, dependencies);
+    command = addLogoWatermarkOptions(command);
     command = addPresetColorOptions(command);
-    command = addPresetRenderOptions(command, dependencies);
+    command = addPresetRenderOptions(command);
     command.action(async (options) => {
       await dependencies.runRender({
         ...definition.render(options),
-        output: dependencies.parseOutputOptions(options),
+        output: parseOutputOptions(options),
       }, Boolean(options.strict));
     });
   }
@@ -448,13 +446,13 @@ function registerPhotoPresetCommands(parent: Command, dependencies: PresetCliDep
   for (const definition of photoPresetCommandDefinitions()) {
     let command = addCommandOptions(parent.command(definition.command), definition.options);
     command = addPhotoMediaOptions(command);
-    command = addLogoWatermarkOptions(command, dependencies);
+    command = addLogoWatermarkOptions(command);
     command = addPhotoStyleOptions(command);
-    command = addPresetRenderOptions(command, dependencies);
+    command = addPresetRenderOptions(command);
     command.action(async (options) => {
       await dependencies.runRender({
         ...definition.render(options),
-        output: dependencies.parseOutputOptions(options),
+        output: parseOutputOptions(options),
       }, Boolean(options.strict));
     });
   }
@@ -463,12 +461,12 @@ function registerPhotoPresetCommands(parent: Command, dependencies: PresetCliDep
 function registerRichMediaPresetCommands(parent: Command, dependencies: PresetCliDependencies) {
   for (const definition of richMediaPresetCommandDefinitions()) {
     let command = addCommandOptions(parent.command(definition.command), definition.options);
-    command = addRichMediaOptions(command, dependencies);
-    command = addPresetRenderOptions(command, dependencies);
+    command = addRichMediaOptions(command);
+    command = addPresetRenderOptions(command);
     command.action(async (options) => {
       await dependencies.runRender({
         ...definition.render(options),
-        output: dependencies.parseOutputOptions(options),
+        output: parseOutputOptions(options),
       }, Boolean(options.strict));
     });
   }
@@ -493,13 +491,13 @@ function addCommandOption(command: Command, option: PresetCommandOption): Comman
     : command.option(option.flags, option.description);
 }
 
-function addLogoWatermarkOptions(command: Command, dependencies: PresetCliDependencies): Command {
+function addLogoWatermarkOptions(command: Command): Command {
   return command
     .option("--logo <src>", "Logo image URL, path, or data URI")
     .option("--logo-placement <placement>", "Logo placement corner")
     .option("--watermark <src>", "Watermark image URL, path, or data URI")
     .option("--watermark-text <text>", "Watermark text")
-    .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", dependencies.parseNumber);
+    .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber);
 }
 
 function addPresetColorOptions(command: Command): Command {
@@ -523,36 +521,36 @@ function addPhotoStyleOptions(command: Command): Command {
     .option("--font-family <value>", "CSS font-family value");
 }
 
-function addRichMediaOptions(command: Command, dependencies: PresetCliDependencies): Command {
+function addRichMediaOptions(command: Command): Command {
   return command
     .option("--text-color <color>", "Text color")
     .option("--accent <color>", "Accent color")
     .option("--background-image <src>", "Background image URL, path, or data URI")
     .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
     .option("--background-position <position>", "Background image CSS position")
-    .option("--background-opacity <number>", "Background image opacity from 0 to 1", dependencies.parseNumber)
+    .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
     .option("--overlay <color>", "Background image overlay color")
     .option("--logo <src>", "Logo image URL, path, or data URI")
     .option("--logo-placement <placement>", "Logo placement corner")
-    .option("--logo-size <px>", "Logo width in pixels", dependencies.parseInteger)
-    .option("--logo-opacity <number>", "Logo opacity from 0 to 1", dependencies.parseNumber)
+    .option("--logo-size <px>", "Logo width in pixels", parseInteger)
+    .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
     .option("--logo-alt <text>", "Logo alt text")
     .option("--watermark <src>", "Watermark image URL, path, or data URI")
     .option("--watermark-text <text>", "Watermark text")
     .option("--watermark-placement <placement>", "Watermark placement")
-    .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", dependencies.parseNumber)
-    .option("--watermark-scale <number>", "Watermark scale ratio", dependencies.parseNumber)
-    .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", dependencies.parseNumber)
+    .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+    .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
+    .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
     .option("--font-family <value>", "CSS font-family value");
 }
 
-function addPresetRenderOptions(command: Command, dependencies: PresetCliDependencies): Command {
+function addPresetRenderOptions(command: Command): Command {
   return command
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
+    .option("--width <px>", "Image width", parseInteger)
+    .option("--height <px>", "Image height", parseInteger)
     .option("--out, --output <file>", "Output image path")
     .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
+    .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
     .option("--strict", "Exit non-zero when renderer warnings are produced");
 }
 
