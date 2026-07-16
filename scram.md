@@ -1093,7 +1093,7 @@ Keep the examples deterministic with local assets. Include rendered images for v
 ---
 
 ## CC-028 · Add README examples for fit-text edge cases
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: []
 tags: [area.docs, examples, fit-text, readme-examples-coverage]
 
@@ -1129,6 +1129,10 @@ Use small deterministic HTML/CSS fixtures and include resulting images where vis
 
 ### History
 - created · 2026-07-16T14:56:02Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:32:01Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:32:40Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:32:40Z · mauro.goncalo@gmail.com
+  Added README fit-text examples for data attributes, programmatic fitText, TEXT_FIT_OVERFLOW handling, and CLI --strict behavior. npm run check passed.
 
 ---
 

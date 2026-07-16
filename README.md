@@ -377,6 +377,74 @@ Result:
 
 ![Fit text custom HTML result](./examples/use-cases/fit-text-card.png)
 
+### Fit Text Edge Cases
+
+Attribute-based fitting can set a minimum font size and overflow behavior:
+
+```html
+<h1
+  data-clickclick-fit
+  data-clickclick-min-font-size="28"
+  data-clickclick-on-overflow="warn"
+>
+  A launch title that may be much longer than expected
+</h1>
+```
+
+Programmatic fitting is useful when you cannot edit the source HTML:
+
+```ts
+import { renderImage } from "@maurogoncalo/clickclick";
+
+const result = await renderImage({
+  document: {
+    html: '<main><h1 class="headline">A launch title that may be much longer than expected</h1></main>',
+    css: "main{width:1200px;height:630px}.headline{width:760px;max-height:220px;font-size:96px;overflow:hidden}",
+  },
+  fitText: [
+    {
+      selector: ".headline",
+      minFontSize: 28,
+      maxFontSize: 96,
+      onOverflow: "warn",
+    },
+  ],
+});
+
+for (const warning of result.warnings) {
+  if (warning.code === "TEXT_FIT_OVERFLOW") {
+    console.warn(`${warning.selector} overflowed at ${warning.minFontSize}px`);
+  }
+}
+```
+
+Deliberately long copy can produce a structured warning:
+
+```ts
+const result = await renderImage({
+  document: {
+    html: '<main><h1 class="headline">This headline is intentionally far too long for the available card area and should warn</h1></main>',
+    css: "main{width:420px;height:180px}.headline{width:360px;max-height:80px;font-size:72px;overflow:hidden}",
+  },
+  fitText: [{ selector: ".headline", minFontSize: 32, onOverflow: "warn" }],
+});
+
+console.log(result.warnings.map((warning) => warning.code));
+```
+
+The CLI `--strict` flag turns renderer warnings into a non-zero exit:
+
+```bash
+clickclick render examples/use-cases/fit-text-card.html \
+  --css examples/use-cases/fit-text-card.css \
+  --out examples/use-cases/fit-text-card.png \
+  --strict
+```
+
+Text fitting changes only font size. It does not rewrite text, change the box size, adjust
+line-height, or remove transforms; size the containing element for the longest copy you intend to
+support.
+
 ### Modify Template Layers from JSON
 
 Use local templates when you want a reusable art direction with data-driven layer changes. Layers are
