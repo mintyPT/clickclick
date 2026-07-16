@@ -673,16 +673,19 @@ CI runs on pushes to `main` and on pull requests across Node 20, 22, and 24. Eac
 dependencies, installs Playwright Chromium, typechecks, builds, runs tests, and verifies the npm
 package contents with `npm pack --dry-run`.
 
-Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow when a GitHub release is
-published or when the workflow is manually dispatched. The workflow uses npm trusted publishing with
-GitHub Actions OIDC, so npm must be configured with a trusted publisher for:
+Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow after the `CI` workflow
+finishes successfully on `main`. The publish workflow checks out the exact commit that passed CI,
+builds the package, verifies the npm package contents, skips publishing if that package version is
+already on npm, and publishes new versions with provenance. It can also be manually dispatched. The
+workflow uses npm trusted publishing with GitHub Actions OIDC, so npm must be configured with a
+trusted publisher for:
 
 - Package: `@maurogoncalo/clickclick`
 - Repository: `mintyPT/clickclick`
 - Workflow filename: `publish.yml`
 - Allowed action: `npm publish`
 
-The publish job runs the same checks as CI and then publishes with provenance:
+The publish job publishes with provenance:
 
 ```bash
 npm publish --access public --provenance
