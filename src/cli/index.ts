@@ -24,6 +24,7 @@ program
   .option("--height <px>", "Viewport height", parseInteger)
   .option("--format <format>", "Output format: png or jpeg")
   .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--omit-background", "Allow transparent PNG backgrounds")
   .option("--selector <selector>", "Screenshot a specific element")
   .option("--wait-until <event>", "Playwright wait event")
   .option("--delay <ms>", "Delay before screenshot", parseInteger)

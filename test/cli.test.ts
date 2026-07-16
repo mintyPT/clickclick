@@ -54,6 +54,17 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("renders transparent PNG output", async () => {
+    const htmlPath = join(tempDir, "transparent.html");
+    const out = join(tempDir, "transparent.png");
+
+    await writeFile(htmlPath, "<main>Transparent</main><style>html,body{margin:0;background:transparent}main{width:32px;height:32px;background:rgba(255,0,0,.5)}</style>");
+
+    await runCli(["render", htmlPath, "--out", out, "--width", "64", "--height", "64", "--omit-background"]);
+
+    await expect(readFile(out)).resolves.toHaveProperty("length");
+  });
+
   it("renders a template with layer modifications", async () => {
     const htmlPath = join(tempDir, "template.html");
     const out = join(tempDir, "template.png");

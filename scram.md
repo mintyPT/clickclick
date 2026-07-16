@@ -956,7 +956,7 @@ Ensure generated images are stable dimensions, nonblank, and reasonably compress
 ---
 
 ## CC-025 · Add README examples for advanced output modes
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: []
 tags: [area.docs, examples, output, readme-examples-coverage]
 
@@ -992,6 +992,10 @@ Use local HTML/data URLs for deterministic examples where possible. If a live UR
 
 ### History
 - created · 2026-07-16T14:55:26Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:21:58Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:29:03Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:29:04Z · mauro.goncalo@gmail.com
+  Added advanced output mode README examples, JPEG/selector/transparent fixtures and outputs, exposed render --omit-background, and added CLI coverage. npm run build, npm run check, and npm test passed.
 
 ---
 

@@ -96,8 +96,127 @@ clickclick preset list
 ```
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
-`--wait-until`, `--delay`, and `--strict`. URL screenshots also support `--full-page`,
-`--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+`--wait-until`, `--delay`, `--omit-background`, and `--strict`. URL screenshots also support
+`--full-page`, `--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+
+## Advanced Output Modes
+
+Use JPEG when you need smaller opaque images:
+
+```bash
+clickclick render examples/card.html \
+  --css examples/card.css \
+  --out examples/use-cases/jpeg-quality.jpg \
+  --width 1200 \
+  --height 630 \
+  --format jpeg \
+  --quality 82
+```
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  document: {
+    html: await readFile("examples/card.html", "utf8"),
+    css: await readFile("examples/card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/jpeg-quality.jpg", format: "jpeg", quality: 82 },
+});
+```
+
+![JPEG quality output](./examples/use-cases/jpeg-quality.jpg)
+
+Use selector capture when the page contains a larger layout but the image should include only one
+element:
+
+```bash
+clickclick render examples/card.html \
+  --css examples/card.css \
+  --selector main \
+  --out examples/use-cases/selector-card.png \
+  --width 1200 \
+  --height 630
+```
+
+```ts
+await renderImage({
+  document: {
+    html: await readFile("examples/card.html", "utf8"),
+    css: await readFile("examples/card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  render: { selector: "main" },
+  output: { path: "examples/use-cases/selector-card.png" },
+});
+```
+
+![Selector output](./examples/use-cases/selector-card.png)
+
+Use transparent PNG output when the document background should stay transparent:
+
+```bash
+clickclick render examples/use-cases/transparent-card.html \
+  --css examples/use-cases/transparent-card.css \
+  --out examples/use-cases/transparent-card.png \
+  --width 1200 \
+  --height 630 \
+  --omit-background
+```
+
+```ts
+await renderImage({
+  document: {
+    html: await readFile("examples/use-cases/transparent-card.html", "utf8"),
+    css: await readFile("examples/use-cases/transparent-card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/transparent-card.png", omitBackground: true },
+});
+```
+
+![Transparent PNG output](./examples/use-cases/transparent-card.png)
+
+URL screenshots support selector-only capture, full-page capture, wait events, render delays, and
+locale:
+
+```bash
+clickclick screenshot-url https://www.anthropic.com/ \
+  --selector main \
+  --out examples/use-cases/anthropic-home.png \
+  --width 1200 \
+  --height 630 \
+  --wait-until networkidle \
+  --delay 1000 \
+  --locale en-US
+
+clickclick screenshot-url https://www.anthropic.com/ \
+  --full-page \
+  --out examples/use-cases/anthropic-home.png \
+  --width 1200 \
+  --height 630
+```
+
+```ts
+import { screenshotUrl } from "@maurogoncalo/clickclick";
+
+await screenshotUrl({
+  url: "https://www.anthropic.com/",
+  viewport: { width: 1200, height: 630 },
+  render: { selector: "main", waitUntil: "networkidle", delayMs: 1000 },
+  output: { path: "examples/use-cases/anthropic-home.png" },
+  locale: "en-US",
+});
+
+await screenshotUrl({
+  url: "https://www.anthropic.com/",
+  viewport: { width: 1200, height: 630 },
+  render: { fullPage: true },
+  output: { path: "examples/use-cases/anthropic-home.png" },
+});
+```
 
 ## Use Case Gallery
 
