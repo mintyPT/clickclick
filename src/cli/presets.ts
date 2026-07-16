@@ -37,268 +37,209 @@ export function registerPresetCommands(parent: Command, dependencies: PresetCliD
   registerRichMediaPresetCommands(parent, dependencies);
 }
 
+function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
+  return [
+    {
+      command: "announcement",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--badge <text>", description: "Badge text" },
+        { flags: "--meta <text>", description: "Meta text" },
+        { flags: "--cta <text>", description: "Call-to-action text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--muted-color <color>", description: "Muted text color" },
+      ],
+      render: (options) => presets.announcement({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        badge: optionalString(options.badge),
+        meta: optionalString(options.meta),
+        cta: optionalString(options.cta),
+        backgroundColor: optionalString(options.background),
+        textColor: optionalString(options.textColor),
+        accentColor: optionalString(options.accent),
+        mutedColor: optionalString(options.mutedColor),
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "checkerboard",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--label <text>", description: "Small label text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--checker-color <color>", description: "Checker pattern color" },
+      ],
+      render: (options) => presets.checkerboard({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        label: optionalString(options.label),
+        backgroundColor: optionalString(options.background),
+        checkerColor: optionalString(options.checkerColor),
+        textColor: optionalString(options.textColor),
+        accentColor: optionalString(options.accent),
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "compare",
+      options: [
+        { flags: "--before-title <text>", description: "Before column title", required: true },
+        { flags: "--after-title <text>", description: "After column title", required: true },
+        { flags: "--title <text>", description: "Main title text" },
+        { flags: "--before-text <text>", description: "Before column body text" },
+        { flags: "--after-text <text>", description: "After column body text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--before-color <color>", description: "Before panel color" },
+        { flags: "--after-color <color>", description: "After panel color" },
+      ],
+      render: (options) => presets.compare({
+        title: optionalString(options.title),
+        beforeTitle: requiredString(options.beforeTitle, "before-title"),
+        beforeText: optionalString(options.beforeText),
+        afterTitle: requiredString(options.afterTitle, "after-title"),
+        afterText: optionalString(options.afterText),
+        backgroundColor: optionalString(options.background),
+        beforeColor: optionalString(options.beforeColor),
+        afterColor: optionalString(options.afterColor),
+        textColor: optionalString(options.textColor),
+        accentColor: optionalString(options.accent),
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "quote",
+      options: [
+        { flags: "--quote <text>", description: "Quote text", required: true },
+        { flags: "--attribution <text>", description: "Quote attribution" },
+        { flags: "--source <text>", description: "Quote source" },
+        { flags: "--mark <text>", description: "Decorative quote mark" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--align <align>", description: "Text alignment: left or center" },
+      ],
+      render: (options) => presets.quote({
+        quote: requiredString(options.quote, "quote"),
+        attribution: optionalString(options.attribution),
+        source: optionalString(options.source),
+        mark: optionalString(options.mark),
+        backgroundColor: optionalString(options.background),
+        textColor: optionalString(options.textColor),
+        accentColor: optionalString(options.accent),
+        align: parseAlignment(options.align),
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "split",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--label <text>", description: "Small label text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--panel-color <color>", description: "Panel color" },
+        { flags: "--panel-side <side>", description: "Panel side: left or right" },
+      ],
+      render: (options) => presets.split({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        label: optionalString(options.label),
+        backgroundColor: optionalString(options.background),
+        panelColor: optionalString(options.panelColor),
+        accentColor: optionalString(options.accent),
+        textColor: optionalString(options.textColor),
+        panelSide: optionalString(options.panelSide) as "left" | "right" | undefined,
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "terminal",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--command <text>", description: "Command text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--prompt <text>", description: "Prompt text" },
+        { flags: "--output-text <text>", description: "Terminal output text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--terminal-color <color>", description: "Terminal panel color" },
+        { flags: "--command-color <color>", description: "Command text color" },
+        { flags: "--mono-font-family <value>", description: "CSS monospace font-family value" },
+      ],
+      render: (options) => presets.terminal({
+        title: requiredString(options.title, "title"),
+        command: requiredString(options.command, "command"),
+        subtitle: optionalString(options.subtitle),
+        prompt: optionalString(options.prompt),
+        output: optionalString(options.outputText),
+        backgroundColor: optionalString(options.background),
+        terminalColor: optionalString(options.terminalColor),
+        textColor: optionalString(options.textColor),
+        commandColor: optionalString(options.commandColor),
+        accentColor: optionalString(options.accent),
+        fontFamily: optionalString(options.fontFamily),
+        monoFontFamily: optionalString(options.monoFontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+    {
+      command: "minimal",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--meta <text>", description: "Meta text" },
+        ...baseLegacyPresetOptions(),
+        { flags: "--muted-color <color>", description: "Muted text color" },
+        { flags: "--align <align>", description: "Text alignment: left or center" },
+      ],
+      render: (options) => presets.minimal({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        meta: optionalString(options.meta),
+        backgroundColor: optionalString(options.background),
+        textColor: optionalString(options.textColor),
+        accentColor: optionalString(options.accent),
+        mutedColor: optionalString(options.mutedColor),
+        align: parseAlignment(options.align),
+        fontFamily: optionalString(options.fontFamily),
+        width: optionalNumber(options.width),
+        height: optionalNumber(options.height),
+      }),
+    },
+  ];
+}
+
 function registerLegacyPresetCommands(parent: Command, dependencies: PresetCliDependencies) {
-  parent
-    .command("announcement")
-    .requiredOption("--title <text>", "Title text")
-    .option("--subtitle <text>", "Subtitle text")
-    .option("--badge <text>", "Badge text")
-    .option("--meta <text>", "Meta text")
-    .option("--cta <text>", "Call-to-action text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--text-color <color>", "Text color")
-    .option("--accent <color>", "Accent color")
-    .option("--muted-color <color>", "Muted text color")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
+  for (const definition of legacyPresetCommandDefinitions()) {
+    let command = addCommandOptions(parent.command(definition.command), definition.options);
+    command = addPresetRenderOptions(command, dependencies);
+    command.action(async (options) => {
       await dependencies.runRender({
-        ...presets.announcement({
-          title: options.title,
-          subtitle: options.subtitle,
-          badge: options.badge,
-          meta: options.meta,
-          cta: options.cta,
-          backgroundColor: options.background,
-          textColor: options.textColor,
-          accentColor: options.accent,
-          mutedColor: options.mutedColor,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
+        ...definition.render(options),
         output: dependencies.parseOutputOptions(options),
       }, Boolean(options.strict));
     });
+  }
+}
 
-  parent
-    .command("checkerboard")
-    .requiredOption("--title <text>", "Title text")
-    .option("--subtitle <text>", "Subtitle text")
-    .option("--label <text>", "Small label text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--checker-color <color>", "Checker pattern color")
-    .option("--text-color <color>", "Text color")
-    .option("--accent <color>", "Accent color")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.checkerboard({
-          title: options.title,
-          subtitle: options.subtitle,
-          label: options.label,
-          backgroundColor: options.background,
-          checkerColor: options.checkerColor,
-          textColor: options.textColor,
-          accentColor: options.accent,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
-
-  parent
-    .command("compare")
-    .requiredOption("--before-title <text>", "Before column title")
-    .requiredOption("--after-title <text>", "After column title")
-    .option("--title <text>", "Main title text")
-    .option("--before-text <text>", "Before column body text")
-    .option("--after-text <text>", "After column body text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--before-color <color>", "Before panel color")
-    .option("--after-color <color>", "After panel color")
-    .option("--text-color <color>", "Text color")
-    .option("--accent <color>", "Accent color")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.compare({
-          title: options.title,
-          beforeTitle: options.beforeTitle,
-          beforeText: options.beforeText,
-          afterTitle: options.afterTitle,
-          afterText: options.afterText,
-          backgroundColor: options.background,
-          beforeColor: options.beforeColor,
-          afterColor: options.afterColor,
-          textColor: options.textColor,
-          accentColor: options.accent,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
-
-  parent
-    .command("quote")
-    .requiredOption("--quote <text>", "Quote text")
-    .option("--attribution <text>", "Quote attribution")
-    .option("--source <text>", "Quote source")
-    .option("--mark <text>", "Decorative quote mark")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--text-color <color>", "Text color")
-    .option("--accent <color>", "Accent color")
-    .option("--align <align>", "Text alignment: left or center")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.quote({
-          quote: options.quote,
-          attribution: options.attribution,
-          source: options.source,
-          mark: options.mark,
-          backgroundColor: options.background,
-          textColor: options.textColor,
-          accentColor: options.accent,
-          align: options.align,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
-
-  parent
-    .command("split")
-    .requiredOption("--title <text>", "Title text")
-    .option("--subtitle <text>", "Subtitle text")
-    .option("--label <text>", "Small label text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--panel-color <color>", "Panel color")
-    .option("--accent <color>", "Accent color")
-    .option("--text-color <color>", "Text color")
-    .option("--panel-side <side>", "Panel side: left or right")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.split({
-          title: options.title,
-          subtitle: options.subtitle,
-          label: options.label,
-          backgroundColor: options.background,
-          panelColor: options.panelColor,
-          accentColor: options.accent,
-          textColor: options.textColor,
-          panelSide: options.panelSide,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
-
-  parent
-    .command("terminal")
-    .requiredOption("--title <text>", "Title text")
-    .requiredOption("--command <text>", "Command text")
-    .option("--subtitle <text>", "Subtitle text")
-    .option("--prompt <text>", "Prompt text")
-    .option("--output-text <text>", "Terminal output text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--terminal-color <color>", "Terminal panel color")
-    .option("--text-color <color>", "Text color")
-    .option("--command-color <color>", "Command text color")
-    .option("--accent <color>", "Accent color")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--mono-font-family <value>", "CSS monospace font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.terminal({
-          title: options.title,
-          command: options.command,
-          subtitle: options.subtitle,
-          prompt: options.prompt,
-          output: options.outputText,
-          backgroundColor: options.background,
-          terminalColor: options.terminalColor,
-          textColor: options.textColor,
-          commandColor: options.commandColor,
-          accentColor: options.accent,
-          fontFamily: options.fontFamily,
-          monoFontFamily: options.monoFontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
-
-  parent
-    .command("minimal")
-    .requiredOption("--title <text>", "Title text")
-    .option("--subtitle <text>", "Subtitle text")
-    .option("--meta <text>", "Meta text")
-    .option("--background, --background-color <color>", "Background color")
-    .option("--text-color <color>", "Text color")
-    .option("--accent <color>", "Accent color")
-    .option("--muted-color <color>", "Muted text color")
-    .option("--align <align>", "Text alignment: left or center")
-    .option("--font-family <value>", "CSS font-family value")
-    .option("--width <px>", "Image width", dependencies.parseInteger)
-    .option("--height <px>", "Image height", dependencies.parseInteger)
-    .option("--out, --output <file>", "Output image path")
-    .option("--format <format>", "Output format: png or jpeg")
-    .option("--quality <number>", "JPEG quality from 0 to 100", dependencies.parseInteger)
-    .option("--strict", "Exit non-zero when renderer warnings are produced")
-    .action(async (options) => {
-      await dependencies.runRender({
-        ...presets.minimal({
-          title: options.title,
-          subtitle: options.subtitle,
-          meta: options.meta,
-          backgroundColor: options.background,
-          textColor: options.textColor,
-          accentColor: options.accent,
-          mutedColor: options.mutedColor,
-          align: options.align,
-          fontFamily: options.fontFamily,
-          width: options.width,
-          height: options.height,
-        }),
-        output: dependencies.parseOutputOptions(options),
-      }, Boolean(options.strict));
-    });
+function baseLegacyPresetOptions(): PresetCommandOption[] {
+  return [
+    { flags: "--background, --background-color <color>", description: "Background color" },
+    { flags: "--text-color <color>", description: "Text color" },
+    { flags: "--accent <color>", description: "Accent color" },
+    { flags: "--font-family <value>", description: "CSS font-family value" },
+  ];
 }
 
 function brandPresetCommandDefinitions(): PresetCommandDefinition[] {
