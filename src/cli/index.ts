@@ -413,175 +413,7 @@ preset
     }, Boolean(options.strict));
   });
 
-preset
-  .command("photo-hero")
-  .requiredOption("--title <text>", "Title text")
-  .option("--subtitle <text>", "Subtitle text")
-  .option("--label <text>", "Small label text")
-  .option("--image <src>", "Background image URL, path, or data URI")
-  .option("--overlay <color>", "Background overlay CSS color or gradient")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--text-color <color>", "Text color")
-  .option("--accent <color>", "Accent color")
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.photoHero({
-        title: options.title,
-        subtitle: options.subtitle,
-        label: options.label,
-        image: options.image,
-        overlay: options.overlay,
-        logo: parseLogoOption(options),
-        watermark: parseWatermarkOption(options),
-        textColor: options.textColor,
-        accentColor: options.accent,
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
-
-preset
-  .command("editorial-feature")
-  .requiredOption("--title <text>", "Title text")
-  .option("--kicker <text>", "Kicker text")
-  .option("--byline <text>", "Byline or metadata text")
-  .option("--image <src>", "Feature image URL, path, or data URI")
-  .option("--image-position <position>", "Feature image CSS position")
-  .option("--overlay <color>", "Background color")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--text-color <color>", "Text color")
-  .option("--accent <color>", "Accent color")
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.editorialFeature({
-        title: options.title,
-        kicker: options.kicker,
-        byline: options.byline,
-        image: options.image,
-        imagePosition: options.imagePosition,
-        overlay: options.overlay,
-        logo: parseLogoOption(options),
-        watermark: parseWatermarkOption(options),
-        textColor: options.textColor,
-        accentColor: options.accent,
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
-
-preset
-  .command("event-poster")
-  .requiredOption("--title <text>", "Title text")
-  .option("--date <text>", "Date text")
-  .option("--meta <text>", "Meta text")
-  .option("--cta <text>", "Call-to-action text")
-  .option("--image <src>", "Background image URL, path, or data URI")
-  .option("--overlay <color>", "Background overlay CSS color or gradient")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--text-color <color>", "Text color")
-  .option("--accent <color>", "Accent color")
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.eventPoster({
-        title: options.title,
-        date: options.date,
-        meta: options.meta,
-        cta: options.cta,
-        image: options.image,
-        overlay: options.overlay,
-        logo: parseLogoOption(options),
-        watermark: parseWatermarkOption(options),
-        textColor: options.textColor,
-        accentColor: options.accent,
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
-
-preset
-  .command("case-study")
-  .requiredOption("--title <text>", "Title text")
-  .option("--customer <text>", "Customer or brand text")
-  .option("--quote <text>", "Quote text")
-  .option("--metric <text>", "Result metric text")
-  .option("--image <src>", "Background image URL, path, or data URI")
-  .option("--overlay <color>", "Background overlay CSS color or gradient")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--text-color <color>", "Text color")
-  .option("--accent <color>", "Accent color")
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.caseStudy({
-        title: options.title,
-        customer: options.customer,
-        quote: options.quote,
-        metric: options.metric,
-        image: options.image,
-        overlay: options.overlay,
-        logo: parseLogoOption(options),
-        watermark: parseWatermarkOption(options),
-        textColor: options.textColor,
-        accentColor: options.accent,
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
+registerPhotoPresetCommands(preset);
 
 preset
   .command("solid")
@@ -780,13 +612,13 @@ interface PresetCommandOption {
   required?: boolean;
 }
 
-interface BrandPresetCommandDefinition {
+interface PresetCommandDefinition {
   command: string;
   options: PresetCommandOption[];
   render: (options: Record<string, unknown>) => RenderImageInput;
 }
 
-function brandPresetCommandDefinitions(): BrandPresetCommandDefinition[] {
+function brandPresetCommandDefinitions(): PresetCommandDefinition[] {
   return [
     {
       command: "brand-announcement",
@@ -863,12 +695,76 @@ function brandPresetCommandDefinitions(): BrandPresetCommandDefinition[] {
   ];
 }
 
+function photoPresetCommandDefinitions(): PresetCommandDefinition[] {
+  return [
+    {
+      command: "photo-hero",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--label <text>", description: "Small label text" },
+      ],
+      render: (options) => presets.photoHero({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        label: optionalString(options.label),
+        ...photoMediaOptions(options),
+      }),
+    },
+    {
+      command: "editorial-feature",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--kicker <text>", description: "Kicker text" },
+        { flags: "--byline <text>", description: "Byline or metadata text" },
+        { flags: "--image-position <position>", description: "Feature image CSS position" },
+      ],
+      render: (options) => presets.editorialFeature({
+        title: requiredString(options.title, "title"),
+        kicker: optionalString(options.kicker),
+        byline: optionalString(options.byline),
+        imagePosition: optionalString(options.imagePosition),
+        ...photoMediaOptions(options),
+      }),
+    },
+    {
+      command: "event-poster",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--date <text>", description: "Date text" },
+        { flags: "--meta <text>", description: "Meta text" },
+        { flags: "--cta <text>", description: "Call-to-action text" },
+      ],
+      render: (options) => presets.eventPoster({
+        title: requiredString(options.title, "title"),
+        date: optionalString(options.date),
+        meta: optionalString(options.meta),
+        cta: optionalString(options.cta),
+        ...photoMediaOptions(options),
+      }),
+    },
+    {
+      command: "case-study",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--customer <text>", description: "Customer or brand text" },
+        { flags: "--quote <text>", description: "Quote text" },
+        { flags: "--metric <text>", description: "Result metric text" },
+      ],
+      render: (options) => presets.caseStudy({
+        title: requiredString(options.title, "title"),
+        customer: optionalString(options.customer),
+        quote: optionalString(options.quote),
+        metric: optionalString(options.metric),
+        ...photoMediaOptions(options),
+      }),
+    },
+  ];
+}
+
 function registerBrandPresetCommands(parent: Command) {
   for (const definition of brandPresetCommandDefinitions()) {
-    let command = parent.command(definition.command);
-    for (const option of definition.options) {
-      command = addCommandOption(command, option);
-    }
+    let command = addCommandOptions(parent.command(definition.command), definition.options);
     command = addLogoWatermarkOptions(command);
     command = addPresetColorOptions(command);
     command = addPresetRenderOptions(command);
@@ -879,6 +775,30 @@ function registerBrandPresetCommands(parent: Command) {
       }, Boolean(options.strict));
     });
   }
+}
+
+function registerPhotoPresetCommands(parent: Command) {
+  for (const definition of photoPresetCommandDefinitions()) {
+    let command = addCommandOptions(parent.command(definition.command), definition.options);
+    command = addPhotoMediaOptions(command);
+    command = addLogoWatermarkOptions(command);
+    command = addPhotoStyleOptions(command);
+    command = addPresetRenderOptions(command);
+    command.action(async (options) => {
+      await runRender({
+        ...definition.render(options),
+        output: parseOutputOptions(options),
+      }, Boolean(options.strict));
+    });
+  }
+}
+
+function addCommandOptions(command: Command, options: PresetCommandOption[]): Command {
+  let next = command;
+  for (const option of options) {
+    next = addCommandOption(next, option);
+  }
+  return next;
 }
 
 function addCommandOption(command: Command, option: PresetCommandOption): Command {
@@ -909,6 +829,19 @@ function addPresetColorOptions(command: Command): Command {
     .option("--font-family <value>", "CSS font-family value");
 }
 
+function addPhotoMediaOptions(command: Command): Command {
+  return command
+    .option("--image <src>", "Image URL, path, or data URI")
+    .option("--overlay <color>", "Background overlay CSS color or gradient");
+}
+
+function addPhotoStyleOptions(command: Command): Command {
+  return command
+    .option("--text-color <color>", "Text color")
+    .option("--accent <color>", "Accent color")
+    .option("--font-family <value>", "CSS font-family value");
+}
+
 function addPresetRenderOptions(command: Command): Command {
   return command
     .option("--width <px>", "Image width", parseInteger)
@@ -924,6 +857,20 @@ function brandMediaOptions(options: Record<string, unknown>) {
     logo: parseLogoOption(options),
     watermark: parseWatermarkOption(options),
     backgroundColor: optionalString(options.background),
+    textColor: optionalString(options.textColor),
+    accentColor: optionalString(options.accent),
+    fontFamily: optionalString(options.fontFamily),
+    width: optionalNumber(options.width),
+    height: optionalNumber(options.height),
+  };
+}
+
+function photoMediaOptions(options: Record<string, unknown>) {
+  return {
+    image: optionalString(options.image),
+    overlay: optionalString(options.overlay),
+    logo: parseLogoOption(options),
+    watermark: parseWatermarkOption(options),
     textColor: optionalString(options.textColor),
     accentColor: optionalString(options.accent),
     fontFamily: optionalString(options.fontFamily),
