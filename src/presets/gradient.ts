@@ -1,6 +1,6 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml, renderPresetMedia } from "./utils.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "./layout.js";
+import { renderPresetMedia } from "./utils.js";
 import type { PresetMediaOptions } from "./utils.js";
 
 export interface GradientPresetOptions extends PresetMediaOptions {
@@ -18,44 +18,31 @@ export interface GradientPresetOptions extends PresetMediaOptions {
 }
 
 export function gradient(options: GradientPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
+  const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeLabel = options.label ? escapeHtml(options.label) : "";
   const accentColor = options.accentColor ?? "rgba(255,255,255,0.28)";
   const media = renderPresetMedia(options, width, height);
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
+  return renderPresetDocument({
+    size: { width, height },
+    fontFamily: options.fontFamily,
+    textColor: options.textColor,
+    bodyCss: `
+  background:
+    radial-gradient(circle at 82% 18%, ${accentColor}, transparent 28%),
+    linear-gradient(135deg, ${options.fromColor ?? "#0f766e"} 0%, ${options.toColor ?? "#7c3aed"} 100%);
+`,
+    html: `
     <main class="${align}">
       ${media.html}
       <div class="accent"></div>
       <section>
-        ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
-        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
+        ${textLayer(options.label, { className: "label" })}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 34 })}
+        ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 22 })}
       </section>
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
-  color: ${options.textColor ?? "#ffffff"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-  background:
-    radial-gradient(circle at 82% 18%, ${accentColor}, transparent 28%),
-    linear-gradient(135deg, ${options.fromColor ?? "#0f766e"} 0%, ${options.toColor ?? "#7c3aed"} 100%);
-}
+    </main>`,
+    css: `
 main {
   position: relative;
   overflow: hidden;
@@ -94,7 +81,5 @@ h1 { max-height: ${Math.round(height * 0.48)}px; font-size: ${Math.round(width *
 p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.035)}px; line-height: 1.2; opacity: 0.88; }
 ${media.css}
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

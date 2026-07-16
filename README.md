@@ -828,6 +828,7 @@ clickclick preset brand-announcement \
   --title "New partner program" \
   --subtitle "Reusable branded cards with logo marks." \
   --cta "Apply today" \
+  --logo examples/presets/clickclick-logo.svg \
   --out examples/presets/brand-announcement.png
 ```
 
@@ -841,10 +842,14 @@ await renderImage({
     title: "New partner program",
     subtitle: "Reusable branded cards with logo marks.",
     cta: "Apply today",
+    logo: { src: "examples/presets/clickclick-logo.svg", placement: "top-right" },
   }),
   output: { path: "examples/presets/brand-announcement.png" },
 });
 ```
+
+Image options accept `https:`, `data:`, `file:`, absolute paths, and paths relative to the current
+working directory. Local paths are converted to `file://` URLs before Chromium renders the image.
 
 Result:
 

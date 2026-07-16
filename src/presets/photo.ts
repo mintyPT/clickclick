@@ -1,6 +1,6 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml, renderPresetMedia } from "./utils.js";
+import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "./layout.js";
+import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 
 const defaultPhoto =
@@ -43,7 +43,7 @@ export interface CaseStudyPresetOptions extends PhotoBaseOptions {
 }
 
 export function photoHero(options: PhotoHeroPresetOptions): RenderImageInput {
-  const size = resolveSize(options);
+  const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(90deg, rgba(3,7,18,.78), rgba(3,7,18,.24))" },
     logo: options.logo,
@@ -53,9 +53,9 @@ export function photoHero(options: PhotoHeroPresetOptions): RenderImageInput {
     <main class="photo photo-hero">
       ${media.html}
       <section class="content">
-        ${options.label ? `<div class="eyebrow">${escapeHtml(options.label)}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="34">${escapeHtml(options.title)}</h1>
-        ${options.subtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${escapeHtml(options.subtitle)}</p>` : ""}
+        ${textLayer(options.label, { className: "eyebrow" })}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 34 })}
+        ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 22 })}
       </section>
     </main>`, `
 .photo-hero .content { width: 68%; justify-content: center; }
@@ -63,28 +63,27 @@ ${media.css}`);
 }
 
 export function editorialFeature(options: EditorialFeaturePresetOptions): RenderImageInput {
-  const size = resolveSize(options);
-  const image = escapeHtml(options.image ?? defaultPhoto);
+  const size = resolvePresetSize(options);
   const media = renderPresetMedia({ watermark: options.watermark, logo: options.logo }, size.width, size.height);
   return presetDocument(size, options, `
     <main class="photo editorial">
       ${media.html}
       <section class="copy">
-        ${options.kicker ? `<div class="eyebrow">${escapeHtml(options.kicker)}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${escapeHtml(options.title)}</h1>
-        ${options.byline ? `<p>${escapeHtml(options.byline)}</p>` : ""}
+        ${textLayer(options.kicker, { className: "eyebrow" })}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 32 })}
+        ${textLayer(options.byline, { tag: "p" })}
       </section>
-      <aside class="image" aria-hidden="true"></aside>
+      ${imageLayer(options.image ?? defaultPhoto, { className: "image", ariaHidden: true })}
     </main>`, `
 .editorial { background: ${options.overlay ?? "#f8fafc"}; color: ${options.textColor ?? "#111827"}; }
 .editorial .copy { position: relative; z-index: 2; width: 55%; padding: ${Math.round(size.height * 0.1)}px ${Math.round(size.width * 0.07)}px; display: flex; flex-direction: column; justify-content: flex-end; gap: ${Math.round(size.height * 0.035)}px; }
-.editorial .image { position: absolute; right: ${Math.round(size.width * 0.06)}px; top: ${Math.round(size.height * 0.08)}px; width: 38%; height: 78%; background: url("${image}") ${options.imagePosition ?? "center"} / cover no-repeat; box-shadow: 0 30px 90px rgba(15,23,42,.24); }
+.editorial .image { position: absolute; right: ${Math.round(size.width * 0.06)}px; top: ${Math.round(size.height * 0.08)}px; width: 38%; height: 78%; object-fit: cover; object-position: ${options.imagePosition ?? "center"}; box-shadow: 0 30px 90px rgba(15,23,42,.24); }
 .editorial p { color: ${options.accentColor ?? "#475569"}; }
 ${media.css}`);
 }
 
 export function eventPoster(options: EventPosterPresetOptions): RenderImageInput {
-  const size = resolveSize(options);
+  const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(180deg, rgba(2,6,23,.18), rgba(2,6,23,.88))" },
     logo: options.logo,
@@ -94,12 +93,12 @@ export function eventPoster(options: EventPosterPresetOptions): RenderImageInput
     <main class="photo event">
       ${media.html}
       <section class="event-meta">
-        ${options.date ? `<strong>${escapeHtml(options.date)}</strong>` : ""}
-        ${options.meta ? `<span>${escapeHtml(options.meta)}</span>` : ""}
+        ${textLayer(options.date, { tag: "strong" })}
+        ${textLayer(options.meta, { tag: "span" })}
       </section>
       <section class="content">
-        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${escapeHtml(options.title)}</h1>
-        ${options.cta ? `<div class="cta">${escapeHtml(options.cta)}</div>` : ""}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 32 })}
+        ${textLayer(options.cta, { className: "cta" })}
       </section>
     </main>`, `
 .event .content { justify-content: flex-end; width: 72%; }
@@ -111,7 +110,7 @@ ${media.css}`);
 }
 
 export function caseStudy(options: CaseStudyPresetOptions): RenderImageInput {
-  const size = resolveSize(options);
+  const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(90deg, rgba(15,23,42,.82), rgba(15,23,42,.52))" },
     logo: options.logo,
@@ -121,10 +120,10 @@ export function caseStudy(options: CaseStudyPresetOptions): RenderImageInput {
     <main class="photo case-study">
       ${media.html}
       <section class="content">
-        ${options.customer ? `<div class="eyebrow">${escapeHtml(options.customer)}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="30">${escapeHtml(options.title)}</h1>
-        ${options.quote ? `<blockquote>${escapeHtml(options.quote)}</blockquote>` : ""}
-        ${options.metric ? `<div class="metric">${escapeHtml(options.metric)}</div>` : ""}
+        ${textLayer(options.customer, { className: "eyebrow" })}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 30 })}
+        ${textLayer(options.quote, { tag: "blockquote" })}
+        ${textLayer(options.metric, { className: "metric" })}
       </section>
     </main>`, `
 .case-study .content { width: 62%; justify-content: center; }
@@ -133,23 +132,13 @@ blockquote { margin: 0; font-size: ${Math.round(size.width * 0.03)}px; line-heig
 ${media.css}`);
 }
 
-function resolveSize(options: { width?: number; height?: number }) {
-  return { width: options.width ?? sizes.og.width, height: options.height ?? sizes.og.height };
-}
-
 function presetDocument(size: { width: number; height: number }, options: { textColor?: string; accentColor?: string; fontFamily?: string }, html: string, extraCss: string): RenderImageInput {
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>${html}
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body { width: ${size.width}px; height: ${size.height}px; font-family: ${options.fontFamily ?? defaultSansFont}; color: ${options.textColor ?? "#fff"}; }
+  return renderPresetDocument({
+    size,
+    html,
+    fontFamily: options.fontFamily,
+    textColor: options.textColor,
+    css: `
 .photo { position: relative; overflow: hidden; width: ${size.width}px; height: ${size.height}px; background: #0f172a; }
 .content { position: relative; z-index: 2; height: 100%; padding: ${Math.round(size.height * 0.11)}px ${Math.round(size.width * 0.08)}px; display: flex; flex-direction: column; gap: ${Math.round(size.height * 0.035)}px; }
 .eyebrow { align-self: flex-start; padding: 12px 16px; background: ${options.accentColor ?? "rgba(255,255,255,.16)"}; font-size: ${Math.round(size.width * 0.018)}px; line-height: 1; font-weight: 900; text-transform: uppercase; }
@@ -158,7 +147,5 @@ h1 { max-height: ${Math.round(size.height * 0.48)}px; font-size: ${Math.round(si
 p { max-height: ${Math.round(size.height * 0.18)}px; font-size: ${Math.round(size.width * 0.032)}px; line-height: 1.22; opacity: .88; }
 ${extraCss}
 `,
-    },
-    viewport: size,
-  };
+  });
 }

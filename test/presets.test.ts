@@ -58,6 +58,16 @@ describe("solid preset", () => {
     expect(input.document.css).toContain("background-size: cover");
     expect(input.document.css).toContain("opacity: 0.7");
   });
+
+  it("serializes local media paths to file URLs", () => {
+    const input = presets.brandAnnouncement({
+      title: "Launch",
+      logo: { src: "examples/presets/clickclick-logo.svg" },
+    });
+
+    expect(input.document.html).toContain("file://");
+    expect(input.document.html).toContain("clickclick-logo.svg");
+  });
 });
 
 describe("new social presets", () => {

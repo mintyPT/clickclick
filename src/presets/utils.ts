@@ -1,3 +1,6 @@
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+
 export function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -51,13 +54,14 @@ export function renderPresetMedia(options: PresetMediaOptions | undefined, width
 
   if (options.background) {
     const background = options.background;
+    const backgroundSrc = serializeMediaSource(background.src);
     html.push('<div class="preset-media-background" aria-hidden="true"></div>');
     css.push(`
 .preset-media-background {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url("${escapeCssString(background.src)}");
+  background-image: url("${escapeCssString(backgroundSrc)}");
   background-size: ${background.fit ?? "cover"};
   background-position: ${escapeCssIdentifier(background.position ?? "center")};
   background-repeat: no-repeat;
@@ -76,6 +80,7 @@ export function renderPresetMedia(options: PresetMediaOptions | undefined, width
     const placement = watermark.placement ?? "center";
     const transform = `${placementTransform(placement)} rotate(${serializeNumber(watermark.rotation, -360, 360, 0)}deg)`;
     if (watermark.src) {
+      const watermarkSrc = serializeMediaSource(watermark.src);
       html.push('<img class="preset-media-watermark" alt="" aria-hidden="true" />');
       css.push(`
 .preset-media-watermark {
@@ -87,7 +92,7 @@ export function renderPresetMedia(options: PresetMediaOptions | undefined, width
   object-fit: contain;
   opacity: ${serializeOpacity(watermark.opacity, 0.16)};
   transform: ${transform};
-  content: url("${escapeCssString(watermark.src)}");
+  content: url("${escapeCssString(watermarkSrc)}");
 }`);
     } else if (watermark.text) {
       html.push(`<div class="preset-media-watermark-text" aria-hidden="true">${escapeHtml(watermark.text)}</div>`);
@@ -110,7 +115,7 @@ export function renderPresetMedia(options: PresetMediaOptions | undefined, width
 
   if (options.logo) {
     const logo = options.logo;
-    html.push(`<img class="preset-media-logo" src="${escapeHtml(logo.src)}" alt="${escapeHtml(logo.alt ?? "")}" />`);
+    html.push(`<img class="preset-media-logo" src="${escapeHtml(serializeMediaSource(logo.src))}" alt="${escapeHtml(logo.alt ?? "")}" />`);
     css.push(`
 .preset-media-logo {
   position: absolute;
@@ -124,6 +129,11 @@ export function renderPresetMedia(options: PresetMediaOptions | undefined, width
   }
 
   return { html: html.join("\n      "), css: css.join("\n") };
+}
+
+export function serializeMediaSource(src: string): string {
+  if (/^(?:[a-z][a-z0-9+.-]*:|#)/i.test(src)) return src;
+  return pathToFileURL(resolve(src)).href;
 }
 
 function escapeCssString(value: string): string {
