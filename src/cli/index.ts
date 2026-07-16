@@ -325,59 +325,6 @@ preset
   });
 
 preset
-  .command("gradient")
-  .requiredOption("--title <text>", "Title text")
-  .option("--subtitle <text>", "Subtitle text")
-  .option("--label <text>", "Small label text")
-  .option("--from <color>", "Gradient start color")
-  .option("--to <color>", "Gradient end color")
-  .option("--accent <color>", "Accent color")
-  .option("--text-color <color>", "Text color")
-  .option("--background-image <src>", "Background image URL, path, or data URI")
-  .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
-  .option("--background-position <position>", "Background image CSS position")
-  .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
-  .option("--overlay <color>", "Background image overlay color")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--logo-size <px>", "Logo width in pixels", parseInteger)
-  .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
-  .option("--logo-alt <text>", "Logo alt text")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-placement <placement>", "Watermark placement")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
-  .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
-  .option("--align <align>", "Text alignment: left or center")
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.gradient({
-        title: options.title,
-        subtitle: options.subtitle,
-        label: options.label,
-        fromColor: options.from,
-        toColor: options.to,
-        accentColor: options.accent,
-        textColor: options.textColor,
-        ...parsePresetMediaOptions(options),
-        align: options.align,
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
-
-preset
   .command("quote")
   .requiredOption("--quote <text>", "Quote text")
   .option("--attribution <text>", "Quote attribution")
@@ -414,57 +361,7 @@ preset
   });
 
 registerPhotoPresetCommands(preset);
-
-preset
-  .command("solid")
-  .requiredOption("--title <text>", "Title text")
-  .option("--subtitle <text>", "Subtitle text")
-  .option("--label <text>", "Small label text")
-  .option("--background, --background-color <color>", "Background color")
-  .option("--text-color <color>", "Text color")
-  .option("--accent <color>", "Accent color")
-  .option("--background-image <src>", "Background image URL, path, or data URI")
-  .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
-  .option("--background-position <position>", "Background image CSS position")
-  .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
-  .option("--overlay <color>", "Background image overlay color")
-  .option("--logo <src>", "Logo image URL, path, or data URI")
-  .option("--logo-placement <placement>", "Logo placement corner")
-  .option("--logo-size <px>", "Logo width in pixels", parseInteger)
-  .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
-  .option("--logo-alt <text>", "Logo alt text")
-  .option("--watermark <src>", "Watermark image URL, path, or data URI")
-  .option("--watermark-text <text>", "Watermark text")
-  .option("--watermark-placement <placement>", "Watermark placement")
-  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
-  .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
-  .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
-  .option("--font-family <value>", "CSS font-family value")
-  .option("--width <px>", "Image width", parseInteger)
-  .option("--height <px>", "Image height", parseInteger)
-  .option("--align <align>", "Text alignment: left or center")
-  .option("--out, --output <file>", "Output image path")
-  .option("--format <format>", "Output format: png or jpeg")
-  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
-  .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (options) => {
-    await runRender({
-      ...presets.solid({
-        title: options.title,
-        subtitle: options.subtitle,
-        label: options.label,
-        backgroundColor: options.background,
-        textColor: options.textColor,
-        accentColor: options.accent,
-        ...parsePresetMediaOptions(options),
-        fontFamily: options.fontFamily,
-        width: options.width,
-        height: options.height,
-        align: options.align,
-      }),
-      output: parseOutputOptions(options),
-    }, Boolean(options.strict));
-  });
+registerRichMediaPresetCommands(preset);
 
 preset
   .command("split")
@@ -762,6 +659,49 @@ function photoPresetCommandDefinitions(): PresetCommandDefinition[] {
   ];
 }
 
+function richMediaPresetCommandDefinitions(): PresetCommandDefinition[] {
+  return [
+    {
+      command: "gradient",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--label <text>", description: "Small label text" },
+        { flags: "--from <color>", description: "Gradient start color" },
+        { flags: "--to <color>", description: "Gradient end color" },
+        { flags: "--align <align>", description: "Text alignment: left or center" },
+      ],
+      render: (options) => presets.gradient({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        label: optionalString(options.label),
+        fromColor: optionalString(options.from),
+        toColor: optionalString(options.to),
+        align: parseAlignment(options.align),
+        ...richMediaPresetOptions(options),
+      }),
+    },
+    {
+      command: "solid",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--label <text>", description: "Small label text" },
+        { flags: "--background, --background-color <color>", description: "Background color" },
+        { flags: "--align <align>", description: "Text alignment: left or center" },
+      ],
+      render: (options) => presets.solid({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        label: optionalString(options.label),
+        backgroundColor: optionalString(options.background),
+        align: parseAlignment(options.align),
+        ...richMediaPresetOptions(options),
+      }),
+    },
+  ];
+}
+
 function registerBrandPresetCommands(parent: Command) {
   for (const definition of brandPresetCommandDefinitions()) {
     let command = addCommandOptions(parent.command(definition.command), definition.options);
@@ -783,6 +723,20 @@ function registerPhotoPresetCommands(parent: Command) {
     command = addPhotoMediaOptions(command);
     command = addLogoWatermarkOptions(command);
     command = addPhotoStyleOptions(command);
+    command = addPresetRenderOptions(command);
+    command.action(async (options) => {
+      await runRender({
+        ...definition.render(options),
+        output: parseOutputOptions(options),
+      }, Boolean(options.strict));
+    });
+  }
+}
+
+function registerRichMediaPresetCommands(parent: Command) {
+  for (const definition of richMediaPresetCommandDefinitions()) {
+    let command = addCommandOptions(parent.command(definition.command), definition.options);
+    command = addRichMediaOptions(command);
     command = addPresetRenderOptions(command);
     command.action(async (options) => {
       await runRender({
@@ -842,6 +796,29 @@ function addPhotoStyleOptions(command: Command): Command {
     .option("--font-family <value>", "CSS font-family value");
 }
 
+function addRichMediaOptions(command: Command): Command {
+  return command
+    .option("--text-color <color>", "Text color")
+    .option("--accent <color>", "Accent color")
+    .option("--background-image <src>", "Background image URL, path, or data URI")
+    .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
+    .option("--background-position <position>", "Background image CSS position")
+    .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
+    .option("--overlay <color>", "Background image overlay color")
+    .option("--logo <src>", "Logo image URL, path, or data URI")
+    .option("--logo-placement <placement>", "Logo placement corner")
+    .option("--logo-size <px>", "Logo width in pixels", parseInteger)
+    .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
+    .option("--logo-alt <text>", "Logo alt text")
+    .option("--watermark <src>", "Watermark image URL, path, or data URI")
+    .option("--watermark-text <text>", "Watermark text")
+    .option("--watermark-placement <placement>", "Watermark placement")
+    .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+    .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
+    .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
+    .option("--font-family <value>", "CSS font-family value");
+}
+
 function addPresetRenderOptions(command: Command): Command {
   return command
     .option("--width <px>", "Image width", parseInteger)
@@ -877,6 +854,23 @@ function photoMediaOptions(options: Record<string, unknown>) {
     width: optionalNumber(options.width),
     height: optionalNumber(options.height),
   };
+}
+
+function richMediaPresetOptions(options: Record<string, unknown>) {
+  return {
+    textColor: optionalString(options.textColor),
+    accentColor: optionalString(options.accent),
+    ...parsePresetMediaOptions(options),
+    fontFamily: optionalString(options.fontFamily),
+    width: optionalNumber(options.width),
+    height: optionalNumber(options.height),
+  };
+}
+
+function parseAlignment(value: unknown): "left" | "center" | undefined {
+  if (value === undefined) return undefined;
+  if (value === "left" || value === "center") return value;
+  throw new ClickClickError("INVALID_INPUT", "align must be left or center.");
 }
 
 function requiredString(value: unknown, name: string): string {
