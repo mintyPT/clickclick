@@ -26,6 +26,13 @@ npx playwright install chromium
 
 If Chromium cannot start, install the system dependencies requested by Playwright for your platform.
 
+First-run CLI check:
+
+```bash
+npx clickclick preset list
+npx clickclick preset solid --title "Hello from ClickClick" --out og.png
+```
+
 ## Library
 
 ```ts
@@ -76,6 +83,29 @@ clickclick preset list
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
 `--wait-until`, `--delay`, and `--strict`. `--out` and `--output` are aliases.
+
+## Package Release
+
+The npm package is prepared as `@maurogoncalo/clickclick` with MIT licensing, public npm access,
+provenance-enabled publishing, a `clickclick` binary, ESM library exports, and TypeScript
+declarations.
+
+Before publishing, run the local release check:
+
+```bash
+npm run release:check
+```
+
+This runs type-checking, tests, a production build, and a package dry-run verification that checks
+the built CLI, library entry points, declaration files, README, and license. To inspect npm's packed
+file list without the full check:
+
+```bash
+npm run pack:dry
+```
+
+Publishing is intentionally manual. See [`RELEASE.md`](./RELEASE.md) for the confirmation checklist
+and the GitHub Actions workflow steps. Do not publish from routine CI.
 
 ## Presets
 
