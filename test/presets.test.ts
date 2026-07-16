@@ -24,6 +24,40 @@ describe("solid preset", () => {
       description: expect.stringContaining("Solid-background"),
     });
   });
+
+  it("renders shared media layers safely", () => {
+    const input = presets.solid({
+      title: "Launch",
+      background: {
+        src: 'https://example.com/photo-"wide".jpg',
+        fit: "cover",
+        position: "center top",
+        opacity: 0.7,
+        overlay: "rgba(0,0,0,0.35)",
+      },
+      logo: {
+        src: "data:image/svg+xml,%3Csvg%3E%3C/svg%3E",
+        placement: "bottom-left",
+        size: 96,
+        alt: "<Company>",
+      },
+      watermark: {
+        text: "<Draft>",
+        placement: "center",
+        opacity: 0.18,
+        scale: 0.18,
+        rotation: -12,
+      },
+    });
+
+    expect(input.document.html).toContain("preset-media-background");
+    expect(input.document.html).toContain("preset-media-logo");
+    expect(input.document.html).toContain("&lt;Company&gt;");
+    expect(input.document.html).toContain("&lt;Draft&gt;");
+    expect(input.document.css).toContain('url("https://example.com/photo-\\"wide\\".jpg")');
+    expect(input.document.css).toContain("background-size: cover");
+    expect(input.document.css).toContain("opacity: 0.7");
+  });
 });
 
 describe("new social presets", () => {
@@ -56,6 +90,7 @@ describe("new social presets", () => {
   it("applies additional options to existing presets", () => {
     expect(presets.solid({ title: "Hello", label: "Update", fontFamily: "Arial" }).document.html).toContain("Update");
     expect(presets.gradient({ title: "Hello", label: "Update", align: "center" }).document.html).toContain("class=\"center\"");
+    expect(presets.gradient({ title: "Hello", background: { src: "photo.png", overlay: "rgba(0,0,0,.4)" } }).document.css).toContain("preset-media-background");
     expect(presets.quote({ quote: "Hello", mark: ">>", align: "center" }).document.html).toContain("&gt;&gt;");
     expect(presets.split({ title: "Hello", panelSide: "left" }).document.css).toContain("grid-template-columns: 1fr 1.45fr");
     expect(presets.terminal({ title: "Hello", command: "npm test", prompt: ">", output: "done" }).document.html).toContain("done");

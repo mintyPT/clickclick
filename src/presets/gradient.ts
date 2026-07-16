@@ -1,8 +1,9 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "./utils.js";
+import { defaultSansFont, escapeHtml, renderPresetMedia } from "./utils.js";
+import type { PresetMediaOptions } from "./utils.js";
 
-export interface GradientPresetOptions {
+export interface GradientPresetOptions extends PresetMediaOptions {
   title: string;
   subtitle?: string;
   label?: string;
@@ -24,6 +25,7 @@ export function gradient(options: GradientPresetOptions): RenderImageInput {
   const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
   const safeLabel = options.label ? escapeHtml(options.label) : "";
   const accentColor = options.accentColor ?? "rgba(255,255,255,0.28)";
+  const media = renderPresetMedia(options, width, height);
 
   return {
     document: {
@@ -32,6 +34,7 @@ export function gradient(options: GradientPresetOptions): RenderImageInput {
   <head><meta charset="utf-8" /></head>
   <body>
     <main class="${align}">
+      ${media.html}
       <div class="accent"></div>
       <section>
         ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
@@ -55,6 +58,7 @@ body {
 }
 main {
   position: relative;
+  overflow: hidden;
   width: ${width}px;
   height: ${height}px;
   padding: ${Math.round(height * 0.12)}px ${Math.round(width * 0.1)}px;
@@ -64,13 +68,14 @@ main {
 }
 .accent {
   position: absolute;
+  z-index: 2;
   top: ${Math.round(height * 0.09)}px;
   left: ${Math.round(width * 0.1)}px;
   width: ${Math.round(width * 0.18)}px;
   height: ${Math.max(10, Math.round(height * 0.018))}px;
   background: ${accentColor};
 }
-section { width: 100%; display: flex; flex-direction: column; align-items: ${align === "center" ? "center" : "flex-start"}; gap: ${Math.round(height * 0.04)}px; }
+section { position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: ${align === "center" ? "center" : "flex-start"}; gap: ${Math.round(height * 0.04)}px; }
 .label {
   max-width: 100%;
   overflow: hidden;
@@ -87,6 +92,7 @@ section { width: 100%; display: flex; flex-direction: column; align-items: ${ali
 h1, p { margin: 0; max-width: 100%; overflow: hidden; }
 h1 { max-height: ${Math.round(height * 0.48)}px; font-size: ${Math.round(width * 0.078)}px; line-height: 1.02; font-weight: 850; }
 p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.035)}px; line-height: 1.2; opacity: 0.88; }
+${media.css}
 `,
     },
     viewport: { width, height },

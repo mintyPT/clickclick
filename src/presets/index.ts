@@ -16,6 +16,7 @@ export type { QuotePresetOptions } from "./quote.js";
 export type { SolidPresetOptions } from "./solid.js";
 export type { SplitPresetOptions } from "./split.js";
 export type { TerminalPresetOptions } from "./terminal.js";
+export type { PresetBackgroundMediaOptions, PresetLogoOptions, PresetMediaOptions, PresetWatermarkOptions } from "./utils.js";
 
 export const presets = {
   announcement,

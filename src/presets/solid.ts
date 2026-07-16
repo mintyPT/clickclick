@@ -1,8 +1,9 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "./utils.js";
+import { defaultSansFont, escapeHtml, renderPresetMedia } from "./utils.js";
+import type { PresetMediaOptions } from "./utils.js";
 
-export interface SolidPresetOptions {
+export interface SolidPresetOptions extends PresetMediaOptions {
   title: string;
   subtitle?: string;
   label?: string;
@@ -22,6 +23,7 @@ export function solid(options: SolidPresetOptions): RenderImageInput {
   const safeTitle = escapeHtml(options.title);
   const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
   const safeLabel = options.label ? escapeHtml(options.label) : "";
+  const media = renderPresetMedia(options, width, height);
 
   return {
     document: {
@@ -30,9 +32,12 @@ export function solid(options: SolidPresetOptions): RenderImageInput {
   <head><meta charset="utf-8" /></head>
   <body>
     <main class="card ${align}">
+      ${media.html}
+      <section class="content">
       ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
       <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
       ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
+      </section>
     </main>
   </body>
 </html>`,
@@ -47,8 +52,16 @@ body {
   font-family: ${options.fontFamily ?? defaultSansFont};
 }
 .card {
+  position: relative;
+  overflow: hidden;
   width: ${width}px;
   height: ${height}px;
+}
+.content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -56,8 +69,8 @@ body {
   padding: ${Math.round(height * 0.12)}px ${Math.round(width * 0.1)}px;
   text-align: ${align};
 }
-.card.left { align-items: flex-start; }
-.card.center { align-items: center; }
+.card.left .content { align-items: flex-start; }
+.card.center .content { align-items: center; }
 .label {
   max-width: 100%;
   overflow: hidden;
@@ -75,6 +88,7 @@ body {
 h1, p { margin: 0; max-width: 100%; overflow: hidden; }
 h1 { width: 100%; max-height: ${Math.round(height * 0.46)}px; font-size: ${Math.round(width * 0.076)}px; line-height: 1.04; font-weight: 800; }
 p { width: 100%; max-height: ${Math.round(height * 0.2)}px; font-size: ${Math.round(width * 0.036)}px; line-height: 1.2; opacity: 0.86; }
+${media.css}
 `,
     },
     viewport: { width, height },

@@ -7,6 +7,12 @@ export type {
   ClickClickErrorCode,
 } from "./errors.js";
 export type {
+  PresetBackgroundMediaOptions,
+  PresetLogoOptions,
+  PresetMediaOptions,
+  PresetWatermarkOptions,
+} from "./presets/index.js";
+export type {
   ClickClickRenderer,
   ClickClickConfig,
   FitTextTarget,

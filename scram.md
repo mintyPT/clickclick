@@ -773,7 +773,7 @@ Ensure imported templates include enough sample recipe/modification data for use
 ---
 
 ## CC-021 · Add shared media options for built-in presets
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-022, CC-023] | blocked_by: []
 tags: [area.presets, media, api, preset-media-foundation]
 
@@ -811,6 +811,10 @@ Add tests that prove user-authored text is escaped, media URLs are serialized sa
 
 ### History
 - created · 2026-07-16T14:53:46Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:02:32Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:04:19Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:04:19Z · mauro.goncalo@gmail.com
+  Implemented shared preset media options for background images, logos, and watermarks; wired into solid/gradient CLI and library APIs; npm test and npm run build passed.
 
 ---
 

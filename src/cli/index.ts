@@ -329,6 +329,22 @@ preset
   .option("--to <color>", "Gradient end color")
   .option("--accent <color>", "Accent color")
   .option("--text-color <color>", "Text color")
+  .option("--background-image <src>", "Background image URL, path, or data URI")
+  .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
+  .option("--background-position <position>", "Background image CSS position")
+  .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
+  .option("--overlay <color>", "Background image overlay color")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--logo-size <px>", "Logo width in pixels", parseInteger)
+  .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
+  .option("--logo-alt <text>", "Logo alt text")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-placement <placement>", "Watermark placement")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
+  .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
   .option("--align <align>", "Text alignment: left or center")
   .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
@@ -347,6 +363,7 @@ preset
         toColor: options.to,
         accentColor: options.accent,
         textColor: options.textColor,
+        ...parsePresetMediaOptions(options),
         align: options.align,
         fontFamily: options.fontFamily,
         width: options.width,
@@ -400,6 +417,22 @@ preset
   .option("--background, --background-color <color>", "Background color")
   .option("--text-color <color>", "Text color")
   .option("--accent <color>", "Accent color")
+  .option("--background-image <src>", "Background image URL, path, or data URI")
+  .option("--background-fit <fit>", "Background image fit: cover, contain, fill, none, or scale-down")
+  .option("--background-position <position>", "Background image CSS position")
+  .option("--background-opacity <number>", "Background image opacity from 0 to 1", parseNumber)
+  .option("--overlay <color>", "Background image overlay color")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--logo-size <px>", "Logo width in pixels", parseInteger)
+  .option("--logo-opacity <number>", "Logo opacity from 0 to 1", parseNumber)
+  .option("--logo-alt <text>", "Logo alt text")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-placement <placement>", "Watermark placement")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--watermark-scale <number>", "Watermark scale ratio", parseNumber)
+  .option("--watermark-rotation <degrees>", "Watermark rotation in degrees", parseNumber)
   .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
@@ -417,6 +450,7 @@ preset
         backgroundColor: options.background,
         textColor: options.textColor,
         accentColor: options.accent,
+        ...parsePresetMediaOptions(options),
         fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
@@ -579,6 +613,59 @@ function parseInteger(value: string): number {
     throw new Error(`Expected an integer, received ${value}`);
   }
   return parsed;
+}
+
+function parseNumber(value: string): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`Expected a number, received ${value}`);
+  }
+  return parsed;
+}
+
+function parsePresetMediaOptions(options: Record<string, unknown>) {
+  const media: Record<string, unknown> = {};
+  if (typeof options.backgroundImage === "string") {
+    media.background = {
+      src: options.backgroundImage,
+      fit: parseMediaFit(options.backgroundFit),
+      position: typeof options.backgroundPosition === "string" ? options.backgroundPosition : undefined,
+      opacity: typeof options.backgroundOpacity === "number" ? options.backgroundOpacity : undefined,
+      overlay: typeof options.overlay === "string" ? options.overlay : undefined,
+    };
+  }
+  if (typeof options.logo === "string") {
+    media.logo = {
+      src: options.logo,
+      placement: parseMediaPlacement(options.logoPlacement, "logo-placement"),
+      size: typeof options.logoSize === "number" ? options.logoSize : undefined,
+      opacity: typeof options.logoOpacity === "number" ? options.logoOpacity : undefined,
+      alt: typeof options.logoAlt === "string" ? options.logoAlt : undefined,
+    };
+  }
+  if (typeof options.watermark === "string" || typeof options.watermarkText === "string") {
+    media.watermark = {
+      src: typeof options.watermark === "string" ? options.watermark : undefined,
+      text: typeof options.watermarkText === "string" ? options.watermarkText : undefined,
+      placement: parseMediaPlacement(options.watermarkPlacement, "watermark-placement"),
+      opacity: typeof options.watermarkOpacity === "number" ? options.watermarkOpacity : undefined,
+      scale: typeof options.watermarkScale === "number" ? options.watermarkScale : undefined,
+      rotation: typeof options.watermarkRotation === "number" ? options.watermarkRotation : undefined,
+    };
+  }
+  return media;
+}
+
+function parseMediaFit(value: unknown) {
+  if (value === undefined) return undefined;
+  if (value === "cover" || value === "contain" || value === "fill" || value === "none" || value === "scale-down") return value;
+  throw new ClickClickError("INVALID_INPUT", "background-fit must be cover, contain, fill, none, or scale-down.");
+}
+
+function parseMediaPlacement(value: unknown, label: string) {
+  if (value === undefined) return undefined;
+  if (value === "top-left" || value === "top-right" || value === "bottom-left" || value === "bottom-right" || value === "center") return value;
+  throw new ClickClickError("INVALID_INPUT", `${label} must be top-left, top-right, bottom-left, bottom-right, or center.`);
 }
 
 function parseOutputOptions(options: Record<string, unknown>) {
