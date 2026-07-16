@@ -168,14 +168,23 @@ dependencies, installs Playwright Chromium, typechecks, builds, runs tests, and 
 package contents with `npm pack --dry-run`.
 
 Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow when a GitHub release is
-published or when the workflow is manually dispatched. The workflow uses npm trusted publishing with
-GitHub Actions OIDC, so npm must be configured with a trusted publisher for:
+published or when the workflow is manually dispatched. The workflow supports two npm authentication
+paths:
+
+1. First publish: create a granular npm access token with publish access for `@mintypt/clickclick`
+   and 2FA bypass enabled, then save it as the repository secret `NPM_TOKEN`. This is needed before
+   trusted publishing can be configured for a package that does not exist on npm yet.
+2. Later publishes: remove the `NPM_TOKEN` secret and use npm trusted publishing with GitHub Actions
+   OIDC. Configure a trusted publisher for:
 
 - Package: `@mintypt/clickclick`
 - Repository: `mintyPT/clickclick`
-- Workflow file: `.github/workflows/publish.yml`
+- Workflow filename: `publish.yml`
+- Allowed action: `npm publish`
 
-The publish job runs the same checks as CI and then publishes with provenance:
+The publish job runs the same checks as CI and then publishes with provenance. It uses
+`NODE_AUTH_TOKEN` only when the `NPM_TOKEN` secret is present; otherwise it uses OIDC trusted
+publishing.
 
 ```bash
 npm publish --access public --provenance
