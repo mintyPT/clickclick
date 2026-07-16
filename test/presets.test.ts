@@ -25,3 +25,33 @@ describe("solid preset", () => {
     });
   });
 });
+
+describe("new social presets", () => {
+  it.each([
+    ["gradient", presets.gradient({ title: "Hello", subtitle: "World" })],
+    ["split", presets.split({ title: "Hello", subtitle: "World", label: "New" })],
+    ["quote", presets.quote({ quote: "Hello", attribution: "Ada", source: "Notes" })],
+    ["terminal", presets.terminal({ title: "Hello", command: "npm run build", subtitle: "World" })],
+  ] as const)("%s returns a renderer input with default Open Graph size", (_name, input) => {
+    expect(input.viewport).toEqual(sizes.og);
+    expect(input.document.html).toContain("data-clickclick-fit");
+    expect(input.document.css).toBeTruthy();
+  });
+
+  it("escapes user-authored text in new presets", () => {
+    expect(presets.gradient({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.split({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.quote({ quote: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.terminal({ title: "Safe", command: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+  });
+
+  it("has internal CLI metadata for every exported preset", () => {
+    expect(presetMetadata.map((preset) => preset.name)).toEqual([
+      "gradient",
+      "quote",
+      "solid",
+      "split",
+      "terminal",
+    ]);
+  });
+});

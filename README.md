@@ -8,7 +8,7 @@ Playwright. It can be used as a library or as the `clickclick` CLI.
 The v1 surface is intentionally small:
 
 - render user-authored HTML/CSS to PNG or JPEG;
-- render a built-in solid-background text preset;
+- render built-in social image presets;
 - opt in to text fitting for elements that should shrink to fit;
 - report structured warnings and stable error codes.
 
@@ -62,10 +62,10 @@ Render an HTML file:
 clickclick render ./examples/card.html --css ./examples/card.css --out og.png
 ```
 
-Generate the solid preset:
+Generate a built-in preset:
 
 ```bash
-clickclick preset solid --title "Hello" --subtitle "From ClickClick" --out og.png
+clickclick preset gradient --title "Hello" --subtitle "From ClickClick" --out og.png
 ```
 
 List presets:
@@ -81,6 +81,78 @@ Common render flags include `--width`, `--height`, `--format`, `--quality`, `--s
 
 ClickClick currently ships these built-in presets. Keep this list in sync with the exported
 `presets` object and the CLI preset commands.
+
+### `gradient`
+
+A colorful gradient social image with a title, optional subtitle, configurable gradient colors, text
+color, and accent color. It uses `data-clickclick-fit` text fitting for title and subtitle.
+
+CLI:
+
+```bash
+clickclick preset gradient \
+  --title "Launch faster" \
+  --subtitle "Colorful social cards from HTML and CSS" \
+  --from "#0f766e" \
+  --to "#7c3aed" \
+  --accent "rgba(255,255,255,0.32)" \
+  --out examples/presets/gradient.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@mintypt/clickclick";
+
+await renderImage({
+  ...presets.gradient({
+    title: "Launch faster",
+    subtitle: "Colorful social cards from HTML and CSS",
+    fromColor: "#0f766e",
+    toColor: "#7c3aed",
+    accentColor: "rgba(255,255,255,0.32)",
+  }),
+  output: { path: "examples/presets/gradient.png" },
+});
+```
+
+Result:
+
+![Gradient preset result](./examples/presets/gradient.png)
+
+### `quote`
+
+An editorial quote image with large quote text, optional attribution, optional source, and
+configurable background, text, and accent colors.
+
+CLI:
+
+```bash
+clickclick preset quote \
+  --quote "Small tools should still feel carefully made." \
+  --attribution "ClickClick" \
+  --source "Preset gallery" \
+  --out examples/presets/quote.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@mintypt/clickclick";
+
+await renderImage({
+  ...presets.quote({
+    quote: "Small tools should still feel carefully made.",
+    attribution: "ClickClick",
+    source: "Preset gallery",
+  }),
+  output: { path: "examples/presets/quote.png" },
+});
+```
+
+Result:
+
+![Quote preset result](./examples/presets/quote.png)
 
 ### `solid`
 
@@ -118,6 +190,74 @@ await renderImage({
 Result:
 
 ![Solid preset result](./examples/presets/solid.png)
+
+### `split`
+
+A split-layout social image with text on the left and a bold graphic panel on the right. It supports
+an optional label, subtitle, panel color, background color, text color, and accent color.
+
+CLI:
+
+```bash
+clickclick preset split \
+  --title "Ship a sharper changelog" \
+  --subtitle "Readable layouts for posts, releases, and product updates." \
+  --label "Release" \
+  --out examples/presets/split.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@mintypt/clickclick";
+
+await renderImage({
+  ...presets.split({
+    title: "Ship a sharper changelog",
+    subtitle: "Readable layouts for posts, releases, and product updates.",
+    label: "Release",
+  }),
+  output: { path: "examples/presets/split.png" },
+});
+```
+
+Result:
+
+![Split preset result](./examples/presets/split.png)
+
+### `terminal`
+
+A developer-focused social image with title, optional subtitle, and a command block. It supports
+configurable page, terminal, text, and accent colors.
+
+CLI:
+
+```bash
+clickclick preset terminal \
+  --title "Automate image generation" \
+  --subtitle "Render social cards from scripts, docs, or CI." \
+  --command "clickclick preset terminal --out og.png" \
+  --out examples/presets/terminal.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@mintypt/clickclick";
+
+await renderImage({
+  ...presets.terminal({
+    title: "Automate image generation",
+    subtitle: "Render social cards from scripts, docs, or CI.",
+    command: "clickclick preset terminal --out og.png",
+  }),
+  output: { path: "examples/presets/terminal.png" },
+});
+```
+
+Result:
+
+![Terminal preset result](./examples/presets/terminal.png)
 
 ## PNG and JPEG
 

@@ -1,5 +1,6 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
+import { escapeHtml } from "./utils.js";
 
 export interface SolidPresetOptions {
   title: string;
@@ -59,13 +60,4 @@ p { width: 100%; max-height: ${Math.round(height * 0.2)}px; font-size: ${Math.ro
     },
     viewport: { width, height },
   };
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
 }

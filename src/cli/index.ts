@@ -56,6 +56,66 @@ preset.command("list").description("List built-in presets").action(() => {
 });
 
 preset
+  .command("gradient")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--from <color>", "Gradient start color")
+  .option("--to <color>", "Gradient end color")
+  .option("--accent <color>", "Accent color")
+  .option("--text-color <color>", "Text color")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.gradient({
+        title: options.title,
+        subtitle: options.subtitle,
+        fromColor: options.from,
+        toColor: options.to,
+        accentColor: options.accent,
+        textColor: options.textColor,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("quote")
+  .requiredOption("--quote <text>", "Quote text")
+  .option("--attribution <text>", "Quote attribution")
+  .option("--source <text>", "Quote source")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.quote({
+        quote: options.quote,
+        attribution: options.attribution,
+        source: options.source,
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
   .command("solid")
   .requiredOption("--title <text>", "Title text")
   .option("--subtitle <text>", "Subtitle text")
@@ -78,6 +138,70 @@ preset
         width: options.width,
         height: options.height,
         align: options.align,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("split")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--label <text>", "Small label text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--panel-color <color>", "Panel color")
+  .option("--accent <color>", "Accent color")
+  .option("--text-color <color>", "Text color")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.split({
+        title: options.title,
+        subtitle: options.subtitle,
+        label: options.label,
+        backgroundColor: options.background,
+        panelColor: options.panelColor,
+        accentColor: options.accent,
+        textColor: options.textColor,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("terminal")
+  .requiredOption("--title <text>", "Title text")
+  .requiredOption("--command <text>", "Command text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--terminal-color <color>", "Terminal panel color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.terminal({
+        title: options.title,
+        command: options.command,
+        subtitle: options.subtitle,
+        backgroundColor: options.background,
+        terminalColor: options.terminalColor,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        width: options.width,
+        height: options.height,
       }),
       output: parseOutputOptions(options),
     }, Boolean(options.strict));
