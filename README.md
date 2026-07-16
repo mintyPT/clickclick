@@ -507,6 +507,93 @@ Result:
 
 ![Local template result](./examples/templates/local-template.png)
 
+### Advanced Template Features
+
+Use `--modify-file` when layer updates are easier to review as JSON:
+
+```bash
+clickclick template examples/use-cases/image-template.html \
+  --css examples/use-cases/image-template.css \
+  --modify-file examples/use-cases/template-modifications.json \
+  --out examples/use-cases/image-template.png \
+  --width 1200 \
+  --height 630 \
+  --strict
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  htmlPath: "examples/use-cases/image-template.html",
+  cssPath: "examples/use-cases/image-template.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/template-modifications.json", "utf8")),
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/image-template.png" },
+});
+```
+
+Result:
+
+![Image layer template result](./examples/use-cases/image-template.png)
+
+The JSON file updates an image layer with `src`, `fit`, `anchor`, and `effect`; it also demonstrates
+text updates, `style`, `attributes`, `x`, `y`, `border`, `shadow`, and visibility-compatible layer
+fields:
+
+```json
+[
+  { "name": "hero", "src": "data:image/svg+xml,...", "fit": "cover", "anchor": "center", "effect": "grayscale" },
+  { "name": "badge", "text": "STRICT", "x": -24, "y": -18, "border": "3px solid #111827" }
+]
+```
+
+Register a custom font from the CLI or library/config:
+
+```bash
+clickclick template examples/use-cases/image-template.html \
+  --css examples/use-cases/image-template.css \
+  --font "Inter=./fonts/Inter.woff2" \
+  --modify-file examples/use-cases/template-modifications.json \
+  --out image-template.png
+```
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/image-template.html",
+  cssPath: "examples/use-cases/image-template.css",
+  fonts: [{ family: "Inter", source: "./fonts/Inter.woff2" }],
+});
+```
+
+Choose warning behavior explicitly while developing templates:
+
+```bash
+clickclick template examples/use-cases/image-template.html \
+  --css examples/use-cases/image-template.css \
+  --modify-json '[{"name":"missing","text":"No layer"}]' \
+  --on-missing-layer warn
+
+clickclick template examples/use-cases/image-template.html \
+  --css examples/use-cases/image-template.css \
+  --modify-json '[{"name":"missing","text":"No layer"}]' \
+  --on-missing-layer error \
+  --strict
+```
+
+Debug bundles write the rendered HTML, CSS, and manifest:
+
+```bash
+clickclick template examples/use-cases/image-template.html \
+  --css examples/use-cases/image-template.css \
+  --modify-file examples/use-cases/template-modifications.json \
+  --debug-dir .clickclick-debug \
+  --out image-template.png
+```
+
 Supported modification fields include `text`, `html`, `src`, `image_url`, `color`, `background`,
 `font_family`, `alignment`, `hide`, `show`, `style`, `className`, `attributes`, `x`, `y`, `border`,
 `shadow`, `fit`, `anchor`, and `effect`. Effects are CSS-only: `grayscale`, `sepia`, `blur`,

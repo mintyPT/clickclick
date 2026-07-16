@@ -1046,7 +1046,7 @@ Prefer concise TypeScript examples over long prose. Where an example produces an
 ---
 
 ## CC-027 · Add README examples for advanced template features
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: []
 tags: [area.docs, examples, templates, readme-examples-coverage]
 
@@ -1085,6 +1085,10 @@ Keep the examples deterministic with local assets. Include rendered images for v
 
 ### History
 - created · 2026-07-16T14:55:51Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:30:19Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:31:43Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:31:43Z · mauro.goncalo@gmail.com
+  Added advanced template README examples, modify-file JSON fixture, image-layer template fixture, and rendered output. npm run check passed.
 
 ---
 

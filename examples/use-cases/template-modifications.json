@@ -1,0 +1,14 @@
+[
+  {
+    "name": "hero",
+    "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%230ea5e9'/%3E%3Cstop offset='1' stop-color='%23f97316'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='630' fill='url(%23g)'/%3E%3Ccircle cx='880' cy='180' r='190' fill='%23fff' opacity='.22'/%3E%3Cpath d='M180 520 420 260l180 180 140-120 280 260H180Z' fill='%23fff' opacity='.28'/%3E%3C/svg%3E",
+    "fit": "cover",
+    "anchor": "center",
+    "effect": "grayscale"
+  },
+  { "name": "label", "text": "Modify file" },
+  { "name": "title", "text": "Image layer updates" },
+  { "name": "subtitle", "text": "Drive image source, fit, anchor, effect, style, and visibility from JSON." },
+  { "name": "badge", "text": "STRICT", "x": -24, "y": -18, "border": "3px solid #111827", "shadow": "0 18px 50px rgba(0,0,0,.32)" },
+  { "name": "card", "attributes": { "data-example": "advanced-template" }, "style": { "outline": "8px solid rgba(250,204,21,.4)" } }
+]
