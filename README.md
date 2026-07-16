@@ -57,10 +57,10 @@ await renderImage({
 });
 
 await screenshotUrl({
-  url: "https://example.com",
+  url: "https://www.anthropic.com/",
   viewport: { width: 1200, height: 630 },
   render: { fullPage: true, waitUntil: "networkidle" },
-  output: { path: "example.png", format: "png" },
+  output: { path: "anthropic-home.png", format: "png" },
   locale: "en-US",
 });
 ```
@@ -80,7 +80,7 @@ clickclick render ./examples/card.html --css ./examples/card.css --out og.png
 Screenshot a URL:
 
 ```bash
-clickclick screenshot-url https://example.com --out example.png --width 1200 --height 630 --full-page
+clickclick screenshot-url https://www.anthropic.com/ --out anthropic-home.png --width 1200 --height 630
 ```
 
 Generate a built-in preset:
@@ -98,6 +98,176 @@ clickclick preset list
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
 `--wait-until`, `--delay`, and `--strict`. URL screenshots also support `--full-page`,
 `--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+
+## Use Case Gallery
+
+These examples cover the workflows ClickClick is meant to make scriptable: live website screenshots,
+custom HTML cards, template modifications, and config-driven image sets.
+
+### Capture a Live Website
+
+Use URL screenshots when you need a reproducible image of a product page, docs page, landing page,
+or public status page.
+
+CLI:
+
+```bash
+clickclick screenshot-url https://www.anthropic.com/ \
+  --out examples/use-cases/anthropic-home.png \
+  --width 1200 \
+  --height 630 \
+  --wait-until networkidle \
+  --delay 1000
+```
+
+Library:
+
+```ts
+import { screenshotUrl } from "@maurogoncalo/clickclick";
+
+await screenshotUrl({
+  url: "https://www.anthropic.com/",
+  viewport: { width: 1200, height: 630 },
+  render: { waitUntil: "networkidle", delayMs: 1000 },
+  output: { path: "examples/use-cases/anthropic-home.png" },
+  locale: "en-US",
+});
+```
+
+Result:
+
+![Anthropic homepage screenshot result](./examples/use-cases/anthropic-home.png)
+
+### Render Custom HTML with Fit Text
+
+Use custom HTML/CSS when presets are too constrained, but keep `data-clickclick-fit` on important
+copy that needs to survive variable titles.
+
+CLI:
+
+```bash
+clickclick render examples/use-cases/fit-text-card.html \
+  --css examples/use-cases/fit-text-card.css \
+  --out examples/use-cases/fit-text-card.png \
+  --width 1200 \
+  --height 630
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  document: {
+    html: await readFile("examples/use-cases/fit-text-card.html", "utf8"),
+    css: await readFile("examples/use-cases/fit-text-card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/fit-text-card.png" },
+});
+```
+
+Result:
+
+![Fit text custom HTML result](./examples/use-cases/fit-text-card.png)
+
+### Modify Template Layers from JSON
+
+Use local templates when you want a reusable art direction with data-driven layer changes. Layers are
+selected with `data-layer` attributes in the HTML.
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --modify-json '[{"name":"label","text":"Template"},{"name":"title","text":"Modify image layers from JSON"},{"name":"subtitle","text":"Change copy, colors, effects, and visibility while the HTML stays reusable."},{"name":"cta","text":"Ship the asset"},{"name":"panel","background":"#312e81","shadow":"0 28px 80px rgba(15,23,42,.35)"},{"name":"badge","text":"JSON"}]' \
+  --out examples/use-cases/template-modifications.png \
+  --width 1200 \
+  --height 630
+```
+
+Library:
+
+```ts
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  htmlPath: "examples/use-cases/product-card.html",
+  cssPath: "examples/use-cases/product-card.css",
+  modifications: [
+    { name: "label", text: "Template" },
+    { name: "title", text: "Modify image layers from JSON" },
+    {
+      name: "subtitle",
+      text: "Change copy, colors, effects, and visibility while the HTML stays reusable.",
+    },
+    { name: "cta", text: "Ship the asset" },
+    { name: "panel", background: "#312e81", shadow: "0 28px 80px rgba(15,23,42,.35)" },
+    { name: "badge", text: "JSON" },
+  ],
+  viewport: { width: 1200, height: 630 },
+  output: { path: "examples/use-cases/template-modifications.png" },
+});
+```
+
+Result:
+
+![Template layer modification result](./examples/use-cases/template-modifications.png)
+
+### Render a Config Recipe
+
+Use recipes when the template, output size, and standard modifications should live in a project
+config instead of a shell script.
+
+CLI:
+
+```bash
+clickclick config recipe examples/use-cases/clickclick.config.json release
+```
+
+Library:
+
+```ts
+import { renderRecipe } from "@maurogoncalo/clickclick";
+
+await renderRecipe("examples/use-cases/clickclick.config.json", "release");
+```
+
+Result:
+
+![Config recipe result](./examples/use-cases/config-recipe.png)
+
+### Render a Multi-Size Social Set
+
+Use template sets when one source template needs to produce several assets for different surfaces.
+
+CLI:
+
+```bash
+clickclick config set examples/use-cases/clickclick.config.json social \
+  --out-dir examples/use-cases/config-set
+```
+
+Library:
+
+```ts
+import { renderTemplateSet } from "@maurogoncalo/clickclick";
+
+await renderTemplateSet(
+  "examples/use-cases/clickclick.config.json",
+  "social",
+  "examples/use-cases/config-set",
+);
+```
+
+Results:
+
+![Config set wide result](./examples/use-cases/config-set/wide.png)
+
+![Config set square result](./examples/use-cases/config-set/square.png)
 
 ## Local Templates
 

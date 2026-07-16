@@ -1,0 +1,58 @@
+{
+  "templates": {
+    "product": {
+      "htmlPath": "./product-card.html",
+      "cssPath": "./product-card.css"
+    }
+  },
+  "recipes": {
+    "release": {
+      "template": "product",
+      "output": {
+        "path": "examples/use-cases/config-recipe.png",
+        "width": 1200,
+        "height": 630
+      },
+      "modifications": [
+        { "name": "label", "text": "Release" },
+        { "name": "title", "text": "Config recipes keep image generation repeatable" },
+        { "name": "subtitle", "text": "Store templates, modifications, and outputs in one project file." },
+        { "name": "cta", "text": "Render from CI" },
+        { "name": "panel", "background": "#14532d" },
+        { "name": "badge", "text": "CI" }
+      ]
+    }
+  },
+  "templateSets": {
+    "social": [
+      {
+        "name": "wide",
+        "template": "product",
+        "output": {
+          "width": 1200,
+          "height": 630
+        },
+        "modifications": [
+          { "name": "label", "text": "Wide" },
+          { "name": "title", "text": "One template, multiple output sizes" },
+          { "name": "subtitle", "text": "Render a full social set from one config command." },
+          { "name": "badge", "text": "1200" }
+        ]
+      },
+      {
+        "name": "square",
+        "template": "product",
+        "output": {
+          "width": 1080,
+          "height": 1080
+        },
+        "modifications": [
+          { "name": "label", "text": "Square" },
+          { "name": "title", "text": "Reuse the same art direction" },
+          { "name": "subtitle", "text": "Override copy per asset while keeping the template stable." },
+          { "name": "badge", "text": "1080" }
+        ]
+      }
+    ]
+  }
+}
