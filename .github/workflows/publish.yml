@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org
-          scope: "@mintypt"
+          scope: "@maurogoncalo"
           package-manager-cache: false
 
       - name: Install dependencies
