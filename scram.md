@@ -350,7 +350,7 @@ Do not publish to npm in this ticket. It should end with a verified dry-run pack
 ---
 
 ## CC-010 · Publish public GitHub repo and npm package
-type: Task | status: Blocked | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: [CC-009]
 tags: [hitl, release-publishing]
 
@@ -382,6 +382,9 @@ Do not perform this ticket until a human confirms the target GitHub repo, npm ac
 ### History
 - created · 2026-07-15T20:58:48Z · mauro.goncalo@gmail.com
 - Backlog → Blocked: Human approval required before creating public release artifacts: confirm GitHub repo target, npm package/account, license, release version, and publication timing. · 2026-07-16T13:49:48Z · mauro.goncalo@gmail.com
+- Blocked → Done · 2026-07-16T14:29:31Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T14:29:47Z · mauro.goncalo@gmail.com
+  Verified existing public release: origin main reachable at github.com:mintyPT/clickclick.git, npm reports @maurogoncalo/clickclick@0.1.1 with MIT/GitHub metadata, clean temp install exposes the clickclick binary, and library exports resolve. Local install warned because verifier Node was 18.20.4 while package requires >=20.
 
 ---
 
