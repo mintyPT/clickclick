@@ -77,6 +77,48 @@ clickclick preset list
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
 `--wait-until`, `--delay`, and `--strict`. `--out` and `--output` are aliases.
 
+## Presets
+
+ClickClick currently ships these built-in presets. Keep this list in sync with the exported
+`presets` object and the CLI preset commands.
+
+### `solid`
+
+A solid-background social image with a title, optional subtitle, configurable colors, size, and
+left or center alignment. It uses the same `data-clickclick-fit` text-fitting mechanism available to
+user-authored HTML.
+
+CLI:
+
+```bash
+clickclick preset solid \
+  --title "Launch notes" \
+  --subtitle "A concise social card" \
+  --background "#111827" \
+  --text-color "#ffffff" \
+  --out examples/presets/solid.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "clickclick";
+
+await renderImage({
+  ...presets.solid({
+    title: "Launch notes",
+    subtitle: "A concise social card",
+    backgroundColor: "#111827",
+    textColor: "#ffffff",
+  }),
+  output: { path: "examples/presets/solid.png" },
+});
+```
+
+Result:
+
+![Solid preset result](./examples/presets/solid.png)
+
 ## PNG and JPEG
 
 ClickClick infers the format from `output.path` when possible. `.jpg` and `.jpeg` produce JPEG;
