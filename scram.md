@@ -1000,7 +1000,7 @@ Use local HTML/data URLs for deterministic examples where possible. If a live UR
 ---
 
 ## CC-026 · Add README examples for renderer lifecycle APIs
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: []
 tags: [area.docs, examples, library, readme-examples-coverage]
 
@@ -1038,6 +1038,10 @@ Prefer concise TypeScript examples over long prose. Where an example produces an
 
 ### History
 - created · 2026-07-16T14:55:38Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:29:21Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:30:02Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:30:02Z · mauro.goncalo@gmail.com
+  Added README renderer lifecycle examples for createRenderer batching, external browser ownership, beforeScreenshot, buffer returns, warnings, and ClickClickError handling. npm run check passed.
 
 ---
 

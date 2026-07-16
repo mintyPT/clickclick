@@ -69,6 +69,91 @@ Use `createRenderer()` when rendering many images in one process. It reuses the 
 creating a fresh browser context for every render. You may also pass an externally managed Playwright
 `Browser`; ClickClick will not close it.
 
+### Renderer Lifecycle APIs
+
+Batch renders through one browser:
+
+```ts
+import { createRenderer, presets } from "@maurogoncalo/clickclick";
+
+const renderer = await createRenderer();
+try {
+  for (const name of ["launch", "docs", "release"]) {
+    await renderer.render({
+      ...presets.solid({ title: name, subtitle: "Batch render" }),
+      output: { path: `dist/${name}.png` },
+    });
+  }
+} finally {
+  await renderer.close();
+}
+```
+
+Use an externally managed Playwright browser when another process owns browser startup and shutdown:
+
+```ts
+import { chromium } from "playwright";
+import { createRenderer, presets } from "@maurogoncalo/clickclick";
+
+const browser = await chromium.launch();
+const renderer = await createRenderer({ browser });
+await renderer.render({
+  ...presets.gradient({ title: "Managed browser" }),
+  output: { path: "managed-browser.png" },
+});
+await renderer.close();
+await browser.close();
+```
+
+Mutate or wait on the page immediately before capture:
+
+```ts
+await renderer.render({
+  document: { html: "<main><h1>Ready</h1></main>", css: "main{width:1200px;height:630px}" },
+  render: {
+    beforeScreenshot: async (page) => {
+      await page.locator("h1").evaluate((node) => { node.textContent = "Captured"; });
+    },
+  },
+});
+```
+
+Read the returned buffer when you do not pass `output.path`:
+
+```ts
+const result = await renderer.render({
+  ...presets.quote({ quote: "Return a buffer, not a file." }),
+  output: { format: "png" },
+});
+
+console.log(result.buffer.length, result.format, result.width, result.height, result.path);
+for (const warning of result.warnings) console.warn(warning.code, warning.message);
+```
+
+Handle structured errors and text-fit warnings:
+
+```ts
+import { ClickClickError, renderImage } from "@maurogoncalo/clickclick";
+
+try {
+  const result = await renderImage({
+    document: {
+      html: '<main><h1 class="title" data-clickclick-fit>Very long copy...</h1></main>',
+      css: "main{width:400px;height:200px}.title{font-size:96px;max-height:90px;overflow:hidden}",
+    },
+    fitText: [{ selector: ".title", minFontSize: 24, maxFontSize: 96, onOverflow: "warn" }],
+  });
+
+  for (const warning of result.warnings) {
+    if (warning.code === "TEXT_FIT_OVERFLOW") console.warn(warning.selector);
+  }
+} catch (error) {
+  if (error instanceof ClickClickError && error.code === "INVALID_INPUT") {
+    console.error(error.message);
+  }
+}
+```
+
 ## CLI
 
 Render an HTML file:
