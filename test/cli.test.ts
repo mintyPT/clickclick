@@ -18,7 +18,11 @@ describe("CLI", () => {
   it("lists presets", async () => {
     const result = await runCli(["preset", "list"]);
 
+    expect(result.stdout).toContain("announcement");
+    expect(result.stdout).toContain("checkerboard");
+    expect(result.stdout).toContain("compare");
     expect(result.stdout).toContain("gradient");
+    expect(result.stdout).toContain("minimal");
     expect(result.stdout).toContain("quote");
     expect(result.stdout).toContain("solid");
     expect(result.stdout).toContain("split");
@@ -42,7 +46,11 @@ describe("CLI", () => {
   });
 
   it.each([
+    ["announcement", ["--title", "Hello", "--badge", "New"]],
+    ["checkerboard", ["--title", "Hello", "--label", "New"]],
+    ["compare", ["--before-title", "Before", "--after-title", "After"]],
     ["gradient", ["--title", "Hello"]],
+    ["minimal", ["--title", "Hello", "--meta", "Notes"]],
     ["quote", ["--quote", "Hello"]],
     ["split", ["--title", "Hello"]],
     ["terminal", ["--title", "Hello", "--command", "npm test"]],

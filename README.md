@@ -20,7 +20,7 @@ anything externally.
 Use Node 20 or newer.
 
 ```bash
-npm install @mintypt/clickclick
+npm install @maurogoncalo/clickclick
 npx playwright install chromium
 ```
 
@@ -29,7 +29,7 @@ If Chromium cannot start, install the system dependencies requested by Playwrigh
 ## Library
 
 ```ts
-import { renderImage, presets } from "@mintypt/clickclick";
+import { renderImage, presets } from "@maurogoncalo/clickclick";
 
 await renderImage({
   document: {
@@ -84,8 +84,9 @@ ClickClick currently ships these built-in presets. Keep this list in sync with t
 
 ### `gradient`
 
-A colorful gradient social image with a title, optional subtitle, configurable gradient colors, text
-color, and accent color. It uses `data-clickclick-fit` text fitting for title and subtitle.
+A colorful gradient social image with title, optional subtitle, optional label, configurable
+gradient colors, text color, accent color, alignment, size, and font family. It uses
+`data-clickclick-fit` text fitting for title and subtitle.
 
 CLI:
 
@@ -93,24 +94,28 @@ CLI:
 clickclick preset gradient \
   --title "Launch faster" \
   --subtitle "Colorful social cards from HTML and CSS" \
+  --label "Preset" \
   --from "#0f766e" \
   --to "#7c3aed" \
   --accent "rgba(255,255,255,0.32)" \
+  --align center \
   --out examples/presets/gradient.png
 ```
 
 Library:
 
 ```ts
-import { presets, renderImage } from "@mintypt/clickclick";
+import { presets, renderImage } from "@maurogoncalo/clickclick";
 
 await renderImage({
   ...presets.gradient({
     title: "Launch faster",
     subtitle: "Colorful social cards from HTML and CSS",
+    label: "Preset",
     fromColor: "#0f766e",
     toColor: "#7c3aed",
     accentColor: "rgba(255,255,255,0.32)",
+    align: "center",
   }),
   output: { path: "examples/presets/gradient.png" },
 });
@@ -120,10 +125,156 @@ Result:
 
 ![Gradient preset result](./examples/presets/gradient.png)
 
+### `announcement`
+
+A launch or event announcement image with title, optional subtitle, badge, meta line, CTA,
+configurable colors, size, and font family.
+
+CLI:
+
+```bash
+clickclick preset announcement \
+  --title "Launch week starts now" \
+  --subtitle "Five focused updates for faster social image workflows." \
+  --badge "Event" \
+  --meta "July 2026" \
+  --cta "See the schedule" \
+  --out examples/presets/announcement.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.announcement({
+    title: "Launch week starts now",
+    subtitle: "Five focused updates for faster social image workflows.",
+    badge: "Event",
+    meta: "July 2026",
+    cta: "See the schedule",
+  }),
+  output: { path: "examples/presets/announcement.png" },
+});
+```
+
+Result:
+
+![Announcement preset result](./examples/presets/announcement.png)
+
+### `checkerboard`
+
+A bold checkerboard-pattern social image with title, optional subtitle, optional label,
+configurable pattern color, text color, accent color, size, and font family.
+
+CLI:
+
+```bash
+clickclick preset checkerboard \
+  --title "Make the update impossible to miss" \
+  --subtitle "High-contrast cards for launches and calls for attention." \
+  --label "New" \
+  --out examples/presets/checkerboard.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.checkerboard({
+    title: "Make the update impossible to miss",
+    subtitle: "High-contrast cards for launches and calls for attention.",
+    label: "New",
+  }),
+  output: { path: "examples/presets/checkerboard.png" },
+});
+```
+
+Result:
+
+![Checkerboard preset result](./examples/presets/checkerboard.png)
+
+### `compare`
+
+A two-column before-and-after image with optional heading, configurable panel colors, text color,
+accent color, size, and font family.
+
+CLI:
+
+```bash
+clickclick preset compare \
+  --title "Before and after the preset pass" \
+  --before-title "Before" \
+  --before-text "One solid card" \
+  --after-title "After" \
+  --after-text "Nine documented presets" \
+  --out examples/presets/compare.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.compare({
+    title: "Before and after the preset pass",
+    beforeTitle: "Before",
+    beforeText: "One solid card",
+    afterTitle: "After",
+    afterText: "Nine documented presets",
+  }),
+  output: { path: "examples/presets/compare.png" },
+});
+```
+
+Result:
+
+![Compare preset result](./examples/presets/compare.png)
+
+### `minimal`
+
+A minimal editorial image with title, optional subtitle, optional metadata, configurable colors,
+alignment, size, and font family.
+
+CLI:
+
+```bash
+clickclick preset minimal \
+  --title "Readable social cards without decoration" \
+  --subtitle "A quiet preset for articles, docs, and product notes." \
+  --meta "Design note" \
+  --accent "#111827" \
+  --out examples/presets/minimal.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.minimal({
+    title: "Readable social cards without decoration",
+    subtitle: "A quiet preset for articles, docs, and product notes.",
+    meta: "Design note",
+    accentColor: "#111827",
+  }),
+  output: { path: "examples/presets/minimal.png" },
+});
+```
+
+Result:
+
+![Minimal preset result](./examples/presets/minimal.png)
+
 ### `quote`
 
-An editorial quote image with large quote text, optional attribution, optional source, and
-configurable background, text, and accent colors.
+An editorial quote image with large quote text, optional attribution, optional source, configurable
+quote mark, alignment, background, text, accent color, size, and font family.
 
 CLI:
 
@@ -132,19 +283,23 @@ clickclick preset quote \
   --quote "Small tools should still feel carefully made." \
   --attribution "ClickClick" \
   --source "Preset gallery" \
+  --mark ">>" \
+  --align center \
   --out examples/presets/quote.png
 ```
 
 Library:
 
 ```ts
-import { presets, renderImage } from "@mintypt/clickclick";
+import { presets, renderImage } from "@maurogoncalo/clickclick";
 
 await renderImage({
   ...presets.quote({
     quote: "Small tools should still feel carefully made.",
     attribution: "ClickClick",
     source: "Preset gallery",
+    mark: ">>",
+    align: "center",
   }),
   output: { path: "examples/presets/quote.png" },
 });
@@ -156,9 +311,9 @@ Result:
 
 ### `solid`
 
-A solid-background social image with a title, optional subtitle, configurable colors, size, and
-left or center alignment. It uses the same `data-clickclick-fit` text-fitting mechanism available to
-user-authored HTML.
+A solid-background social image with title, optional subtitle, optional label, configurable colors,
+accent color, size, font family, and left or center alignment. It uses the same
+`data-clickclick-fit` text-fitting mechanism available to user-authored HTML.
 
 CLI:
 
@@ -166,22 +321,26 @@ CLI:
 clickclick preset solid \
   --title "Launch notes" \
   --subtitle "A concise social card" \
+  --label "Update" \
   --background "#111827" \
   --text-color "#ffffff" \
+  --accent "#2563eb" \
   --out examples/presets/solid.png
 ```
 
 Library:
 
 ```ts
-import { presets, renderImage } from "@mintypt/clickclick";
+import { presets, renderImage } from "@maurogoncalo/clickclick";
 
 await renderImage({
   ...presets.solid({
     title: "Launch notes",
     subtitle: "A concise social card",
+    label: "Update",
     backgroundColor: "#111827",
     textColor: "#ffffff",
+    accentColor: "#2563eb",
   }),
   output: { path: "examples/presets/solid.png" },
 });
@@ -194,7 +353,8 @@ Result:
 ### `split`
 
 A split-layout social image with text on the left and a bold graphic panel on the right. It supports
-an optional label, subtitle, panel color, background color, text color, and accent color.
+an optional label, subtitle, panel color, background color, text color, accent color, panel side,
+size, and font family.
 
 CLI:
 
@@ -203,19 +363,21 @@ clickclick preset split \
   --title "Ship a sharper changelog" \
   --subtitle "Readable layouts for posts, releases, and product updates." \
   --label "Release" \
+  --panel-side left \
   --out examples/presets/split.png
 ```
 
 Library:
 
 ```ts
-import { presets, renderImage } from "@mintypt/clickclick";
+import { presets, renderImage } from "@maurogoncalo/clickclick";
 
 await renderImage({
   ...presets.split({
     title: "Ship a sharper changelog",
     subtitle: "Readable layouts for posts, releases, and product updates.",
     label: "Release",
+    panelSide: "left",
   }),
   output: { path: "examples/presets/split.png" },
 });
@@ -227,8 +389,8 @@ Result:
 
 ### `terminal`
 
-A developer-focused social image with title, optional subtitle, and a command block. It supports
-configurable page, terminal, text, and accent colors.
+A developer-focused social image with title, optional subtitle, command, prompt, optional output
+line, configurable page, terminal, text, command, accent colors, size, and font families.
 
 CLI:
 
@@ -236,20 +398,24 @@ CLI:
 clickclick preset terminal \
   --title "Automate image generation" \
   --subtitle "Render social cards from scripts, docs, or CI." \
+  --prompt ">" \
   --command "clickclick preset terminal --out og.png" \
+  --output-text "created og.png" \
   --out examples/presets/terminal.png
 ```
 
 Library:
 
 ```ts
-import { presets, renderImage } from "@mintypt/clickclick";
+import { presets, renderImage } from "@maurogoncalo/clickclick";
 
 await renderImage({
   ...presets.terminal({
     title: "Automate image generation",
     subtitle: "Render social cards from scripts, docs, or CI.",
+    prompt: ">",
     command: "clickclick preset terminal --out og.png",
+    output: "created og.png",
   }),
   output: { path: "examples/presets/terminal.png" },
 });
@@ -258,6 +424,186 @@ await renderImage({
 Result:
 
 ![Terminal preset result](./examples/presets/terminal.png)
+
+## Preset Variations
+
+These examples use the same built-in presets with different option combinations. They are useful
+starting points when you want a different tone without writing custom HTML/CSS.
+
+### Gradient Launch Alert
+
+CLI:
+
+```bash
+clickclick preset gradient \
+  --title "API v2 is live" \
+  --subtitle "A sharper endpoint design with fewer moving parts." \
+  --label "Launch" \
+  --from "#be123c" \
+  --to "#f97316" \
+  --accent "rgba(255,255,255,0.35)" \
+  --align left \
+  --out og-gradient-launch.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.gradient({
+    title: "API v2 is live",
+    subtitle: "A sharper endpoint design with fewer moving parts.",
+    label: "Launch",
+    fromColor: "#be123c",
+    toColor: "#f97316",
+    accentColor: "rgba(255,255,255,0.35)",
+    align: "left",
+  }),
+  output: { path: "og-gradient-launch.png" },
+});
+```
+
+### Minimal Centered Article
+
+CLI:
+
+```bash
+clickclick preset minimal \
+  --title "What changed in the renderer" \
+  --subtitle "A short technical note for people maintaining image pipelines." \
+  --meta "Engineering" \
+  --align center \
+  --background "#f8fafc" \
+  --accent "#0f766e" \
+  --out og-minimal-article.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.minimal({
+    title: "What changed in the renderer",
+    subtitle: "A short technical note for people maintaining image pipelines.",
+    meta: "Engineering",
+    align: "center",
+    backgroundColor: "#f8fafc",
+    accentColor: "#0f766e",
+  }),
+  output: { path: "og-minimal-article.png" },
+});
+```
+
+### Split Product Update
+
+CLI:
+
+```bash
+clickclick preset split \
+  --title "New dashboard filters" \
+  --subtitle "Pin saved views, compare segments, and scan fresher data." \
+  --label "Product" \
+  --panel-side right \
+  --background "#ffffff" \
+  --panel-color "#0f172a" \
+  --accent "#eab308" \
+  --out og-split-product.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.split({
+    title: "New dashboard filters",
+    subtitle: "Pin saved views, compare segments, and scan fresher data.",
+    label: "Product",
+    panelSide: "right",
+    backgroundColor: "#ffffff",
+    panelColor: "#0f172a",
+    accentColor: "#eab308",
+  }),
+  output: { path: "og-split-product.png" },
+});
+```
+
+### Terminal Install Card
+
+CLI:
+
+```bash
+clickclick preset terminal \
+  --title "Install ClickClick" \
+  --subtitle "Generate social images from your release scripts." \
+  --prompt "$" \
+  --command "npm install @maurogoncalo/clickclick" \
+  --output-text "added 1 package" \
+  --accent "#38bdf8" \
+  --command-color "#ffffff" \
+  --out og-terminal-install.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.terminal({
+    title: "Install ClickClick",
+    subtitle: "Generate social images from your release scripts.",
+    prompt: "$",
+    command: "npm install @maurogoncalo/clickclick",
+    output: "added 1 package",
+    accentColor: "#38bdf8",
+    commandColor: "#ffffff",
+  }),
+  output: { path: "og-terminal-install.png" },
+});
+```
+
+### Compare Migration Card
+
+CLI:
+
+```bash
+clickclick preset compare \
+  --title "Migration impact" \
+  --before-title "Old flow" \
+  --before-text "Manual screenshots" \
+  --after-title "New flow" \
+  --after-text "Scripted preset renders" \
+  --before-color "#fee2e2" \
+  --after-color "#dbeafe" \
+  --accent "#2563eb" \
+  --out og-compare-migration.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.compare({
+    title: "Migration impact",
+    beforeTitle: "Old flow",
+    beforeText: "Manual screenshots",
+    afterTitle: "New flow",
+    afterText: "Scripted preset renders",
+    beforeColor: "#fee2e2",
+    afterColor: "#dbeafe",
+    accentColor: "#2563eb",
+  }),
+  output: { path: "og-compare-migration.png" },
+});
+```
 
 ## PNG and JPEG
 
@@ -311,7 +657,7 @@ Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow whe
 published or when the workflow is manually dispatched. The workflow uses npm trusted publishing with
 GitHub Actions OIDC, so npm must be configured with a trusted publisher for:
 
-- Package: `@mintypt/clickclick`
+- Package: `@maurogoncalo/clickclick`
 - Repository: `mintyPT/clickclick`
 - Workflow filename: `publish.yml`
 - Allowed action: `npm publish`

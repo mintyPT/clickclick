@@ -1,0 +1,94 @@
+import type { RenderImageInput } from "../types.js";
+import { sizes } from "../shared/sizes.js";
+import { defaultSansFont, escapeHtml } from "./utils.js";
+
+export interface AnnouncementPresetOptions {
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  meta?: string;
+  cta?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  mutedColor?: string;
+  fontFamily?: string;
+  width?: number;
+  height?: number;
+}
+
+export function announcement(options: AnnouncementPresetOptions): RenderImageInput {
+  const width = options.width ?? sizes.og.width;
+  const height = options.height ?? sizes.og.height;
+  const safeTitle = escapeHtml(options.title);
+  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
+  const safeBadge = options.badge ? escapeHtml(options.badge) : "";
+  const safeMeta = options.meta ? escapeHtml(options.meta) : "";
+  const safeCta = options.cta ? escapeHtml(options.cta) : "";
+  const accent = options.accentColor ?? "#2563eb";
+
+  return {
+    document: {
+      html: `<!doctype html>
+<html>
+  <head><meta charset="utf-8" /></head>
+  <body>
+    <main>
+      <header>
+        ${safeBadge ? `<strong>${safeBadge}</strong>` : ""}
+        ${safeMeta ? `<span>${safeMeta}</span>` : ""}
+      </header>
+      <section>
+        <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
+        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
+      </section>
+      ${safeCta ? `<footer>${safeCta}</footer>` : ""}
+    </main>
+  </body>
+</html>`,
+      css: `
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; }
+body {
+  width: ${width}px;
+  height: ${height}px;
+  background:
+    linear-gradient(90deg, ${accent} 0 ${Math.round(width * 0.018)}px, transparent ${Math.round(width * 0.018)}px),
+    ${options.backgroundColor ?? "#f8fafc"};
+  color: ${options.textColor ?? "#0f172a"};
+  font-family: ${options.fontFamily ?? defaultSansFont};
+}
+main {
+  width: ${width}px;
+  height: ${height}px;
+  padding: ${Math.round(height * 0.105)}px ${Math.round(width * 0.09)}px ${Math.round(height * 0.09)}px ${Math.round(width * 0.11)}px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+header { display: flex; align-items: center; gap: ${Math.round(width * 0.025)}px; min-height: ${Math.round(height * 0.07)}px; }
+strong {
+  max-width: 42%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: ${Math.round(height * 0.014)}px ${Math.round(width * 0.02)}px;
+  background: ${accent};
+  color: #ffffff;
+  font-size: ${Math.round(width * 0.019)}px;
+  line-height: 1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+span, footer { color: ${options.mutedColor ?? "#475569"}; font-size: ${Math.round(width * 0.026)}px; line-height: 1.1; }
+section { display: flex; flex-direction: column; gap: ${Math.round(height * 0.035)}px; }
+h1, p { margin: 0; max-width: 100%; overflow: hidden; }
+h1 { max-height: ${Math.round(height * 0.4)}px; font-size: ${Math.round(width * 0.072)}px; line-height: 1.03; font-weight: 850; }
+p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.034)}px; line-height: 1.22; color: ${options.mutedColor ?? "#475569"}; }
+footer { width: fit-content; max-width: 100%; padding-top: ${Math.round(height * 0.025)}px; border-top: ${Math.max(4, Math.round(width * 0.006))}px solid ${accent}; font-weight: 750; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+`,
+    },
+    viewport: { width, height },
+  };
+}

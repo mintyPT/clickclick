@@ -6,3 +6,8 @@ export function escapeHtml(value: string): string {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 }
+
+export const defaultSansFont =
+  'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+export const defaultMonoFont = '"SFMono-Regular", Consolas, "Liberation Mono", monospace';

@@ -1,6 +1,6 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
-import { escapeHtml } from "./utils.js";
+import { defaultSansFont, escapeHtml } from "./utils.js";
 
 export interface SplitPresetOptions {
   title: string;
@@ -10,6 +10,8 @@ export interface SplitPresetOptions {
   panelColor?: string;
   accentColor?: string;
   textColor?: string;
+  panelSide?: "left" | "right";
+  fontFamily?: string;
   width?: number;
   height?: number;
 }
@@ -20,6 +22,8 @@ export function split(options: SplitPresetOptions): RenderImageInput {
   const safeTitle = escapeHtml(options.title);
   const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
   const safeLabel = options.label ? escapeHtml(options.label) : "";
+  const panelSide = options.panelSide ?? "right";
+  const copyFirst = panelSide === "right";
 
   return {
     document: {
@@ -28,15 +32,20 @@ export function split(options: SplitPresetOptions): RenderImageInput {
   <head><meta charset="utf-8" /></head>
   <body>
     <main>
-      <section class="copy">
+      ${copyFirst ? `<section class="copy">
         ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
         <h1 data-clickclick-fit data-clickclick-min-font-size="32">${safeTitle}</h1>
         ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeSubtitle}</p>` : ""}
-      </section>
+      </section>` : ""}
       <aside>
         <div class="rule"></div>
         <div class="dot"></div>
       </aside>
+      ${copyFirst ? "" : `<section class="copy">
+        ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
+        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${safeTitle}</h1>
+        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeSubtitle}</p>` : ""}
+      </section>`}
     </main>
   </body>
 </html>`,
@@ -48,13 +57,13 @@ body {
   height: ${height}px;
   background: ${options.backgroundColor ?? "#f8fafc"};
   color: ${options.textColor ?? "#0f172a"};
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: ${options.fontFamily ?? defaultSansFont};
 }
 main {
   width: ${width}px;
   height: ${height}px;
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
+  grid-template-columns: ${copyFirst ? "1.45fr 1fr" : "1fr 1.45fr"};
 }
 .copy {
   min-width: 0;

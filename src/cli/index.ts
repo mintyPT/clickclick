@@ -56,13 +56,128 @@ preset.command("list").description("List built-in presets").action(() => {
 });
 
 preset
+  .command("announcement")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--badge <text>", "Badge text")
+  .option("--meta <text>", "Meta text")
+  .option("--cta <text>", "Call-to-action text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--muted-color <color>", "Muted text color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.announcement({
+        title: options.title,
+        subtitle: options.subtitle,
+        badge: options.badge,
+        meta: options.meta,
+        cta: options.cta,
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        mutedColor: options.mutedColor,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("checkerboard")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--label <text>", "Small label text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--checker-color <color>", "Checker pattern color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.checkerboard({
+        title: options.title,
+        subtitle: options.subtitle,
+        label: options.label,
+        backgroundColor: options.background,
+        checkerColor: options.checkerColor,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("compare")
+  .requiredOption("--before-title <text>", "Before column title")
+  .requiredOption("--after-title <text>", "After column title")
+  .option("--title <text>", "Main title text")
+  .option("--before-text <text>", "Before column body text")
+  .option("--after-text <text>", "After column body text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--before-color <color>", "Before panel color")
+  .option("--after-color <color>", "After panel color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.compare({
+        title: options.title,
+        beforeTitle: options.beforeTitle,
+        beforeText: options.beforeText,
+        afterTitle: options.afterTitle,
+        afterText: options.afterText,
+        backgroundColor: options.background,
+        beforeColor: options.beforeColor,
+        afterColor: options.afterColor,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
   .command("gradient")
   .requiredOption("--title <text>", "Title text")
   .option("--subtitle <text>", "Subtitle text")
+  .option("--label <text>", "Small label text")
   .option("--from <color>", "Gradient start color")
   .option("--to <color>", "Gradient end color")
   .option("--accent <color>", "Accent color")
   .option("--text-color <color>", "Text color")
+  .option("--align <align>", "Text alignment: left or center")
+  .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
   .option("--out, --output <file>", "Output image path")
@@ -74,10 +189,13 @@ preset
       ...presets.gradient({
         title: options.title,
         subtitle: options.subtitle,
+        label: options.label,
         fromColor: options.from,
         toColor: options.to,
         accentColor: options.accent,
         textColor: options.textColor,
+        align: options.align,
+        fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
       }),
@@ -90,9 +208,12 @@ preset
   .requiredOption("--quote <text>", "Quote text")
   .option("--attribution <text>", "Quote attribution")
   .option("--source <text>", "Quote source")
+  .option("--mark <text>", "Decorative quote mark")
   .option("--background, --background-color <color>", "Background color")
   .option("--text-color <color>", "Text color")
   .option("--accent <color>", "Accent color")
+  .option("--align <align>", "Text alignment: left or center")
+  .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
   .option("--out, --output <file>", "Output image path")
@@ -105,9 +226,12 @@ preset
         quote: options.quote,
         attribution: options.attribution,
         source: options.source,
+        mark: options.mark,
         backgroundColor: options.background,
         textColor: options.textColor,
         accentColor: options.accent,
+        align: options.align,
+        fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
       }),
@@ -119,8 +243,11 @@ preset
   .command("solid")
   .requiredOption("--title <text>", "Title text")
   .option("--subtitle <text>", "Subtitle text")
+  .option("--label <text>", "Small label text")
   .option("--background, --background-color <color>", "Background color")
   .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
   .option("--align <align>", "Text alignment: left or center")
@@ -133,8 +260,11 @@ preset
       ...presets.solid({
         title: options.title,
         subtitle: options.subtitle,
+        label: options.label,
         backgroundColor: options.background,
         textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
         align: options.align,
@@ -152,6 +282,8 @@ preset
   .option("--panel-color <color>", "Panel color")
   .option("--accent <color>", "Accent color")
   .option("--text-color <color>", "Text color")
+  .option("--panel-side <side>", "Panel side: left or right")
+  .option("--font-family <value>", "CSS font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
   .option("--out, --output <file>", "Output image path")
@@ -168,6 +300,8 @@ preset
         panelColor: options.panelColor,
         accentColor: options.accent,
         textColor: options.textColor,
+        panelSide: options.panelSide,
+        fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
       }),
@@ -180,10 +314,15 @@ preset
   .requiredOption("--title <text>", "Title text")
   .requiredOption("--command <text>", "Command text")
   .option("--subtitle <text>", "Subtitle text")
+  .option("--prompt <text>", "Prompt text")
+  .option("--output-text <text>", "Terminal output text")
   .option("--background, --background-color <color>", "Background color")
   .option("--terminal-color <color>", "Terminal panel color")
   .option("--text-color <color>", "Text color")
+  .option("--command-color <color>", "Command text color")
   .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--mono-font-family <value>", "CSS monospace font-family value")
   .option("--width <px>", "Image width", parseInteger)
   .option("--height <px>", "Image height", parseInteger)
   .option("--out, --output <file>", "Output image path")
@@ -196,10 +335,51 @@ preset
         title: options.title,
         command: options.command,
         subtitle: options.subtitle,
+        prompt: options.prompt,
+        output: options.outputText,
         backgroundColor: options.background,
         terminalColor: options.terminalColor,
         textColor: options.textColor,
+        commandColor: options.commandColor,
         accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        monoFontFamily: options.monoFontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("minimal")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--meta <text>", "Meta text")
+  .option("--background, --background-color <color>", "Background color")
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--muted-color <color>", "Muted text color")
+  .option("--align <align>", "Text alignment: left or center")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.minimal({
+        title: options.title,
+        subtitle: options.subtitle,
+        meta: options.meta,
+        backgroundColor: options.background,
+        textColor: options.textColor,
+        accentColor: options.accent,
+        mutedColor: options.mutedColor,
+        align: options.align,
+        fontFamily: options.fontFamily,
         width: options.width,
         height: options.height,
       }),
