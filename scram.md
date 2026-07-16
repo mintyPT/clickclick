@@ -912,7 +912,7 @@ Add CLI commands and tests for each preset. Tests should prove that logos/waterm
 ---
 
 ## CC-024 · Document media-rich presets with rendered examples
-type: Task | status: Backlog | priority: Medium
+type: Task | status: Done | priority: Medium
 blocks: [] | blocked_by: [CC-022, CC-023]
 tags: [area.docs, media, presets, media-preset-docs]
 
@@ -949,6 +949,9 @@ Ensure generated images are stable dimensions, nonblank, and reasonably compress
 
 ### History
 - created · 2026-07-16T14:54:24Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:21:16Z · mauro.goncalo@gmail.com
+  Documented all 18 built-in presets with CLI/library examples and result images for the new media-rich presets. npm run build, npm run check, and npm test passed.
+- Backlog → Done · 2026-07-16T15:21:16Z · mauro.goncalo@gmail.com
 
 ---
 

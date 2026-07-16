@@ -374,6 +374,169 @@ and the GitHub Actions workflow steps. Do not publish from routine CI.
 ClickClick currently ships these built-in presets. Keep this list in sync with the exported
 `presets` object and the CLI preset commands.
 
+### `brandAnnouncement`
+
+A branded announcement image with title, subtitle, CTA, a corner logo, and a faint logo watermark.
+
+CLI:
+
+```bash
+clickclick preset brand-announcement \
+  --title "New partner program" \
+  --subtitle "Reusable branded cards with logo marks." \
+  --cta "Apply today" \
+  --out examples/presets/brand-announcement.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.brandAnnouncement({
+    title: "New partner program",
+    subtitle: "Reusable branded cards with logo marks.",
+    cta: "Apply today",
+  }),
+  output: { path: "examples/presets/brand-announcement.png" },
+});
+```
+
+Result:
+
+![Brand announcement preset result](./examples/presets/brand-announcement.png)
+
+### `logoBackdrop`
+
+A centered headline over a large logo or text watermark backdrop.
+
+CLI:
+
+```bash
+clickclick preset logo-backdrop \
+  --title "Brand assets in seconds" \
+  --meta "Backdrop" \
+  --watermark-text "CLICK" \
+  --out examples/presets/logo-backdrop.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.logoBackdrop({
+    title: "Brand assets in seconds",
+    meta: "Backdrop",
+    watermark: { text: "CLICK" },
+  }),
+  output: { path: "examples/presets/logo-backdrop.png" },
+});
+```
+
+Result:
+
+![Logo backdrop preset result](./examples/presets/logo-backdrop.png)
+
+### `partnerCard`
+
+A two-logo card for integrations, partnerships, and co-marketing announcements.
+
+CLI:
+
+```bash
+clickclick preset partner-card \
+  --title "ClickClick + Acme" \
+  --partner-name "Integration" \
+  --out examples/presets/partner-card.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.partnerCard({
+    title: "ClickClick + Acme",
+    partnerName: "Integration",
+  }),
+  output: { path: "examples/presets/partner-card.png" },
+});
+```
+
+Result:
+
+![Partner card preset result](./examples/presets/partner-card.png)
+
+### `watermarkQuote`
+
+A branded quote card with a logo or text watermark behind the quote.
+
+CLI:
+
+```bash
+clickclick preset watermark-quote \
+  --quote "Every launch asset now follows the brand." \
+  --attribution "ClickClick" \
+  --watermark-text "QUOTE" \
+  --out examples/presets/watermark-quote.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.watermarkQuote({
+    quote: "Every launch asset now follows the brand.",
+    attribution: "ClickClick",
+    watermark: { text: "QUOTE" },
+  }),
+  output: { path: "examples/presets/watermark-quote.png" },
+});
+```
+
+Result:
+
+![Watermark quote preset result](./examples/presets/watermark-quote.png)
+
+### `badgeGrid`
+
+An announcement card with a repeated logo or badge pattern behind foreground copy.
+
+CLI:
+
+```bash
+clickclick preset badge-grid \
+  --title "Hiring across product" \
+  --subtitle "Repeatable badge backgrounds for announcements." \
+  --badge "Hiring" \
+  --out examples/presets/badge-grid.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.badgeGrid({
+    title: "Hiring across product",
+    subtitle: "Repeatable badge backgrounds for announcements.",
+    badge: "Hiring",
+  }),
+  output: { path: "examples/presets/badge-grid.png" },
+});
+```
+
+Result:
+
+![Badge grid preset result](./examples/presets/badge-grid.png)
+
 ### `gradient`
 
 A colorful gradient social image with title, optional subtitle, optional label, configurable
@@ -416,6 +579,143 @@ await renderImage({
 Result:
 
 ![Gradient preset result](./examples/presets/gradient.png)
+
+### `photoHero`
+
+A full-bleed photo-backed hero card with a readable overlay, title, subtitle, label, and optional
+logo corner.
+
+CLI:
+
+```bash
+clickclick preset photo-hero \
+  --title "Launch visuals that feel alive" \
+  --subtitle "Photo-forward cards with readable overlays and logo corners." \
+  --label "Photo" \
+  --out examples/presets/photo-hero.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.photoHero({
+    title: "Launch visuals that feel alive",
+    subtitle: "Photo-forward cards with readable overlays and logo corners.",
+    label: "Photo",
+  }),
+  output: { path: "examples/presets/photo-hero.png" },
+});
+```
+
+Result:
+
+![Photo hero preset result](./examples/presets/photo-hero.png)
+
+### `editorialFeature`
+
+A magazine-style feature layout with a cropped media panel, headline, kicker, and byline.
+
+CLI:
+
+```bash
+clickclick preset editorial-feature \
+  --title "Designing with local images" \
+  --kicker "Editorial" \
+  --byline "ClickClick Magazine" \
+  --out examples/presets/editorial-feature.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.editorialFeature({
+    title: "Designing with local images",
+    kicker: "Editorial",
+    byline: "ClickClick Magazine",
+  }),
+  output: { path: "examples/presets/editorial-feature.png" },
+});
+```
+
+Result:
+
+![Editorial feature preset result](./examples/presets/editorial-feature.png)
+
+### `eventPoster`
+
+An event or launch poster with image backdrop, date block, metadata, CTA, and optional logo.
+
+CLI:
+
+```bash
+clickclick preset event-poster \
+  --title "Summer Launch" \
+  --date "Jul 16" \
+  --meta "Online" \
+  --cta "Register now" \
+  --out examples/presets/event-poster.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.eventPoster({
+    title: "Summer Launch",
+    date: "Jul 16",
+    meta: "Online",
+    cta: "Register now",
+  }),
+  output: { path: "examples/presets/event-poster.png" },
+});
+```
+
+Result:
+
+![Event poster preset result](./examples/presets/event-poster.png)
+
+### `caseStudy`
+
+An image-backed customer story card with customer label, quote, metric, logo, and overlay controls.
+
+CLI:
+
+```bash
+clickclick preset case-study \
+  --title "Acme ships images faster" \
+  --customer "Acme" \
+  --quote "We replaced hand-made cards with one script." \
+  --metric "42% faster" \
+  --out examples/presets/case-study.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.caseStudy({
+    title: "Acme ships images faster",
+    customer: "Acme",
+    quote: "We replaced hand-made cards with one script.",
+    metric: "42% faster",
+  }),
+  output: { path: "examples/presets/case-study.png" },
+});
+```
+
+Result:
+
+![Case study preset result](./examples/presets/case-study.png)
 
 ### `announcement`
 
