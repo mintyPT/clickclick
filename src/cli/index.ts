@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { ClickClickError, listConfigTemplates, presets, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
+import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { ImageFormat, LayerModification, RenderImageInput, RenderWarning, TemplateInput, WaitUntil } from "../types.js";
 
 const program = new Command();
@@ -410,6 +411,176 @@ preset
   });
 
 preset
+  .command("photo-hero")
+  .requiredOption("--title <text>", "Title text")
+  .option("--subtitle <text>", "Subtitle text")
+  .option("--label <text>", "Small label text")
+  .option("--image <src>", "Background image URL, path, or data URI")
+  .option("--overlay <color>", "Background overlay CSS color or gradient")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.photoHero({
+        title: options.title,
+        subtitle: options.subtitle,
+        label: options.label,
+        image: options.image,
+        overlay: options.overlay,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("editorial-feature")
+  .requiredOption("--title <text>", "Title text")
+  .option("--kicker <text>", "Kicker text")
+  .option("--byline <text>", "Byline or metadata text")
+  .option("--image <src>", "Feature image URL, path, or data URI")
+  .option("--image-position <position>", "Feature image CSS position")
+  .option("--overlay <color>", "Background color")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.editorialFeature({
+        title: options.title,
+        kicker: options.kicker,
+        byline: options.byline,
+        image: options.image,
+        imagePosition: options.imagePosition,
+        overlay: options.overlay,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("event-poster")
+  .requiredOption("--title <text>", "Title text")
+  .option("--date <text>", "Date text")
+  .option("--meta <text>", "Meta text")
+  .option("--cta <text>", "Call-to-action text")
+  .option("--image <src>", "Background image URL, path, or data URI")
+  .option("--overlay <color>", "Background overlay CSS color or gradient")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.eventPoster({
+        title: options.title,
+        date: options.date,
+        meta: options.meta,
+        cta: options.cta,
+        image: options.image,
+        overlay: options.overlay,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
+  .command("case-study")
+  .requiredOption("--title <text>", "Title text")
+  .option("--customer <text>", "Customer or brand text")
+  .option("--quote <text>", "Quote text")
+  .option("--metric <text>", "Result metric text")
+  .option("--image <src>", "Background image URL, path, or data URI")
+  .option("--overlay <color>", "Background overlay CSS color or gradient")
+  .option("--logo <src>", "Logo image URL, path, or data URI")
+  .option("--logo-placement <placement>", "Logo placement corner")
+  .option("--watermark <src>", "Watermark image URL, path, or data URI")
+  .option("--watermark-text <text>", "Watermark text")
+  .option("--watermark-opacity <number>", "Watermark opacity from 0 to 1", parseNumber)
+  .option("--text-color <color>", "Text color")
+  .option("--accent <color>", "Accent color")
+  .option("--font-family <value>", "CSS font-family value")
+  .option("--width <px>", "Image width", parseInteger)
+  .option("--height <px>", "Image height", parseInteger)
+  .option("--out, --output <file>", "Output image path")
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...presets.caseStudy({
+        title: options.title,
+        customer: options.customer,
+        quote: options.quote,
+        metric: options.metric,
+        image: options.image,
+        overlay: options.overlay,
+        logo: parseLogoOption(options),
+        watermark: parseWatermarkOption(options),
+        textColor: options.textColor,
+        accentColor: options.accent,
+        fontFamily: options.fontFamily,
+        width: options.width,
+        height: options.height,
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict));
+  });
+
+preset
   .command("solid")
   .requiredOption("--title <text>", "Title text")
   .option("--subtitle <text>", "Subtitle text")
@@ -656,13 +827,34 @@ function parsePresetMediaOptions(options: Record<string, unknown>) {
   return media;
 }
 
+function parseLogoOption(options: Record<string, unknown>): PresetLogoOptions | undefined {
+  if (typeof options.logo !== "string") return undefined;
+  const placement = parseMediaPlacement(options.logoPlacement, "logo-placement");
+  if (placement === "center") {
+    throw new ClickClickError("INVALID_INPUT", "logo-placement must be top-left, top-right, bottom-left, or bottom-right.");
+  }
+  return {
+    src: options.logo,
+    placement,
+  };
+}
+
+function parseWatermarkOption(options: Record<string, unknown>): PresetWatermarkOptions | undefined {
+  if (typeof options.watermark !== "string" && typeof options.watermarkText !== "string") return undefined;
+  return {
+    src: typeof options.watermark === "string" ? options.watermark : undefined,
+    text: typeof options.watermarkText === "string" ? options.watermarkText : undefined,
+    opacity: typeof options.watermarkOpacity === "number" ? options.watermarkOpacity : undefined,
+  };
+}
+
 function parseMediaFit(value: unknown) {
   if (value === undefined) return undefined;
   if (value === "cover" || value === "contain" || value === "fill" || value === "none" || value === "scale-down") return value;
   throw new ClickClickError("INVALID_INPUT", "background-fit must be cover, contain, fill, none, or scale-down.");
 }
 
-function parseMediaPlacement(value: unknown, label: string) {
+function parseMediaPlacement(value: unknown, label: string): PresetWatermarkOptions["placement"] | undefined {
   if (value === undefined) return undefined;
   if (value === "top-left" || value === "top-right" || value === "bottom-left" || value === "bottom-right" || value === "center") return value;
   throw new ClickClickError("INVALID_INPUT", `${label} must be top-left, top-right, bottom-left, bottom-right, or center.`);

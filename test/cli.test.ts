@@ -22,6 +22,10 @@ describe("CLI", () => {
     expect(result.stdout).toContain("checkerboard");
     expect(result.stdout).toContain("compare");
     expect(result.stdout).toContain("gradient");
+    expect(result.stdout).toContain("photoHero");
+    expect(result.stdout).toContain("editorialFeature");
+    expect(result.stdout).toContain("eventPoster");
+    expect(result.stdout).toContain("caseStudy");
     expect(result.stdout).toContain("minimal");
     expect(result.stdout).toContain("quote");
     expect(result.stdout).toContain("solid");
@@ -130,6 +134,10 @@ describe("CLI", () => {
     ["checkerboard", ["--title", "Hello", "--label", "New"]],
     ["compare", ["--before-title", "Before", "--after-title", "After"]],
     ["gradient", ["--title", "Hello"]],
+    ["photo-hero", ["--title", "Hello", "--image", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E", "--label", "New"]],
+    ["editorial-feature", ["--title", "Hello", "--image", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E", "--byline", "By Ada"]],
+    ["event-poster", ["--title", "Hello", "--image", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E", "--date", "May 4"]],
+    ["case-study", ["--title", "Hello", "--image", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E", "--metric", "42% faster"]],
     ["minimal", ["--title", "Hello", "--meta", "Notes"]],
     ["quote", ["--quote", "Hello"]],
     ["split", ["--title", "Hello"]],

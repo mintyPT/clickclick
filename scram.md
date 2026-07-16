@@ -819,7 +819,7 @@ Add tests that prove user-authored text is escaped, media URLs are serialized sa
 ---
 
 ## CC-022 · Add photo-forward social image presets
-type: Task | status: Backlog | priority: High
+type: Task | status: Done | priority: High
 blocks: [CC-024] | blocked_by: [CC-021]
 tags: [area.presets, media, photos, photo-presets]
 
@@ -857,6 +857,10 @@ Avoid remote network dependencies in tests. For docs/examples, use checked-in lo
 
 ### History
 - created · 2026-07-16T14:53:58Z · mauro.goncalo@gmail.com
+- Backlog → Claimed · 2026-07-16T15:04:43Z · mauro.goncalo@gmail.com
+- Claimed → Done · 2026-07-16T15:10:34Z · mauro.goncalo@gmail.com
+- handoff · 2026-07-16T15:10:35Z · mauro.goncalo@gmail.com
+  Added photoHero, editorialFeature, eventPoster, and caseStudy presets with CLI commands and smoke tests. npm test passed; npm run build passed after CLI type narrowing.
 
 ---
 

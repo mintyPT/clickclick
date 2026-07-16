@@ -3,6 +3,7 @@ import { checkerboard } from "./checkerboard.js";
 import { compare } from "./compare.js";
 import { gradient } from "./gradient.js";
 import { minimal } from "./minimal.js";
+import { caseStudy, editorialFeature, eventPoster, photoHero } from "./photo.js";
 import { quote } from "./quote.js";
 import { solid } from "./solid.js";
 import { split } from "./split.js";
@@ -12,6 +13,7 @@ export type { CheckerboardPresetOptions } from "./checkerboard.js";
 export type { ComparePresetOptions } from "./compare.js";
 export type { GradientPresetOptions } from "./gradient.js";
 export type { MinimalPresetOptions } from "./minimal.js";
+export type { CaseStudyPresetOptions, EditorialFeaturePresetOptions, EventPosterPresetOptions, PhotoHeroPresetOptions } from "./photo.js";
 export type { QuotePresetOptions } from "./quote.js";
 export type { SolidPresetOptions } from "./solid.js";
 export type { SplitPresetOptions } from "./split.js";
@@ -24,6 +26,10 @@ export const presets = {
   compare,
   gradient,
   minimal,
+  photoHero,
+  editorialFeature,
+  eventPoster,
+  caseStudy,
   quote,
   solid,
   split,
@@ -46,6 +52,22 @@ export const presetMetadata = [
   {
     name: "gradient",
     description: "Gradient social image with title, optional subtitle, and accent glow.",
+  },
+  {
+    name: "photoHero",
+    description: "Photo-forward hero image with title, subtitle, label, and optional logo.",
+  },
+  {
+    name: "editorialFeature",
+    description: "Magazine-style feature image with cropped media panel and byline.",
+  },
+  {
+    name: "eventPoster",
+    description: "Event or launch poster with image backdrop, date block, and CTA.",
+  },
+  {
+    name: "caseStudy",
+    description: "Image-backed customer story card with quote, logo, and metric.",
   },
   {
     name: "minimal",
