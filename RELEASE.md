@@ -36,6 +36,17 @@ npm run pack:dry
 Do not publish from routine CI. The GitHub Actions publish workflow is manual-only and requires the
 operator to type the package name before it can publish.
 
+The npm package owner must first authorize this repository as a trusted publisher:
+
+```bash
+npm install -g npm@latest
+npm trust github @maurogoncalo/clickclick \
+  --repo mintyPT/clickclick \
+  --file publish.yml \
+  --allow-publish \
+  --yes
+```
+
 To publish through GitHub Actions, run the "Publish to npm" workflow on `main` and enter:
 
 ```text

@@ -1731,3 +1731,14 @@ The publish job publishes with provenance:
 ```bash
 npm publish --access public --provenance
 ```
+
+Before the workflow can publish, the npm package owner must authorize it as a trusted publisher:
+
+```bash
+npm install -g npm@latest
+npm trust github @maurogoncalo/clickclick \
+  --repo mintyPT/clickclick \
+  --file publish.yml \
+  --allow-publish \
+  --yes
+```

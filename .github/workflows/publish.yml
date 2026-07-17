@@ -36,6 +36,9 @@ jobs:
           scope: "@maurogoncalo"
           package-manager-cache: false
 
+      - name: Use latest npm
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
 
