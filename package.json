@@ -1,6 +1,6 @@
 {
   "name": "@maurogoncalo/clickclick",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Generate social images by screenshotting HTML with Playwright.",
   "type": "module",
   "license": "MIT",
