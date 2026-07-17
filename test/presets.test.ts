@@ -133,6 +133,27 @@ describe("new social presets", () => {
     expect(presets.terminal({ title: "Hello", command: "npm test", prompt: ">", output: "done" }).document.html).toContain("done");
   });
 
+  it("does not inject default media assets into media-backed presets", () => {
+    const inputs = [
+      presets.brandAnnouncement({ title: "Hello" }),
+      presets.logoBackdrop({ title: "Hello" }),
+      presets.partnerCard({ title: "Hello" }),
+      presets.badgeGrid({ title: "Hello" }),
+      presets.photoHero({ title: "Hello" }),
+      presets.editorialFeature({ title: "Hello" }),
+      presets.eventPoster({ title: "Hello" }),
+      presets.caseStudy({ title: "Hello" }),
+    ];
+
+    for (const input of inputs) {
+      expect(input.document.html).not.toContain("data:image");
+      expect(input.document.html).not.toContain("preset-media-logo");
+      expect(input.document.css).not.toContain("data:image");
+      expect(input.document.css).not.toContain("preset-media-background");
+      expect(input.document.css).not.toContain("preset-media-watermark");
+    }
+  });
+
   it("has internal CLI metadata for every exported preset", () => {
     expect(presetMetadata.map((preset) => preset.name)).toEqual([
       "announcement",

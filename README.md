@@ -614,7 +614,7 @@ fields:
 
 ```json
 [
-  { "name": "hero", "src": "data:image/svg+xml,...", "fit": "cover", "anchor": "center", "effect": "grayscale" },
+  { "name": "hero", "src": "examples/presets/photo-source.svg", "fit": "cover", "anchor": "center", "effect": "grayscale" },
   { "name": "badge", "text": "STRICT", "x": -24, "y": -18, "border": "3px solid #111827" }
 ]
 ```
@@ -829,6 +829,7 @@ clickclick preset brand-announcement \
   --subtitle "Reusable branded cards with logo marks." \
   --cta "Apply today" \
   --logo examples/presets/clickclick-logo.svg \
+  --watermark examples/presets/clickclick-logo.svg \
   --out examples/presets/brand-announcement.png
 ```
 
@@ -843,6 +844,7 @@ await renderImage({
     subtitle: "Reusable branded cards with logo marks.",
     cta: "Apply today",
     logo: { src: "examples/presets/clickclick-logo.svg", placement: "top-right" },
+    watermark: { src: "examples/presets/clickclick-logo.svg", opacity: 0.08, scale: 0.58 },
   }),
   output: { path: "examples/presets/brand-announcement.png" },
 });
@@ -898,6 +900,8 @@ CLI:
 clickclick preset partner-card \
   --title "ClickClick + Acme" \
   --partner-name "Integration" \
+  --logo examples/presets/clickclick-logo.svg \
+  --partner-logo examples/presets/photo-source.svg \
   --out examples/presets/partner-card.png
 ```
 
@@ -910,6 +914,8 @@ await renderImage({
   ...presets.partnerCard({
     title: "ClickClick + Acme",
     partnerName: "Integration",
+    logo: { src: "examples/presets/clickclick-logo.svg" },
+    partnerLogo: "examples/presets/photo-source.svg",
   }),
   output: { path: "examples/presets/partner-card.png" },
 });
@@ -963,6 +969,7 @@ clickclick preset badge-grid \
   --title "Hiring across product" \
   --subtitle "Repeatable badge backgrounds for announcements." \
   --badge "Hiring" \
+  --badge-logo examples/presets/clickclick-logo.svg \
   --out examples/presets/badge-grid.png
 ```
 
@@ -976,6 +983,7 @@ await renderImage({
     title: "Hiring across product",
     subtitle: "Repeatable badge backgrounds for announcements.",
     badge: "Hiring",
+    badgeLogo: "examples/presets/clickclick-logo.svg",
   }),
   output: { path: "examples/presets/badge-grid.png" },
 });
@@ -1040,6 +1048,8 @@ clickclick preset photo-hero \
   --title "Launch visuals that feel alive" \
   --subtitle "Photo-forward cards with readable overlays and logo corners." \
   --label "Photo" \
+  --image examples/presets/photo-source.svg \
+  --logo examples/presets/clickclick-logo.svg \
   --out examples/presets/photo-hero.png
 ```
 
@@ -1053,6 +1063,8 @@ await renderImage({
     title: "Launch visuals that feel alive",
     subtitle: "Photo-forward cards with readable overlays and logo corners.",
     label: "Photo",
+    image: "examples/presets/photo-source.svg",
+    logo: { src: "examples/presets/clickclick-logo.svg" },
   }),
   output: { path: "examples/presets/photo-hero.png" },
 });
@@ -1073,6 +1085,7 @@ clickclick preset editorial-feature \
   --title "Designing with local images" \
   --kicker "Editorial" \
   --byline "ClickClick Magazine" \
+  --image examples/presets/photo-source.svg \
   --out examples/presets/editorial-feature.png
 ```
 
@@ -1086,6 +1099,7 @@ await renderImage({
     title: "Designing with local images",
     kicker: "Editorial",
     byline: "ClickClick Magazine",
+    image: "examples/presets/photo-source.svg",
   }),
   output: { path: "examples/presets/editorial-feature.png" },
 });
@@ -1107,6 +1121,8 @@ clickclick preset event-poster \
   --date "Jul 16" \
   --meta "Online" \
   --cta "Register now" \
+  --image examples/presets/photo-source.svg \
+  --logo examples/presets/clickclick-logo.svg \
   --out examples/presets/event-poster.png
 ```
 
@@ -1121,6 +1137,8 @@ await renderImage({
     date: "Jul 16",
     meta: "Online",
     cta: "Register now",
+    image: "examples/presets/photo-source.svg",
+    logo: { src: "examples/presets/clickclick-logo.svg" },
   }),
   output: { path: "examples/presets/event-poster.png" },
 });
@@ -1142,6 +1160,8 @@ clickclick preset case-study \
   --customer "Acme" \
   --quote "We replaced hand-made cards with one script." \
   --metric "42% faster" \
+  --image examples/presets/photo-source.svg \
+  --logo examples/presets/clickclick-logo.svg \
   --out examples/presets/case-study.png
 ```
 
@@ -1156,6 +1176,8 @@ await renderImage({
     customer: "Acme",
     quote: "We replaced hand-made cards with one script.",
     metric: "42% faster",
+    image: "examples/presets/photo-source.svg",
+    logo: { src: "examples/presets/clickclick-logo.svg" },
   }),
   output: { path: "examples/presets/case-study.png" },
 });

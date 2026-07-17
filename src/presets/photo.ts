@@ -3,9 +3,6 @@ import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "
 import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 
-const defaultPhoto =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%230f766e'/%3E%3Cstop offset='.55' stop-color='%232563eb'/%3E%3Cstop offset='1' stop-color='%23f97316'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='630' fill='url(%23g)'/%3E%3Ccircle cx='930' cy='150' r='220' fill='%23ffffff' opacity='.18'/%3E%3Cpath d='M80 520 330 260l210 190 170-160 410 310H80Z' fill='%23ffffff' opacity='.2'/%3E%3C/svg%3E";
-
 interface PhotoBaseOptions {
   title: string;
   image?: string;
@@ -45,7 +42,7 @@ export interface CaseStudyPresetOptions extends PhotoBaseOptions {
 export function photoHero(options: PhotoHeroPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
-    background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(90deg, rgba(3,7,18,.78), rgba(3,7,18,.24))" },
+    background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(90deg, rgba(3,7,18,.78), rgba(3,7,18,.24))" } : undefined,
     logo: options.logo,
     watermark: options.watermark,
   }, size.width, size.height);
@@ -73,7 +70,7 @@ export function editorialFeature(options: EditorialFeaturePresetOptions): Render
         ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 32 })}
         ${textLayer(options.byline, { tag: "p" })}
       </section>
-      ${imageLayer(options.image ?? defaultPhoto, { className: "image", ariaHidden: true })}
+      ${imageLayer(options.image, { className: "image", ariaHidden: true })}
     </main>`, `
 .editorial { background: ${options.overlay ?? "#f8fafc"}; color: ${options.textColor ?? "#111827"}; }
 .editorial .copy { position: relative; z-index: 2; width: 55%; padding: ${Math.round(size.height * 0.1)}px ${Math.round(size.width * 0.07)}px; display: flex; flex-direction: column; justify-content: flex-end; gap: ${Math.round(size.height * 0.035)}px; }
@@ -85,7 +82,7 @@ ${media.css}`);
 export function eventPoster(options: EventPosterPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
-    background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(180deg, rgba(2,6,23,.18), rgba(2,6,23,.88))" },
+    background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(180deg, rgba(2,6,23,.18), rgba(2,6,23,.88))" } : undefined,
     logo: options.logo,
     watermark: options.watermark,
   }, size.width, size.height);
@@ -112,7 +109,7 @@ ${media.css}`);
 export function caseStudy(options: CaseStudyPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
-    background: { src: options.image ?? defaultPhoto, overlay: options.overlay ?? "linear-gradient(90deg, rgba(15,23,42,.82), rgba(15,23,42,.52))" },
+    background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(90deg, rgba(15,23,42,.82), rgba(15,23,42,.52))" } : undefined,
     logo: options.logo,
     watermark: options.watermark,
   }, size.width, size.height);

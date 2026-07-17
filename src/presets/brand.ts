@@ -3,9 +3,6 @@ import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "
 import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 
-const defaultLogo =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='54' fill='%23ffffff'/%3E%3Cpath d='M64 144 120 56h72l-56 88h56l-80 80 24-80H64Z' fill='%23111827'/%3E%3C/svg%3E";
-
 interface BrandBaseOptions {
   title: string;
   subtitle?: string;
@@ -45,8 +42,8 @@ export interface BadgeGridPresetOptions extends BrandBaseOptions {
 export function brandAnnouncement(options: BrandAnnouncementPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
-    logo: options.logo ?? { src: defaultLogo, placement: "top-right" },
-    watermark: options.watermark ?? { src: options.logo?.src ?? defaultLogo, opacity: 0.08, scale: 0.58 },
+    logo: options.logo,
+    watermark: options.watermark,
   }, size.width, size.height);
   return brandDocument(size, options, `
     <main class="brand announcement-brand">
@@ -66,7 +63,7 @@ ${media.css}`);
 export function logoBackdrop(options: LogoBackdropPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
-    watermark: options.watermark ?? { src: options.logo?.src ?? defaultLogo, opacity: 0.1, scale: 0.72 },
+    watermark: options.watermark,
     logo: options.logo,
   }, size.width, size.height);
   return brandDocument(size, options, `
@@ -85,15 +82,13 @@ ${media.css}`);
 export function partnerCard(options: PartnerCardPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({ watermark: options.watermark }, size.width, size.height);
-  const ownLogo = options.logo?.src ?? defaultLogo;
-  const partnerLogo = options.partnerLogo ?? defaultLogo;
   return brandDocument(size, options, `
     <main class="brand partner-card">
       ${media.html}
       <section class="logos">
-        ${imageLayer(ownLogo)}
+        ${imageLayer(options.logo?.src)}
         <span>+</span>
-        ${imageLayer(partnerLogo)}
+        ${imageLayer(options.partnerLogo)}
       </section>
       <section class="partner-copy">
         ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 30 })}
@@ -112,7 +107,7 @@ export function watermarkQuote(options: WatermarkQuotePresetOptions): RenderImag
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     logo: options.logo,
-    watermark: options.watermark ?? { src: options.logo?.src, text: options.logo?.src ? undefined : "QUOTE", opacity: 0.1, scale: 0.22, rotation: -8 },
+    watermark: options.watermark,
   }, size.width, size.height);
   return brandDocument(size, options, `
     <main class="brand watermark-quote">
@@ -129,7 +124,7 @@ ${media.css}`);
 
 export function badgeGrid(options: BadgeGridPresetOptions): RenderImageInput {
   const size = resolvePresetSize(options);
-  const logo = options.badgeLogo ?? options.logo?.src ?? defaultLogo;
+  const logo = options.badgeLogo ?? options.logo?.src;
   const media = renderPresetMedia({ logo: options.logo, watermark: options.watermark }, size.width, size.height);
   return brandDocument(size, options, `
     <main class="brand badge-grid">
