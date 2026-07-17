@@ -33,6 +33,21 @@ describe("template rendering", () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it("renders local image layer sources passed by path", async () => {
+    const assetPath = join(tempDir, "template-red.svg");
+    await writeFile(assetPath, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#ff0000"/></svg>');
+
+    const result = await renderTemplate({
+      html: '<main><img data-layer="hero" alt=""></main>',
+      css: "html,body,main{margin:0;width:100%;height:100%;background:#000}img{width:100%;height:100%;object-fit:cover}",
+      viewport: { width: 80, height: 40 },
+      modifications: [{ name: "hero", src: assetPath }],
+    });
+
+    const png = PNG.sync.read(result.buffer);
+    expect([...png.data.subarray(0, 3)]).toEqual([255, 0, 0]);
+  });
+
   it("reports duplicate layers and can warn for missing layers", async () => {
     const result = await renderTemplate({
       html: '<div data-layer="title">A</div><div data-layer="title">B</div>',

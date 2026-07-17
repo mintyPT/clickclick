@@ -851,7 +851,7 @@ await renderImage({
 ```
 
 Image options accept `https:`, `data:`, `file:`, absolute paths, and paths relative to the current
-working directory. Local paths are converted to `file://` URLs before Chromium renders the image.
+working directory. Local paths are inlined as data URLs before Chromium renders the image.
 
 Result:
 

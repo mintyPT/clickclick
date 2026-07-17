@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Page } from "playwright";
 import { ClickClickError } from "../errors.js";
+import { serializeMediaSource } from "../presets/utils.js";
 import { renderImage } from "../renderer/index.js";
 import type {
   ClickClickConfig,
@@ -24,6 +25,7 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
   const template = await prepareTemplate(input);
   const warnings: TemplateWarning[] = [];
   const css = [fontFaceCss(input.fonts), template.css].filter(Boolean).join("\n");
+  const modifications = serializeLayerModificationSources(input.modifications ?? [], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
 
   const result = await renderImage({
     document: {
@@ -37,7 +39,7 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
     render: {
       ...input.render,
       beforeScreenshot: async (page) => {
-        const layerWarnings = await applyLayerModifications(page, input.modifications ?? [], {
+        const layerWarnings = await applyLayerModifications(page, modifications, {
           onMissingLayer: input.onMissingLayer ?? "error",
           onDuplicateLayer: input.onDuplicateLayer ?? "warn",
         });
@@ -219,6 +221,17 @@ const APPLY_LAYER_MODIFICATIONS_SCRIPT = `({ modifications, behavior }) => {
   }
   return warnings;
 }`;
+
+function serializeLayerModificationSources(modifications: LayerModification[], baseDir: string | undefined): LayerModification[] {
+  return modifications.map((modification) => {
+    const src = modification.src ?? modification.image_url;
+    if (!src) return modification;
+    const serialized = serializeMediaSource(src, baseDir);
+    return modification.src !== undefined
+      ? { ...modification, src: serialized }
+      : { ...modification, image_url: serialized };
+  });
+}
 
 function fontFaceCss(fonts: TemplateInput["fonts"] = []): string {
   return fonts.map((font) => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { pathToFileURL } from "node:url";
 import { presets, sizes } from "../src/index.js";
 import { presetMetadata } from "../src/presets/index.js";
 
@@ -59,14 +60,20 @@ describe("solid preset", () => {
     expect(input.document.css).toContain("opacity: 0.7");
   });
 
-  it("serializes local media paths to file URLs", () => {
+  it("inlines local media paths as data URLs", () => {
     const input = presets.brandAnnouncement({
       title: "Launch",
       logo: { src: "examples/presets/clickclick-logo.svg" },
     });
 
-    expect(input.document.html).toContain("file://");
-    expect(input.document.html).toContain("clickclick-logo.svg");
+    expect(input.document.html).toContain("data:image/svg+xml;base64,");
+    expect(input.document.html).not.toContain("file://");
+
+    const fileUrlInput = presets.brandAnnouncement({
+      title: "Launch",
+      logo: { src: pathToFileURL("examples/presets/clickclick-logo.svg").href },
+    });
+    expect(fileUrlInput.document.html).toContain("data:image/svg+xml;base64,");
   });
 });
 

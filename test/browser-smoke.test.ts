@@ -1,9 +1,9 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ClickClickError, renderImage, screenshotUrl } from "../src/index.js";
+import { ClickClickError, presets, renderImage, screenshotUrl } from "../src/index.js";
 
 let tempDir: string;
 
@@ -137,8 +137,40 @@ describe("browser rendering", () => {
       }),
     ).rejects.toMatchObject({ code: "TEXT_FIT_OVERFLOW" satisfies ClickClickError["code"] });
   });
+
+  it("renders local preset media assets passed by path", async () => {
+    const assetPath = join(tempDir, "red.svg");
+    await writeFile(assetPath, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#ff0000"/></svg>');
+
+    const editorial = await renderImage({
+      ...presets.editorialFeature({
+        title: "Media",
+        image: assetPath,
+        width: 240,
+        height: 126,
+      }),
+    });
+    const editorialPng = PNG.sync.read(editorial.buffer);
+    expect(rgbAt(editorialPng, 190, 40)).toEqual([255, 0, 0]);
+
+    const badgeGrid = await renderImage({
+      ...presets.badgeGrid({
+        title: "Media",
+        badgeLogo: assetPath,
+        width: 600,
+        height: 315,
+      }),
+    });
+    const badgeGridPng = PNG.sync.read(badgeGrid.buffer);
+    expect(rgbAt(badgeGridPng, 550, 50)[0]).toBeGreaterThan(40);
+  });
 });
 
 function toDataUrl(html: string): string {
   return `data:text/html,${encodeURIComponent(html)}`;
+}
+
+function rgbAt(png: PNG, x: number, y: number): [number, number, number] {
+  const index = (y * png.width + x) * 4;
+  return [png.data[index]!, png.data[index + 1]!, png.data[index + 2]!];
 }
