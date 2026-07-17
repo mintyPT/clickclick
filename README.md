@@ -1714,11 +1714,12 @@ dependencies, installs Playwright Chromium, typechecks, builds, runs tests, and 
 package contents with `npm pack --dry-run`.
 
 Publishing to npm is handled by the `Publish to npm` GitHub Actions workflow. The publish workflow
-checks out `main`, bumps `package.json` and `package-lock.json` to the next unpublished patch version
-when the committed version already exists on npm, verifies the npm package contents, commits and tags
-that release version, and publishes it with provenance. It is manually dispatched and requires the
-operator to confirm the package name before publishing. The workflow uses npm trusted publishing with
-GitHub Actions OIDC, so npm must be configured with a trusted publisher for:
+checks out `main`, bumps `package.json` and `package-lock.json` to the next unused patch version when
+the committed version already exists on npm or already has a git tag, verifies the npm package
+contents, commits and tags that release version, and publishes it with provenance. It is manually
+dispatched and requires the operator to confirm the package name before publishing. The workflow uses
+npm trusted publishing with GitHub Actions OIDC, so npm must be configured with a trusted publisher
+for:
 
 - Package: `@maurogoncalo/clickclick`
 - Repository: `mintyPT/clickclick`

@@ -42,6 +42,6 @@ To publish through GitHub Actions, run the "Publish to npm" workflow on `main` a
 @maurogoncalo/clickclick
 ```
 
-The workflow bumps `package.json` and `package-lock.json` to the next unpublished patch version when
-the committed version already exists on npm, runs `npm run release:check`, commits and tags that
-release version, and publishes with public access and provenance.
+The workflow bumps `package.json` and `package-lock.json` to the next unused patch version when the
+committed version already exists on npm or already has a git tag, runs `npm run release:check`,
+commits and tags that release version, and publishes with public access and provenance.

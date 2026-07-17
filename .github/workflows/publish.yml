@@ -50,7 +50,7 @@ jobs:
           current_version="$(node -p "require('./package.json').version")"
           package_version="${current_version}"
 
-          while npm view "${package_name}@${package_version}" version >/dev/null 2>&1; do
+          while npm view "${package_name}@${package_version}" version >/dev/null 2>&1 || git rev-parse "v${package_version}" >/dev/null 2>&1; do
             package_version="$(node -e "const [major, minor, patch] = process.argv[1].split('.').map(Number); console.log([major, minor, patch + 1].join('.'))" "${package_version}")"
           done
 

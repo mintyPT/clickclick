@@ -23,7 +23,7 @@
     "node": ">=20"
   },
   "bin": {
-    "clickclick": "./dist/cli/index.js"
+    "clickclick": "dist/cli/index.js"
   },
   "types": "./dist/index.d.ts",
   "exports": {
