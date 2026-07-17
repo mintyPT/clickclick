@@ -69,7 +69,7 @@ jobs:
       - name: Verify package contents
         run: npm run release:check
 
-      - name: Commit release version
+      - name: Prepare release commit
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -84,7 +84,10 @@ jobs:
             git tag -a "${{ steps.release.outputs.release-tag }}" -m "${{ steps.release.outputs.release-tag }}"
           fi
 
-          git push origin HEAD:${{ github.ref_name }} --follow-tags
-
       - name: Publish to npm
         run: npm publish --access public --provenance
+
+      - name: Push release commit and tag
+        shell: bash
+        run: |
+          git push origin HEAD:${{ github.ref_name }} --follow-tags
