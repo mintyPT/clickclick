@@ -78,7 +78,7 @@ jobs:
           fi
 
           if ! git rev-parse "${{ steps.release.outputs.release-tag }}" >/dev/null 2>&1; then
-            git tag "${{ steps.release.outputs.release-tag }}"
+            git tag -a "${{ steps.release.outputs.release-tag }}" -m "${{ steps.release.outputs.release-tag }}"
           fi
 
           git push origin HEAD:${{ github.ref_name }} --follow-tags
