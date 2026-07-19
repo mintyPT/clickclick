@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-decision" },
+  { "name": "title", "html": "A decision<br>for nature" },
+  { "name": "logo-small", "src": "../presets/agriculture-logo.svg" },
+  { "name": "brand-small", "text": "Fieldora" }
+]

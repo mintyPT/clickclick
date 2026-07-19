@@ -1,0 +1,5 @@
+[
+  { "name": "post", "className": "post post-wordmark" },
+  { "name": "logo", "src": "../presets/agriculture-logo.svg" },
+  { "name": "brand", "text": "Fieldora" }
+]

@@ -342,6 +342,190 @@ Result:
 
 ![Anthropic homepage screenshot result](./examples/use-cases/anthropic-home.png)
 
+### Render Agriculture Brand Social Posts
+
+Use custom templates when you need a cohesive family of square social posts with shared brand
+language. These examples break a farm-branding social set into separate outputs: neon accent,
+wordmark, cream shape, nature statement, dark slogan, and geometric pattern posts. Logo sources are
+passed through modification JSON instead of being hardcoded in the template.
+
+#### Neon Accent Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-accent.json \
+  --out examples/use-cases/agriculture-social-accent.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-accent.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-accent.png" },
+});
+```
+
+Result:
+
+![Agriculture neon accent post result](./examples/use-cases/agriculture-social-accent.png)
+
+#### Wordmark Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-wordmark.json \
+  --out examples/use-cases/agriculture-social-wordmark.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-wordmark.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-wordmark.png" },
+});
+```
+
+Result:
+
+![Agriculture wordmark post result](./examples/use-cases/agriculture-social-wordmark.png)
+
+#### Sustainable Shape Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-sustainable.json \
+  --out examples/use-cases/agriculture-social-sustainable.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-sustainable.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-sustainable.png" },
+});
+```
+
+Result:
+
+![Agriculture sustainable shape post result](./examples/use-cases/agriculture-social-sustainable.png)
+
+#### Nature Statement Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-decision.json \
+  --out examples/use-cases/agriculture-social-decision.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-decision.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-decision.png" },
+});
+```
+
+Result:
+
+![Agriculture nature statement post result](./examples/use-cases/agriculture-social-decision.png)
+
+#### Connecting Fields Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-connecting.json \
+  --out examples/use-cases/agriculture-social-connecting.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-connecting.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-connecting.png" },
+});
+```
+
+Result:
+
+![Agriculture connecting fields post result](./examples/use-cases/agriculture-social-connecting.png)
+
+#### Perspective Pattern Post
+
+CLI:
+
+```bash
+clickclick template examples/use-cases/agriculture-social-post.html \
+  --css examples/use-cases/agriculture-social-post.css \
+  --modify-file examples/use-cases/agriculture-social-perspective.json \
+  --out examples/use-cases/agriculture-social-perspective.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/agriculture-social-post.html",
+  cssPath: "examples/use-cases/agriculture-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/agriculture-social-perspective.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/agriculture-social-perspective.png" },
+});
+```
+
+Result:
+
+![Agriculture perspective pattern post result](./examples/use-cases/agriculture-social-perspective.png)
+
 ### Render Custom HTML with Fit Text
 
 Use custom HTML/CSS when presets are too constrained, but keep `data-clickclick-fit` on important
