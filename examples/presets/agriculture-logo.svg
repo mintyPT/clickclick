@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Fieldora logo">
+  <rect width="240" height="240" rx="120" fill="#eaffdd"/>
+  <g fill="#005c37">
+    <path d="M120 27a93 93 0 0 1 19 184l-19-64z"/>
+    <path d="M213 120a93 93 0 0 1-74 91l-19-64z" opacity=".88"/>
+    <path d="M185 186a93 93 0 0 1-130-1l65-38z"/>
+    <path d="M120 213a93 93 0 0 1-91-74l91 8z" opacity=".88"/>
+    <path d="M27 120a93 93 0 0 1 74-91l19 118z"/>
+    <path d="M55 54a93 93 0 0 1 130 0l-65 93z" opacity=".88"/>
+  </g>
+  <circle cx="120" cy="120" r="32" fill="#10f565"/>
+</svg>

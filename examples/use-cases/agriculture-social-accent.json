@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-accent" },
+  { "name": "title", "html": "Grow<br>the next<br>season" },
+  { "name": "logo-small", "src": "../presets/agriculture-logo.svg" },
+  { "name": "brand-small", "text": "Fieldora" }
+]

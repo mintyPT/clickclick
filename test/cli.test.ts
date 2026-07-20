@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execa } from "execa";
+import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 let tempDir: string;
@@ -169,6 +170,28 @@ describe("CLI", () => {
     await runCli(["preset", name, ...args, "--out", out, "--width", "64", "--height", "64"]);
 
     await expect(readFile(out)).resolves.toHaveProperty("length");
+  });
+
+  it("applies preset background-color aliases", async () => {
+    const out = join(tempDir, "brand-background-color.png");
+
+    await runCli([
+      "preset",
+      "brand-announcement",
+      "--title",
+      "Hello",
+      "--background-color",
+      "#123456",
+      "--out",
+      out,
+      "--width",
+      "128",
+      "--height",
+      "128",
+    ]);
+
+    const png = PNG.sync.read(await readFile(out));
+    expect([png.data[0], png.data[1], png.data[2]]).toEqual([0x12, 0x34, 0x56]);
   });
 });
 

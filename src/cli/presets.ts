@@ -54,7 +54,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         badge: optionalString(options.badge),
         meta: optionalString(options.meta),
         cta: optionalString(options.cta),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         textColor: optionalString(options.textColor),
         accentColor: optionalString(options.accent),
         mutedColor: optionalString(options.mutedColor),
@@ -76,7 +76,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         label: optionalString(options.label),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         checkerColor: optionalString(options.checkerColor),
         textColor: optionalString(options.textColor),
         accentColor: optionalString(options.accent),
@@ -103,7 +103,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         beforeText: optionalString(options.beforeText),
         afterTitle: requiredString(options.afterTitle, "after-title"),
         afterText: optionalString(options.afterText),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         beforeColor: optionalString(options.beforeColor),
         afterColor: optionalString(options.afterColor),
         textColor: optionalString(options.textColor),
@@ -128,7 +128,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         attribution: optionalString(options.attribution),
         source: optionalString(options.source),
         mark: optionalString(options.mark),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         textColor: optionalString(options.textColor),
         accentColor: optionalString(options.accent),
         align: parseAlignment(options.align),
@@ -151,7 +151,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         label: optionalString(options.label),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         panelColor: optionalString(options.panelColor),
         accentColor: optionalString(options.accent),
         textColor: optionalString(options.textColor),
@@ -180,7 +180,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         subtitle: optionalString(options.subtitle),
         prompt: optionalString(options.prompt),
         output: optionalString(options.outputText),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         terminalColor: optionalString(options.terminalColor),
         textColor: optionalString(options.textColor),
         commandColor: optionalString(options.commandColor),
@@ -205,7 +205,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         meta: optionalString(options.meta),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         textColor: optionalString(options.textColor),
         accentColor: optionalString(options.accent),
         mutedColor: optionalString(options.mutedColor),
@@ -419,7 +419,7 @@ function richMediaPresetCommandDefinitions(): PresetCommandDefinition[] {
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         label: optionalString(options.label),
-        backgroundColor: optionalString(options.background),
+        backgroundColor: optionalBackgroundColor(options),
         align: parseAlignment(options.align),
         ...richMediaPresetOptions(options),
       }),
@@ -558,7 +558,7 @@ function brandMediaOptions(options: Record<string, unknown>) {
   return {
     logo: parseLogoOption(options),
     watermark: parseWatermarkOption(options),
-    backgroundColor: optionalString(options.background),
+    backgroundColor: optionalBackgroundColor(options),
     textColor: optionalString(options.textColor),
     accentColor: optionalString(options.accent),
     fontFamily: optionalString(options.fontFamily),
@@ -609,6 +609,10 @@ function optionalString(value: unknown): string | undefined {
 
 function optionalNumber(value: unknown): number | undefined {
   return typeof value === "number" ? value : undefined;
+}
+
+function optionalBackgroundColor(options: Record<string, unknown>): string | undefined {
+  return optionalString(options.background) ?? optionalString(options.backgroundColor);
 }
 
 function parsePresetMediaOptions(options: Record<string, unknown>) {

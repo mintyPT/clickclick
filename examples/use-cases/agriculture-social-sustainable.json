@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-cream" },
+  { "name": "title", "html": "sustainable<br>and flourishing" },
+  { "name": "logo-small", "src": "../presets/agriculture-logo.svg" },
+  { "name": "brand-small", "text": "Fieldora" }
+]
