@@ -526,6 +526,189 @@ Result:
 
 ![Agriculture perspective pattern post result](./examples/use-cases/agriculture-social-perspective.png)
 
+### Render Brandency Marketing Social Posts
+
+Use a reusable template when a campaign has a fixed visual system but each square post swaps color,
+copy, and geometric accents. This set recreates a six-post marketing grid as separate outputs using
+one template and six modification files.
+
+#### Yellow Brand Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-yellow.json \
+  --out examples/use-cases/brandency-social-yellow.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-yellow.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-yellow.png" },
+});
+```
+
+Result:
+
+![Brandency yellow social post result](./examples/use-cases/brandency-social-yellow.png)
+
+#### Blue Brand Fly Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-blue.json \
+  --out examples/use-cases/brandency-social-blue.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-blue.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-blue.png" },
+});
+```
+
+Result:
+
+![Brandency blue social post result](./examples/use-cases/brandency-social-blue.png)
+
+#### Pink Marketing Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-pink.json \
+  --out examples/use-cases/brandency-social-pink.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-pink.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-pink.png" },
+});
+```
+
+Result:
+
+![Brandency pink social post result](./examples/use-cases/brandency-social-pink.png)
+
+#### Green Brand Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-green.json \
+  --out examples/use-cases/brandency-social-green.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-green.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-green.png" },
+});
+```
+
+Result:
+
+![Brandency green social post result](./examples/use-cases/brandency-social-green.png)
+
+#### White Marketing Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-white.json \
+  --out examples/use-cases/brandency-social-white.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-white.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-white.png" },
+});
+```
+
+Result:
+
+![Brandency white social post result](./examples/use-cases/brandency-social-white.png)
+
+#### Black Brand Fly Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/brandency-social-post.html \
+  --css examples/use-cases/brandency-social-post.css \
+  --modify-file examples/use-cases/brandency-social-black.json \
+  --out examples/use-cases/brandency-social-black.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/brandency-social-post.html",
+  cssPath: "examples/use-cases/brandency-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-black.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/brandency-social-black.png" },
+});
+```
+
+Result:
+
+![Brandency black social post result](./examples/use-cases/brandency-social-black.png)
+
 ### Render Custom HTML with Fit Text
 
 Use custom HTML/CSS when presets are too constrained, but keep `data-clickclick-fit` on important

@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-blue" },
+  { "name": "brand", "text": "brandency" },
+  { "name": "title", "html": "Making your<br>brand fly" },
+  { "name": "url", "text": "www.yourwebsite.com" }
+]
