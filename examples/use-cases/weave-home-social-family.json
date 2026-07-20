@@ -1,0 +1,8 @@
+[
+  { "name": "post", "className": "post post-family" },
+  { "name": "brand", "text": "loftloom little" },
+  { "name": "site_top", "text": "loftloom.example" },
+  { "name": "title", "html": "Soft pieces for<br>small rituals" },
+  { "name": "family_image", "src": "./assets/weave-home-nursery-unsplash.jpg", "fit": "cover", "anchor": "52% 52%" },
+  { "name": "site_bottom", "text": "loftloom.example" }
+]

@@ -1,6 +1,6 @@
 {
   "name": "Velora Social Kit",
-  "description": "Use a reusable template for an editorial founder social kit with refined serif typography, strict margins, muted neutrals, and deep red accents. This source-neutral adaptation replaces the inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus CSS-drawn marks and abstract photo crops.",
+  "description": "Use a reusable template for an editorial founder social kit with refined serif typography, strict margins, muted neutrals, and deep red accents. This source-neutral adaptation replaces the inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus Unsplash photos passed through JSON image layers.",
   "template": "./velora-social-kit.html",
   "css": "./velora-social-kit.css",
   "width": 1080,

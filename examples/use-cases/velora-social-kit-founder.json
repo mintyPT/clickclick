@@ -7,11 +7,7 @@
       "--ink": "#171615",
       "--muted": "#6d6865",
       "--accent": "#8f1d20",
-      "--accent-soft": "#cdb6b4",
-      "--photo-a": "#c7bcb3",
-      "--photo-b": "#837770",
-      "--photo-c": "#f4eee6",
-      "--photo-d": "#3a1e1f"
+      "--accent-soft": "#cdb6b4"
     }
   },
   { "name": "kicker_left", "text": "Field Notes" },
@@ -19,6 +15,8 @@
   { "name": "kicker_right", "text": "No. 08" },
   { "name": "eyebrow", "text": "Founder Profile" },
   { "name": "title", "html": "The<br>founder<br>edit." },
+  { "name": "hero_image", "src": "./assets/velora-founder-unsplash.jpg", "fit": "cover", "anchor": "54% center" },
+  { "name": "secondary_image", "src": "./assets/velora-desk-unsplash.jpg", "fit": "cover", "anchor": "center" },
   { "name": "body", "text": "A calm system for showing the person, the proof, and the point of view." },
   { "name": "caption", "text": "Independent studio / advisory content" },
   { "name": "footer_left", "text": "velora.example" },

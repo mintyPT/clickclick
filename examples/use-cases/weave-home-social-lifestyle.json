@@ -1,0 +1,12 @@
+[
+  { "name": "post", "className": "post post-lifestyle" },
+  { "name": "brand", "text": "loftloom" },
+  { "name": "site_top", "text": "loftloom.example" },
+  { "name": "title", "html": "Settle in<br>with texture" },
+  { "name": "lifestyle_image", "src": "./assets/weave-home-lifestyle-unsplash.jpg", "fit": "cover", "anchor": "52% center" },
+  { "name": "item_one", "text": "Crescent cushion" },
+  { "name": "price_one", "text": "$78.00" },
+  { "name": "item_two", "text": "Wide checker rug. Custom weave and color plan" },
+  { "name": "price_two", "text": "$248.00" },
+  { "name": "site_bottom", "text": "loftloom.example" }
+]
