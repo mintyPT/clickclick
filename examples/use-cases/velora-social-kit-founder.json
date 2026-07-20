@@ -1,0 +1,26 @@
+[
+  {
+    "name": "post",
+    "className": "post post-founder",
+    "style": {
+      "--bg": "#ece9e4",
+      "--ink": "#171615",
+      "--muted": "#6d6865",
+      "--accent": "#8f1d20",
+      "--accent-soft": "#cdb6b4",
+      "--photo-a": "#c7bcb3",
+      "--photo-b": "#837770",
+      "--photo-c": "#f4eee6",
+      "--photo-d": "#3a1e1f"
+    }
+  },
+  { "name": "kicker_left", "text": "Field Notes" },
+  { "name": "brand", "text": "Velora" },
+  { "name": "kicker_right", "text": "No. 08" },
+  { "name": "eyebrow", "text": "Founder Profile" },
+  { "name": "title", "html": "The<br>founder<br>edit." },
+  { "name": "body", "text": "A calm system for showing the person, the proof, and the point of view." },
+  { "name": "caption", "text": "Independent studio / advisory content" },
+  { "name": "footer_left", "text": "velora.example" },
+  { "name": "footer_right", "text": "Issue 18" }
+]

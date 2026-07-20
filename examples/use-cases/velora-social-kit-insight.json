@@ -1,0 +1,29 @@
+[
+  {
+    "name": "post",
+    "className": "post post-insight",
+    "style": {
+      "--bg": "#eee8df",
+      "--ink": "#191817",
+      "--muted": "#625c59",
+      "--accent": "#7c171b",
+      "--accent-soft": "#c9b3af",
+      "--photo-a": "#b5a89e",
+      "--photo-b": "#70625d",
+      "--photo-c": "#efe4d6",
+      "--photo-d": "#4d2325"
+    }
+  },
+  { "name": "kicker_left", "text": "Signal Lab" },
+  { "name": "brand", "text": "Velora" },
+  { "name": "kicker_right", "text": "Audit" },
+  { "name": "eyebrow", "text": "Positioning Note" },
+  { "name": "title", "html": "Make the<br>expertise<br>visible." },
+  { "name": "body", "text": "A text-first square balances proof, restraint, and a single image crop to keep the offer legible." },
+  { "name": "caption", "hide": true },
+  { "name": "metric_label", "text": "Content Lift" },
+  { "name": "metric_value", "text": "41%" },
+  { "name": "metric_note", "text": "More saves after narrowing each post to one job." },
+  { "name": "footer_left", "text": "velora.example" },
+  { "name": "footer_right", "text": "Method 03" }
+]

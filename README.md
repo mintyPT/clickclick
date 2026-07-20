@@ -727,6 +727,132 @@ Result:
 
 ![Orbit ink social post result](./examples/use-cases/orbit-social-ink.png)
 
+### Render Velora Social Kit
+
+Use a reusable template for an editorial founder social kit with refined serif typography, strict
+margins, muted neutrals, and deep red accents. This source-neutral adaptation replaces the
+inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus CSS-drawn
+marks and abstract photo crops.
+
+#### Founder Editorial Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/velora-social-kit.html \
+  --css examples/use-cases/velora-social-kit.css \
+  --modify-file examples/use-cases/velora-social-kit-founder.json \
+  --out examples/use-cases/velora-social-kit-founder.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { renderTemplate } from "@maurogoncalo/clickclick";
+
+await renderTemplate({
+  htmlPath: "examples/use-cases/velora-social-kit.html",
+  cssPath: "examples/use-cases/velora-social-kit.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/velora-social-kit-founder.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/velora-social-kit-founder.png" },
+});
+```
+
+Result:
+
+![Velora founder editorial social post result](./examples/use-cases/velora-social-kit-founder.png)
+
+#### Centered Quote Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/velora-social-kit.html \
+  --css examples/use-cases/velora-social-kit.css \
+  --modify-file examples/use-cases/velora-social-kit-quote.json \
+  --out examples/use-cases/velora-social-kit-quote.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/velora-social-kit.html",
+  cssPath: "examples/use-cases/velora-social-kit.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/velora-social-kit-quote.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/velora-social-kit-quote.png" },
+});
+```
+
+Result:
+
+![Velora centered quote social post result](./examples/use-cases/velora-social-kit-quote.png)
+
+#### Insight Metrics Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/velora-social-kit.html \
+  --css examples/use-cases/velora-social-kit.css \
+  --modify-file examples/use-cases/velora-social-kit-insight.json \
+  --out examples/use-cases/velora-social-kit-insight.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/velora-social-kit.html",
+  cssPath: "examples/use-cases/velora-social-kit.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/velora-social-kit-insight.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/velora-social-kit-insight.png" },
+});
+```
+
+Result:
+
+![Velora insight metrics social post result](./examples/use-cases/velora-social-kit-insight.png)
+
+#### Palette Study Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/velora-social-kit.html \
+  --css examples/use-cases/velora-social-kit.css \
+  --modify-file examples/use-cases/velora-social-kit-palette.json \
+  --out examples/use-cases/velora-social-kit-palette.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/velora-social-kit.html",
+  cssPath: "examples/use-cases/velora-social-kit.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/velora-social-kit-palette.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/velora-social-kit-palette.png" },
+});
+```
+
+Result:
+
+![Velora palette study social post result](./examples/use-cases/velora-social-kit-palette.png)
+
 ### Render Custom HTML with Fit Text
 
 Use custom HTML/CSS when presets are too constrained, but keep `data-clickclick-fit` on important

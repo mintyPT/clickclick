@@ -1,0 +1,27 @@
+[
+  {
+    "name": "post",
+    "className": "post post-palette",
+    "style": {
+      "--bg": "#f3f0ea",
+      "--ink": "#161616",
+      "--muted": "#75706d",
+      "--accent": "#9e2428",
+      "--accent-soft": "#d1b9b5",
+      "--photo-a": "#d7c8ba",
+      "--photo-b": "#91857c",
+      "--photo-c": "#f3eadf",
+      "--photo-d": "#592b2d"
+    }
+  },
+  { "name": "kicker_left", "text": "Visual System" },
+  { "name": "brand", "text": "Velora" },
+  { "name": "kicker_right", "text": "Palette" },
+  { "name": "eyebrow", "text": "Brand Study" },
+  { "name": "title", "html": "Four<br>tones,<br>one<br>voice." },
+  { "name": "body", "text": "Use quiet neutrals for pace, then reserve red for the details that should be remembered." },
+  { "name": "caption", "hide": true },
+  { "name": "palette_label", "text": "Velora palette" },
+  { "name": "footer_left", "text": "velora.example" },
+  { "name": "footer_right", "text": "System 01" }
+]
