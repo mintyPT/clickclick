@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-indigo" },
+  { "name": "brand", "text": "orbitside" },
+  { "name": "title", "html": "Give your<br>ideas lift" },
+  { "name": "url", "text": "orbitside.example" }
+]

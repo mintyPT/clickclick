@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-coral" },
+  { "name": "brand", "text": "orbitside" },
+  { "name": "title", "html": "Build<br>a <span>signal</span> people<br>notice" },
+  { "name": "url", "text": "orbitside.example" }
+]
