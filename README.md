@@ -308,6 +308,24 @@ await screenshotUrl({
 These examples cover the workflows ClickClick is meant to make scriptable: live website screenshots,
 custom HTML cards, template modifications, and config-driven image sets.
 
+### Example Set Workflow
+
+Use manifest-driven example sets for multi-post inspiration work. The manifest keeps template paths,
+variant JSON, output paths, and README labels in one place, so rendering and documentation stay in
+sync.
+
+```bash
+npm run examples:scaffold -- campaign-social coral indigo lime
+npm run examples:render -- examples/use-cases/orbit-social.manifest.json
+npm run examples:readme -- examples/use-cases/orbit-social.manifest.json
+npm run examples:contact-sheet -- examples/use-cases/orbit-social.manifest.json examples/use-cases/orbit-social-contact-sheet.png
+```
+
+When adapting external references, replace source-specific names, logos, slogans, URLs, and direct
+media. Use fictional copy and pass any needed assets through modification JSON or documented options.
+Palettes may be shifted when that keeps the composition recognizable without copying the source
+branding.
+
 ### Capture a Live Website
 
 Use URL screenshots when you need a reproducible image of a product page, docs page, landing page,
@@ -526,21 +544,21 @@ Result:
 
 ![Agriculture perspective pattern post result](./examples/use-cases/agriculture-social-perspective.png)
 
-### Render Brandency Marketing Social Posts
+### Render Orbit Marketing Social Posts
 
 Use a reusable template when a campaign has a fixed visual system but each square post swaps color,
-copy, and geometric accents. This set recreates a six-post marketing grid as separate outputs using
-one template and six modification files.
+copy, and geometric accents. This set adapts a six-post marketing grid into source-neutral examples
+with fictional names, original slogans, and a shifted palette.
 
-#### Yellow Brand Post
+#### Coral Signal Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-yellow.json \
-  --out examples/use-cases/brandency-social-yellow.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-coral.json \
+  --out examples/use-cases/orbit-social-coral.png \
   --width 1080 \
   --height 1080
 ```
@@ -552,27 +570,27 @@ import { readFile } from "node:fs/promises";
 import { renderTemplate } from "@maurogoncalo/clickclick";
 
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-yellow.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-coral.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-yellow.png" },
+  output: { path: "examples/use-cases/orbit-social-coral.png" },
 });
 ```
 
 Result:
 
-![Brandency yellow social post result](./examples/use-cases/brandency-social-yellow.png)
+![Orbit coral social post result](./examples/use-cases/orbit-social-coral.png)
 
-#### Blue Brand Fly Post
+#### Indigo Ideas Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-blue.json \
-  --out examples/use-cases/brandency-social-blue.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-indigo.json \
+  --out examples/use-cases/orbit-social-indigo.png \
   --width 1080 \
   --height 1080
 ```
@@ -581,27 +599,27 @@ Library:
 
 ```ts
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-blue.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-indigo.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-blue.png" },
+  output: { path: "examples/use-cases/orbit-social-indigo.png" },
 });
 ```
 
 Result:
 
-![Brandency blue social post result](./examples/use-cases/brandency-social-blue.png)
+![Orbit indigo social post result](./examples/use-cases/orbit-social-indigo.png)
 
-#### Pink Marketing Post
+#### Lime Story Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-pink.json \
-  --out examples/use-cases/brandency-social-pink.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-lime.json \
+  --out examples/use-cases/orbit-social-lime.png \
   --width 1080 \
   --height 1080
 ```
@@ -610,27 +628,27 @@ Library:
 
 ```ts
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-pink.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-lime.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-pink.png" },
+  output: { path: "examples/use-cases/orbit-social-lime.png" },
 });
 ```
 
 Result:
 
-![Brandency pink social post result](./examples/use-cases/brandency-social-pink.png)
+![Orbit lime social post result](./examples/use-cases/orbit-social-lime.png)
 
-#### Green Brand Post
+#### Mint Signal Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-green.json \
-  --out examples/use-cases/brandency-social-green.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-mint.json \
+  --out examples/use-cases/orbit-social-mint.png \
   --width 1080 \
   --height 1080
 ```
@@ -639,27 +657,27 @@ Library:
 
 ```ts
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-green.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-mint.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-green.png" },
+  output: { path: "examples/use-cases/orbit-social-mint.png" },
 });
 ```
 
 Result:
 
-![Brandency green social post result](./examples/use-cases/brandency-social-green.png)
+![Orbit mint social post result](./examples/use-cases/orbit-social-mint.png)
 
-#### White Marketing Post
+#### Stone Story Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-white.json \
-  --out examples/use-cases/brandency-social-white.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-stone.json \
+  --out examples/use-cases/orbit-social-stone.png \
   --width 1080 \
   --height 1080
 ```
@@ -668,27 +686,27 @@ Library:
 
 ```ts
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-white.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-stone.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-white.png" },
+  output: { path: "examples/use-cases/orbit-social-stone.png" },
 });
 ```
 
 Result:
 
-![Brandency white social post result](./examples/use-cases/brandency-social-white.png)
+![Orbit stone social post result](./examples/use-cases/orbit-social-stone.png)
 
-#### Black Brand Fly Post
+#### Ink Ideas Post
 
 CLI:
 
 ```bash
-npm run dev -- template examples/use-cases/brandency-social-post.html \
-  --css examples/use-cases/brandency-social-post.css \
-  --modify-file examples/use-cases/brandency-social-black.json \
-  --out examples/use-cases/brandency-social-black.png \
+npm run dev -- template examples/use-cases/orbit-social-post.html \
+  --css examples/use-cases/orbit-social-post.css \
+  --modify-file examples/use-cases/orbit-social-ink.json \
+  --out examples/use-cases/orbit-social-ink.png \
   --width 1080 \
   --height 1080
 ```
@@ -697,17 +715,17 @@ Library:
 
 ```ts
 await renderTemplate({
-  htmlPath: "examples/use-cases/brandency-social-post.html",
-  cssPath: "examples/use-cases/brandency-social-post.css",
-  modifications: JSON.parse(await readFile("examples/use-cases/brandency-social-black.json", "utf8")),
+  htmlPath: "examples/use-cases/orbit-social-post.html",
+  cssPath: "examples/use-cases/orbit-social-post.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/orbit-social-ink.json", "utf8")),
   viewport: { width: 1080, height: 1080 },
-  output: { path: "examples/use-cases/brandency-social-black.png" },
+  output: { path: "examples/use-cases/orbit-social-ink.png" },
 });
 ```
 
 Result:
 
-![Brandency black social post result](./examples/use-cases/brandency-social-black.png)
+![Orbit ink social post result](./examples/use-cases/orbit-social-ink.png)
 
 ### Render Custom HTML with Fit Text
 

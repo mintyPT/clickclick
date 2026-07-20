@@ -1,6 +1,0 @@
-[
-  { "name": "post", "className": "post post-white" },
-  { "name": "brand", "text": "brandency" },
-  { "name": "title", "html": "Lets start<br>the <span>marketing</span>" },
-  { "name": "url", "text": "www.yourwebsite.com" }
-]

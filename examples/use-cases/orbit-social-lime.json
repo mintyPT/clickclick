@@ -1,0 +1,6 @@
+[
+  { "name": "post", "className": "post post-lime" },
+  { "name": "brand", "text": "orbitside" },
+  { "name": "title", "html": "Start with<br>the <span>story</span>" },
+  { "name": "url", "text": "orbitside.example" }
+]

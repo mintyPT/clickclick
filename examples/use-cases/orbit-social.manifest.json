@@ -1,0 +1,52 @@
+{
+  "name": "Orbit Marketing Social Posts",
+  "description": "Use a reusable template when a campaign has a fixed visual system but each square post swaps color, copy, and geometric accents. This set adapts a six-post marketing grid into source-neutral examples with fictional names, original slogans, and a shifted palette.",
+  "template": "./orbit-social-post.html",
+  "css": "./orbit-social-post.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    {
+      "id": "coral",
+      "title": "Coral Signal Post",
+      "modifyFile": "./orbit-social-coral.json",
+      "output": "./orbit-social-coral.png",
+      "alt": "Orbit coral social post result"
+    },
+    {
+      "id": "indigo",
+      "title": "Indigo Ideas Post",
+      "modifyFile": "./orbit-social-indigo.json",
+      "output": "./orbit-social-indigo.png",
+      "alt": "Orbit indigo social post result"
+    },
+    {
+      "id": "lime",
+      "title": "Lime Story Post",
+      "modifyFile": "./orbit-social-lime.json",
+      "output": "./orbit-social-lime.png",
+      "alt": "Orbit lime social post result"
+    },
+    {
+      "id": "mint",
+      "title": "Mint Signal Post",
+      "modifyFile": "./orbit-social-mint.json",
+      "output": "./orbit-social-mint.png",
+      "alt": "Orbit mint social post result"
+    },
+    {
+      "id": "stone",
+      "title": "Stone Story Post",
+      "modifyFile": "./orbit-social-stone.json",
+      "output": "./orbit-social-stone.png",
+      "alt": "Orbit stone social post result"
+    },
+    {
+      "id": "ink",
+      "title": "Ink Ideas Post",
+      "modifyFile": "./orbit-social-ink.json",
+      "output": "./orbit-social-ink.png",
+      "alt": "Orbit ink social post result"
+    }
+  ]
+}

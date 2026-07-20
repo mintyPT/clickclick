@@ -36,21 +36,32 @@ body {
 
 .brand-mark span {
   position: absolute;
-  top: 4px;
-  width: 50px;
-  height: 26px;
+  top: 6px;
+  width: 44px;
+  height: 24px;
   border-radius: 999px;
   background: var(--mark-a);
-  transform: rotate(-38deg);
+  transform: rotate(-28deg);
 }
 
 .brand-mark span:first-child {
-  left: 0;
+  left: 8px;
 }
 
 .brand-mark span:last-child {
-  left: 34px;
+  left: 38px;
   background: var(--mark-b);
+}
+
+.brand-mark::after {
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--mark-a);
+  content: "";
 }
 
 h1 {
@@ -118,8 +129,8 @@ h1 span::after {
   display: none;
 }
 
-.post-yellow {
-  --bg: #ffc400;
+.post-coral {
+  --bg: #ff6b4a;
   --text: #181a20;
   --brand-color: #fff;
   --mark-a: #fff;
@@ -128,8 +139,8 @@ h1 span::after {
   --url-color: #fff;
 }
 
-.post-yellow .shape-ring,
-.post-green .shape-ring {
+.post-coral .shape-ring,
+.post-mint .shape-ring {
   right: -310px;
   bottom: -296px;
   display: block;
@@ -139,8 +150,8 @@ h1 span::after {
   border-radius: 50%;
 }
 
-.post-blue {
-  --bg: #075cf7;
+.post-indigo {
+  --bg: #4638ff;
   --text: #f4f4f2;
   --brand-color: #fff;
   --mark-a: #fff;
@@ -149,8 +160,8 @@ h1 span::after {
   --url-color: #fff;
 }
 
-.post-blue .shape-pill,
-.post-black .shape-pill {
+.post-indigo .shape-pill,
+.post-ink .shape-pill {
   right: 115px;
   bottom: -118px;
   display: block;
@@ -161,8 +172,8 @@ h1 span::after {
   transform: rotate(45deg);
 }
 
-.post-blue .shape-swish,
-.post-black .shape-swish {
+.post-indigo .shape-swish,
+.post-ink .shape-swish {
   right: -184px;
   bottom: -126px;
   display: block;
@@ -173,29 +184,29 @@ h1 span::after {
   transform: rotate(45deg);
 }
 
-.post-pink {
-  --bg: #ee267c;
-  --text: #fff;
-  --brand-color: #fff;
-  --mark-a: #fff;
-  --mark-b: #f0f0f0;
-  --accent: #fff;
-  --url-color: #fff;
+.post-lime {
+  --bg: #d7ff35;
+  --text: #161719;
+  --brand-color: #161719;
+  --mark-a: #161719;
+  --mark-b: #2d3035;
+  --accent: #161719;
+  --url-color: #161719;
 }
 
-.post-pink .shape-prism {
+.post-lime .shape-prism {
   right: -122px;
   bottom: 92px;
   display: block;
   width: 430px;
   height: 430px;
-  background: #a9257d;
+  background: #7adf78;
   clip-path: polygon(50% 0, 100% 100%, 0 55%);
   transform: rotate(7deg);
 }
 
-.post-green {
-  --bg: #1cf09b;
+.post-mint {
+  --bg: #15d6bd;
   --text: #181a20;
   --brand-color: #fff;
   --mark-a: #fff;
@@ -204,65 +215,65 @@ h1 span::after {
   --url-color: #fff;
 }
 
-.post-white {
+.post-stone {
   --bg: #f1f1f1;
   --text: #222329;
   --brand-color: #222329;
-  --mark-a: #19e998;
-  --mark-b: #22d5bd;
-  --accent: #19e998;
+  --mark-a: #ff6b4a;
+  --mark-b: #4638ff;
+  --accent: #ff6b4a;
   --url-color: #222329;
 }
 
-.post-white .shape-prism {
+.post-stone .shape-prism {
   right: -62px;
   bottom: 30px;
   display: block;
   width: 455px;
   height: 455px;
-  background: #19e998;
+  background: #ff6b4a;
   clip-path: polygon(50% 0, 100% 100%, 0 62%);
   transform: rotate(9deg);
 }
 
-.post-black {
+.post-ink {
   --bg: #111;
-  --text: #f4f4f4;
-  --brand-color: #f4f4f4;
-  --mark-a: #075cf7;
-  --mark-b: #1572ff;
-  --accent: #075cf7;
-  --url-color: #f4f4f4;
+  --text: #fff;
+  --brand-color: #fff;
+  --mark-a: #ff6b4a;
+  --mark-b: #d7ff35;
+  --accent: #ff6b4a;
+  --url-color: #fff;
 }
 
-.post-black .shape-pill,
-.post-black .shape-swish {
-  background: #075cf7;
+.post-ink .shape-pill,
+.post-ink .shape-swish {
+  background: #ff6b4a;
 }
 
-.post-black .shape-pill {
+.post-ink .shape-pill {
   right: 55px;
   bottom: -126px;
 }
 
-.post-black .shape-swish {
+.post-ink .shape-swish {
   right: -230px;
   bottom: -116px;
 }
 
-.post-blue h1,
-.post-black h1 {
+.post-indigo h1,
+.post-ink h1 {
   max-width: 620px;
   font-size: 78px;
 }
 
-.post-pink h1,
-.post-white h1 {
+.post-lime h1,
+.post-stone h1 {
   max-width: 640px;
   font-size: 68px;
   line-height: 1.04;
 }
 
-.post-white h1 {
+.post-stone h1 {
   top: 276px;
 }
