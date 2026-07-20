@@ -3,9 +3,9 @@ import { mkdir, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, listConfigTemplates, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
-import type { LayerModification, RenderImageInput, RenderWarning, TemplateInput } from "../types.js";
-import { parseInteger, parseOutputOptions, parseRenderOptions } from "./options.js";
+import { ClickClickError, clearCache, listConfigTemplates, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import type { LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
+import { parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions } from "./options.js";
 import { registerPresetCommands } from "./presets.js";
 
 const program = new Command();
@@ -28,6 +28,9 @@ program
   .option("--selector <selector>", "Screenshot a specific element")
   .option("--wait-until <event>", "Playwright wait event")
   .option("--delay <ms>", "Delay before screenshot", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (htmlFile: string, options) => {
     const htmlPath = resolve(htmlFile);
@@ -46,7 +49,7 @@ program
       },
       output: parseOutputOptions(options),
       render: parseRenderOptions(options),
-    }, Boolean(options.strict));
+    }, Boolean(options.strict), parseCacheOptions(options));
   });
 
 program
@@ -97,6 +100,9 @@ program
   .option("--selector <selector>", "Screenshot a specific element")
   .option("--wait-until <event>", "Playwright wait event")
   .option("--delay <ms>", "Delay before screenshot", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (htmlFile: string, options) => {
     const htmlPath = resolve(htmlFile);
@@ -115,7 +121,17 @@ program
       },
       output: parseOutputOptions(options),
       render: parseRenderOptions(options),
+      cache: parseCacheOptions(options),
     }, Boolean(options.strict));
+  });
+
+program
+  .command("cache")
+  .description("Manage the local render cache.")
+  .command("clear")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .action(async (options) => {
+    await clearCache({ dir: typeof options.cacheDir === "string" ? options.cacheDir : undefined });
   });
 
 const config = program.command("config").description("Render local templates from a project config.");
@@ -142,6 +158,9 @@ config
   .option("--height <px>", "Viewport height", parseInteger)
   .option("--format <format>", "Output format: png or jpeg")
   .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (configFile: string, name: string, options) => {
     const result = await renderRecipe(resolve(configFile), name, {
@@ -149,8 +168,9 @@ config
       debugDir: typeof options.debugDir === "string" ? options.debugDir : undefined,
       viewport: { width: options.width, height: options.height },
       output: parseOutputOptions(options),
+      cache: parseCacheOptions(options),
     });
-    reportWarnings(result, Boolean(options.strict));
+    reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
   });
 
 config
@@ -158,13 +178,18 @@ config
   .argument("<config-file>", "ClickClick config JSON file")
   .argument("<name>", "Template set name")
   .option("--out-dir <dir>", "Directory for generated images")
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (configFile: string, name: string, options) => {
     const outDir = typeof options.outDir === "string" ? resolve(options.outDir) : undefined;
     if (outDir) await mkdir(outDir, { recursive: true });
-    const results = await renderTemplateSet(resolve(configFile), name, outDir);
+    const results = await renderTemplateSet(resolve(configFile), name, outDir, {
+      cache: parseCacheOptions(options),
+    });
     for (const result of results) {
-      reportWarnings(result, Boolean(options.strict));
+      reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
       if (result.path) console.log(result.path);
     }
   });
@@ -211,14 +236,14 @@ program.parseAsync().catch((error: unknown) => {
   process.exitCode = 1;
 });
 
-async function runRender(input: RenderImageInput, strict: boolean) {
-  const result = await renderImage(input);
-  reportWarnings(result, strict);
+async function runRender(input: RenderImageInput, strict: boolean, cache?: RenderCacheOptions) {
+  const result = await renderImage(input, { cache });
+  reportResult(result, strict, isCacheInfoEnabled(cache));
 }
 
 async function runTemplate(input: TemplateInput, strict: boolean) {
   const result = await renderTemplate(input);
-  reportWarnings(result, strict);
+  reportResult(result, strict, isCacheInfoEnabled(input.cache));
 }
 
 function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) {
@@ -229,6 +254,17 @@ function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) 
   if (strict && result.warnings.length > 0) {
     process.exitCode = 1;
   }
+}
+
+function reportResult(result: RenderImageResult, strict: boolean, cacheInfo: boolean) {
+  if (cacheInfo && result.cache) {
+    console.error(`cache ${result.cache.hit ? "hit" : "miss"}${result.cache.skippedReason ? ` (${result.cache.skippedReason})` : ""}: ${result.cache.key ?? result.cache.dir ?? ""}`.trim());
+  }
+  reportWarnings(result, strict);
+}
+
+function isCacheInfoEnabled(cache: RenderCacheOptions | undefined): boolean {
+  return Boolean(cache && cache !== true && cache.info);
 }
 
 async function readFileChecked(path: string, label: string): Promise<string> {

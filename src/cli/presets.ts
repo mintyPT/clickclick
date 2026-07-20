@@ -3,10 +3,10 @@ import { ClickClickError, presets } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { RenderImageInput } from "../types.js";
-import { parseInteger, parseNumber, parseOutputOptions } from "./options.js";
+import { parseCacheOptions, parseInteger, parseNumber, parseOutputOptions } from "./options.js";
 
 interface PresetCliDependencies {
-  runRender: (input: RenderImageInput, strict: boolean) => Promise<void>;
+  runRender: (input: RenderImageInput, strict: boolean, cache?: ReturnType<typeof parseCacheOptions>) => Promise<void>;
 }
 
 interface PresetCommandOption {
@@ -226,7 +226,7 @@ function registerLegacyPresetCommands(parent: Command, dependencies: PresetCliDe
       await dependencies.runRender({
         ...definition.render(options),
         output: parseOutputOptions(options),
-      }, Boolean(options.strict));
+      }, Boolean(options.strict), parseCacheOptions(options));
     });
   }
 }
@@ -437,7 +437,7 @@ function registerBrandPresetCommands(parent: Command, dependencies: PresetCliDep
       await dependencies.runRender({
         ...definition.render(options),
         output: parseOutputOptions(options),
-      }, Boolean(options.strict));
+      }, Boolean(options.strict), parseCacheOptions(options));
     });
   }
 }
@@ -453,7 +453,7 @@ function registerPhotoPresetCommands(parent: Command, dependencies: PresetCliDep
       await dependencies.runRender({
         ...definition.render(options),
         output: parseOutputOptions(options),
-      }, Boolean(options.strict));
+      }, Boolean(options.strict), parseCacheOptions(options));
     });
   }
 }
@@ -467,7 +467,7 @@ function registerRichMediaPresetCommands(parent: Command, dependencies: PresetCl
       await dependencies.runRender({
         ...definition.render(options),
         output: parseOutputOptions(options),
-      }, Boolean(options.strict));
+      }, Boolean(options.strict), parseCacheOptions(options));
     });
   }
 }
@@ -551,6 +551,9 @@ function addPresetRenderOptions(command: Command): Command {
     .option("--out, --output <file>", "Output image path")
     .option("--format <format>", "Output format: png or jpeg")
     .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+    .option("--cache", "Reuse cached output for identical deterministic input")
+    .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+    .option("--cache-info", "Print cache hit/miss information")
     .option("--strict", "Exit non-zero when renderer warnings are produced");
 }
 

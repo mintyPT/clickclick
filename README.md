@@ -11,6 +11,7 @@ The v1 surface is intentionally small:
 - screenshot arbitrary URLs to PNG or JPEG;
 - render built-in social image presets;
 - opt in to text fitting for elements that should shrink to fit;
+- opt in to a local render cache for deterministic HTML, template, config, and preset renders;
 - report structured warnings and stable error codes.
 
 It does not manage user preset registries or publish anything externally.
@@ -129,6 +130,36 @@ const result = await renderer.render({
 console.log(result.buffer.length, result.format, result.width, result.height, result.path);
 for (const warning of result.warnings) console.warn(warning.code, warning.message);
 ```
+
+### Render Cache
+
+Caching is disabled by default. Enable it when repeatedly rendering the same deterministic input:
+
+```ts
+import { clearCache, renderImage, presets } from "@maurogoncalo/clickclick";
+
+const result = await renderImage({
+  ...presets.solid({ title: "Launch notes", subtitle: "Cached render" }),
+  output: { path: "solid.png" },
+}, {
+  cache: { dir: ".clickclick-cache" },
+});
+
+console.log(result.cache?.hit ? "from cache" : "rendered fresh");
+
+await clearCache({ dir: ".clickclick-cache" });
+```
+
+The default cache directory is `.clickclick-cache/` under the current working directory when
+`cache: true` is used. Cache hits still write `output.path`, so rerunning a command can recreate a
+deleted output file without launching Chromium for the screenshot. Renders with user-provided
+`beforeScreenshot` hooks are not cached. URL screenshots and preview renders are also uncached.
+
+The cache key covers the final normalized HTML/CSS render input, viewport, output format options,
+render options, fit-text settings, and a ClickClick cache schema version. Raw HTML/CSS that references
+external local assets directly, such as `<img src="./photo.png">` or `url("./photo.png")`, is keyed by
+that literal reference rather than by the external file contents. Pass media through preset/template
+options when you need file content changes to affect the cache key.
 
 Handle structured errors and text-fit warnings:
 
@@ -1309,6 +1340,18 @@ clickclick preview ./examples/card.html --css ./examples/card.css --watch
 
 Add `--debug-dir ./debug-render` to template or recipe renders to write the source HTML/CSS and a
 manifest with modifications and warnings.
+
+Use `--cache` on deterministic render commands to avoid generating identical images twice:
+
+```bash
+clickclick preset solid --title "Launch notes" --out solid.png --cache --cache-info
+clickclick template ./examples/card.html --css ./examples/card.css --out card.png --cache
+clickclick config set ./clickclick.config.json social --out-dir ./dist/images --cache
+clickclick cache clear
+```
+
+Use `--cache-dir <dir>` to override the default `.clickclick-cache/` directory. The `screenshot-url`
+and `preview` commands intentionally do not expose cache flags.
 
 ### Preview and Config Authoring
 

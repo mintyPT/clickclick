@@ -1,3 +1,4 @@
+export { clearCache } from "./cache/index.js";
 export { ClickClickError } from "./errors.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
@@ -21,6 +22,8 @@ export type {
   LayerEffect,
   LayerModification,
   RenderDocumentInput,
+  RenderCacheInfo,
+  RenderCacheOptions,
   RenderImageInput,
   RenderImageOptions,
   RenderImageResult,

@@ -55,6 +55,35 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("reports cache misses and hits, recreates output paths, and clears cache", async () => {
+    const htmlPath = join(tempDir, "cached-card.html");
+    const cacheDir = join(tempDir, "cli-cache");
+    const firstOut = join(tempDir, "cached-first.png");
+    const secondOut = join(tempDir, "cached-second.png");
+
+    await writeFile(htmlPath, "<main>Cached</main><style>html,body,main{margin:0;width:100%;height:100%;background:#00ff00;}</style>");
+
+    const miss = await runCli(["render", htmlPath, "--out", firstOut, "--width", "64", "--height", "64", "--cache", "--cache-dir", cacheDir, "--cache-info"]);
+    await rm(firstOut);
+    const hit = await runCli(["render", htmlPath, "--out", secondOut, "--width", "64", "--height", "64", "--cache", "--cache-dir", cacheDir, "--cache-info"]);
+
+    expect(miss.stderr).toContain("cache miss");
+    expect(hit.stderr).toContain("cache hit");
+    await expect(readFile(secondOut)).resolves.toHaveProperty("length");
+
+    await runCli(["cache", "clear", "--cache-dir", cacheDir]);
+    const afterClear = await runCli(["render", htmlPath, "--out", firstOut, "--width", "64", "--height", "64", "--cache", "--cache-dir", cacheDir, "--cache-info"]);
+    expect(afterClear.stderr).toContain("cache miss");
+  });
+
+  it("does not expose cache flags on screenshot-url or preview", async () => {
+    const screenshotHelp = await runCli(["screenshot-url", "--help"]);
+    const previewHelp = await runCli(["preview", "--help"]);
+
+    expect(screenshotHelp.stdout).not.toContain("--cache");
+    expect(previewHelp.stdout).not.toContain("--cache");
+  });
+
   it("renders transparent PNG output", async () => {
     const htmlPath = join(tempDir, "transparent.html");
     const out = join(tempDir, "transparent.png");
