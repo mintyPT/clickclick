@@ -1,0 +1,22 @@
+[
+  {
+    "name": "post",
+    "className": "post post-quote",
+    "style": {
+      "--bg": "#171615",
+      "--ink": "#f5f1ec",
+      "--muted": "#bbb4b1",
+      "--accent": "#c45153",
+      "--accent-soft": "#5c2528"
+    }
+  },
+  { "name": "kicker_left", "text": "Quiet Growth" },
+  { "name": "brand", "text": "Velora" },
+  { "name": "kicker_right", "text": "Series 02" },
+  { "name": "eyebrow", "text": "Editorial Prompt" },
+  { "name": "title", "html": "Clarity<br>is a<br>compounding<br>asset." },
+  { "name": "body", "text": "Say one useful thing at a time. Let the system carry the recognition." },
+  { "name": "caption", "text": "Founder memo / weekly rhythm" },
+  { "name": "footer_left", "text": "velora.example" },
+  { "name": "footer_right", "text": "Save for later" }
+]

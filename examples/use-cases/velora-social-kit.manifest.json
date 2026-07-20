@@ -1,0 +1,38 @@
+{
+  "name": "Velora Social Kit",
+  "description": "Use a reusable template for an editorial founder social kit with refined serif typography, strict margins, muted neutrals, and deep red accents. This source-neutral adaptation replaces the inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus CSS-drawn marks and abstract photo crops.",
+  "template": "./velora-social-kit.html",
+  "css": "./velora-social-kit.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    {
+      "id": "founder",
+      "title": "Founder Editorial Post",
+      "modifyFile": "./velora-social-kit-founder.json",
+      "output": "./velora-social-kit-founder.png",
+      "alt": "Velora founder editorial social post result"
+    },
+    {
+      "id": "quote",
+      "title": "Centered Quote Post",
+      "modifyFile": "./velora-social-kit-quote.json",
+      "output": "./velora-social-kit-quote.png",
+      "alt": "Velora centered quote social post result"
+    },
+    {
+      "id": "insight",
+      "title": "Insight Metrics Post",
+      "modifyFile": "./velora-social-kit-insight.json",
+      "output": "./velora-social-kit-insight.png",
+      "alt": "Velora insight metrics social post result"
+    },
+    {
+      "id": "palette",
+      "title": "Palette Study Post",
+      "modifyFile": "./velora-social-kit-palette.json",
+      "output": "./velora-social-kit-palette.png",
+      "alt": "Velora palette study social post result"
+    }
+  ]
+}
