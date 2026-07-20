@@ -731,8 +731,8 @@ Result:
 
 Use a reusable template for an editorial founder social kit with refined serif typography, strict
 margins, muted neutrals, and deep red accents. This source-neutral adaptation replaces the
-inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus CSS-drawn
-marks and abstract photo crops.
+inspiration's name, slogans, logos, handles, and media with fictional Velora copy plus Unsplash
+photos passed through JSON image layers.
 
 #### Founder Editorial Post
 
@@ -852,6 +852,100 @@ await renderTemplate({
 Result:
 
 ![Velora palette study social post result](./examples/use-cases/velora-social-kit-palette.png)
+
+### Render Weave Home Retail Social Posts
+
+Use a reusable template for a retail campaign with product-forward square posts, lifestyle overlays,
+and a warm family promo card. This set adapts the supplied three-post composition with a fictional
+home brand, original copy, Unsplash photos passed through JSON image layers, and shifted warm
+neutrals.
+
+#### Woven Ottoman Product Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/weave-home-social.html \
+  --css examples/use-cases/weave-home-social.css \
+  --modify-file examples/use-cases/weave-home-social-product.json \
+  --out examples/use-cases/weave-home-social-product.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/weave-home-social.html",
+  cssPath: "examples/use-cases/weave-home-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/weave-home-social-product.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/weave-home-social-product.png" },
+});
+```
+
+Result:
+
+![Weave Home woven ottoman product post result](./examples/use-cases/weave-home-social-product.png)
+
+#### Textile Lifestyle Overlay Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/weave-home-social.html \
+  --css examples/use-cases/weave-home-social.css \
+  --modify-file examples/use-cases/weave-home-social-lifestyle.json \
+  --out examples/use-cases/weave-home-social-lifestyle.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/weave-home-social.html",
+  cssPath: "examples/use-cases/weave-home-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/weave-home-social-lifestyle.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/weave-home-social-lifestyle.png" },
+});
+```
+
+Result:
+
+![Weave Home lifestyle textile overlay post result](./examples/use-cases/weave-home-social-lifestyle.png)
+
+#### Nursery Promo Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/weave-home-social.html \
+  --css examples/use-cases/weave-home-social.css \
+  --modify-file examples/use-cases/weave-home-social-family.json \
+  --out examples/use-cases/weave-home-social-family.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/weave-home-social.html",
+  cssPath: "examples/use-cases/weave-home-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/weave-home-social-family.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/weave-home-social-family.png" },
+});
+```
+
+Result:
+
+![Weave Home nursery promo post result](./examples/use-cases/weave-home-social-family.png)
 
 ### Render Custom HTML with Fit Text
 

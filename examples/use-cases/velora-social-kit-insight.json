@@ -7,11 +7,7 @@
       "--ink": "#191817",
       "--muted": "#625c59",
       "--accent": "#7c171b",
-      "--accent-soft": "#c9b3af",
-      "--photo-a": "#b5a89e",
-      "--photo-b": "#70625d",
-      "--photo-c": "#efe4d6",
-      "--photo-d": "#4d2325"
+      "--accent-soft": "#c9b3af"
     }
   },
   { "name": "kicker_left", "text": "Signal Lab" },
@@ -19,6 +15,8 @@
   { "name": "kicker_right", "text": "Audit" },
   { "name": "eyebrow", "text": "Positioning Note" },
   { "name": "title", "html": "Make the<br>expertise<br>visible." },
+  { "name": "hero_image", "src": "./assets/velora-desk-unsplash.jpg", "fit": "cover", "anchor": "center" },
+  { "name": "secondary_image", "src": "./assets/velora-textile-unsplash.jpg", "fit": "cover", "anchor": "50% 58%" },
   { "name": "body", "text": "A text-first square balances proof, restraint, and a single image crop to keep the offer legible." },
   { "name": "caption", "hide": true },
   { "name": "metric_label", "text": "Content Lift" },

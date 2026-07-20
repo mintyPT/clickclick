@@ -7,11 +7,7 @@
       "--ink": "#161616",
       "--muted": "#75706d",
       "--accent": "#9e2428",
-      "--accent-soft": "#d1b9b5",
-      "--photo-a": "#d7c8ba",
-      "--photo-b": "#91857c",
-      "--photo-c": "#f3eadf",
-      "--photo-d": "#592b2d"
+      "--accent-soft": "#d1b9b5"
     }
   },
   { "name": "kicker_left", "text": "Visual System" },
@@ -19,6 +15,7 @@
   { "name": "kicker_right", "text": "Palette" },
   { "name": "eyebrow", "text": "Brand Study" },
   { "name": "title", "html": "Four<br>tones,<br>one<br>voice." },
+  { "name": "secondary_image", "src": "./assets/velora-textile-unsplash.jpg", "fit": "cover", "anchor": "50% 58%" },
   { "name": "body", "text": "Use quiet neutrals for pace, then reserve red for the details that should be remembered." },
   { "name": "caption", "hide": true },
   { "name": "palette_label", "text": "Velora palette" },

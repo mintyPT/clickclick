@@ -1,0 +1,9 @@
+[
+  { "name": "post", "className": "post post-product" },
+  { "name": "brand", "text": "loftloom" },
+  { "name": "site_top", "text": "loftloom.example" },
+  { "name": "title", "text": "Looped ottoman" },
+  { "name": "product_image", "src": "./assets/weave-home-ottoman-unsplash.jpg", "fit": "cover", "anchor": "66% 70%" },
+  { "name": "price_main", "text": "$162.00" },
+  { "name": "site_bottom", "text": "loftloom.example" }
+]

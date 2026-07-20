@@ -1,0 +1,31 @@
+{
+  "name": "Weave Home Retail Social Posts",
+  "description": "Use a reusable template for a retail campaign with product-forward square posts, lifestyle overlays, and a warm family promo card. This set adapts the supplied three-post composition with a fictional home brand, original copy, Unsplash photos passed through JSON image layers, and shifted warm neutrals.",
+  "template": "./weave-home-social.html",
+  "css": "./weave-home-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    {
+      "id": "product",
+      "title": "Woven Ottoman Product Post",
+      "modifyFile": "./weave-home-social-product.json",
+      "output": "./weave-home-social-product.png",
+      "alt": "Weave Home woven ottoman product post result"
+    },
+    {
+      "id": "lifestyle",
+      "title": "Textile Lifestyle Overlay Post",
+      "modifyFile": "./weave-home-social-lifestyle.json",
+      "output": "./weave-home-social-lifestyle.png",
+      "alt": "Weave Home lifestyle textile overlay post result"
+    },
+    {
+      "id": "family",
+      "title": "Nursery Promo Post",
+      "modifyFile": "./weave-home-social-family.json",
+      "output": "./weave-home-social-family.png",
+      "alt": "Weave Home nursery promo post result"
+    }
+  ]
+}
