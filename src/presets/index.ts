@@ -1,3 +1,4 @@
+import { adaptive } from "./adaptive.js";
 import { announcement } from "./announcement.js";
 import { badgeGrid, brandAnnouncement, logoBackdrop, partnerCard, watermarkQuote } from "./brand.js";
 import { checkerboard } from "./checkerboard.js";
@@ -9,6 +10,7 @@ import { quote } from "./quote.js";
 import { solid } from "./solid.js";
 import { split } from "./split.js";
 import { terminal } from "./terminal.js";
+export type { AdaptivePresetOptions } from "./adaptive.js";
 export type { AnnouncementPresetOptions } from "./announcement.js";
 export type { BadgeGridPresetOptions, BrandAnnouncementPresetOptions, LogoBackdropPresetOptions, PartnerCardPresetOptions, WatermarkQuotePresetOptions } from "./brand.js";
 export type { CheckerboardPresetOptions } from "./checkerboard.js";
@@ -23,6 +25,7 @@ export type { TerminalPresetOptions } from "./terminal.js";
 export type { PresetBackgroundMediaOptions, PresetLogoOptions, PresetMediaOptions, PresetWatermarkOptions } from "./utils.js";
 
 export const presets = {
+  adaptive,
   announcement,
   brandAnnouncement,
   logoBackdrop,
@@ -44,6 +47,10 @@ export const presets = {
 };
 
 export const presetMetadata = [
+  {
+    name: "adaptive",
+    description: "Single adaptive template that rearranges typography and visual blocks for any output size.",
+  },
   {
     name: "announcement",
     description: "Launch or event announcement image with badge, meta, subtitle, and CTA.",
