@@ -79,6 +79,7 @@ describe("solid preset", () => {
 
 describe("new social presets", () => {
   it.each([
+    ["adaptive", presets.adaptive({ title: "Hello", subtitle: "World", eyebrow: "Resize", meta: "500 x 300" })],
     ["announcement", presets.announcement({ title: "Hello", subtitle: "World", badge: "New", meta: "Today", cta: "Read more" })],
     ["brandAnnouncement", presets.brandAnnouncement({ title: "Hello", subtitle: "World", cta: "Read more" })],
     ["logoBackdrop", presets.logoBackdrop({ title: "Hello", subtitle: "World", meta: "New" })],
@@ -104,6 +105,7 @@ describe("new social presets", () => {
 
   it("escapes user-authored text in new presets", () => {
     expect(presets.announcement({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
+    expect(presets.adaptive({ title: "<script>alert(1)</script>", meta: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
     expect(presets.brandAnnouncement({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
     expect(presets.logoBackdrop({ title: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
     expect(presets.partnerCard({ title: "<script>alert(1)</script>", partnerLogo: "<script>alert(1)</script>" }).document.html).not.toContain("<script>");
@@ -140,8 +142,19 @@ describe("new social presets", () => {
     expect(presets.terminal({ title: "Hello", command: "npm test", prompt: ">", output: "done" }).document.html).toContain("done");
   });
 
+  it("adapts layout and viewport from one preset implementation", () => {
+    const wide = presets.adaptive({ title: "Adaptive", width: 900, height: 300 });
+    const tall = presets.adaptive({ title: "Adaptive", width: 300, height: 900 });
+
+    expect(wide.viewport).toEqual({ width: 900, height: 300 });
+    expect(tall.viewport).toEqual({ width: 300, height: 900 });
+    expect(wide.document.html).toContain("adaptive wide");
+    expect(tall.document.html).toContain("adaptive tall");
+  });
+
   it("does not inject default media assets into media-backed presets", () => {
     const inputs = [
+      presets.adaptive({ title: "Hello" }),
       presets.brandAnnouncement({ title: "Hello" }),
       presets.logoBackdrop({ title: "Hello" }),
       presets.partnerCard({ title: "Hello" }),
@@ -163,6 +176,7 @@ describe("new social presets", () => {
 
   it("has internal CLI metadata for every exported preset", () => {
     expect(presetMetadata.map((preset) => preset.name)).toEqual([
+      "adaptive",
       "announcement",
       "brandAnnouncement",
       "logoBackdrop",

@@ -387,6 +387,26 @@ function photoPresetCommandDefinitions(): PresetCommandDefinition[] {
 function richMediaPresetCommandDefinitions(): PresetCommandDefinition[] {
   return [
     {
+      command: "adaptive",
+      options: [
+        { flags: "--title <text>", description: "Title text", required: true },
+        { flags: "--subtitle <text>", description: "Subtitle text" },
+        { flags: "--eyebrow <text>", description: "Small eyebrow text" },
+        { flags: "--meta <text>", description: "Footer metadata text" },
+        { flags: "--background, --background-color <color>", description: "Background color" },
+        { flags: "--panel-color <color>", description: "Visual panel color" },
+      ],
+      render: (options) => presets.adaptive({
+        title: requiredString(options.title, "title"),
+        subtitle: optionalString(options.subtitle),
+        eyebrow: optionalString(options.eyebrow),
+        meta: optionalString(options.meta),
+        backgroundColor: optionalBackgroundColor(options),
+        panelColor: optionalString(options.panelColor),
+        ...richMediaPresetOptions(options),
+      }),
+    },
+    {
       command: "gradient",
       options: [
         { flags: "--title <text>", description: "Title text", required: true },

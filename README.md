@@ -253,6 +253,86 @@ and the GitHub Actions workflow steps. Do not publish from routine CI.
 ClickClick currently ships these built-in presets. Keep this list in sync with the exported
 `presets` object and the CLI preset commands.
 
+### `adaptive`
+
+A single adaptive template that rearranges typography and visual blocks for the requested output
+size.
+
+CLI:
+
+```bash
+clickclick preset adaptive \
+  --title "One template, many sizes" \
+  --subtitle "Typography and visual blocks respond to the requested viewport." \
+  --eyebrow "Adaptive" \
+  --meta "Same content" \
+  --background "#172026" \
+  --accent "#f59e0b" \
+  --panel-color "rgba(255,255,255,0.14)" \
+  --width 1200 \
+  --height 630 \
+  --out examples/presets/adaptive-wide.png
+
+clickclick preset adaptive \
+  --title "One template, many sizes" \
+  --subtitle "Typography and visual blocks respond to the requested viewport." \
+  --eyebrow "Adaptive" \
+  --meta "Same content" \
+  --background "#172026" \
+  --accent "#f59e0b" \
+  --panel-color "rgba(255,255,255,0.14)" \
+  --width 1080 \
+  --height 1080 \
+  --out examples/presets/adaptive-square.png
+
+clickclick preset adaptive \
+  --title "One template, many sizes" \
+  --subtitle "Typography and visual blocks respond to the requested viewport." \
+  --eyebrow "Adaptive" \
+  --meta "Same content" \
+  --background "#172026" \
+  --accent "#f59e0b" \
+  --panel-color "rgba(255,255,255,0.14)" \
+  --width 720 \
+  --height 1280 \
+  --out examples/presets/adaptive-tall.png
+```
+
+Library:
+
+```ts
+import { presets, renderImage } from "@maurogoncalo/clickclick";
+
+const adaptiveOptions = {
+  title: "One template, many sizes",
+  subtitle: "Typography and visual blocks respond to the requested viewport.",
+  eyebrow: "Adaptive",
+  meta: "Same content",
+  backgroundColor: "#172026",
+  accentColor: "#f59e0b",
+  panelColor: "rgba(255,255,255,0.14)",
+};
+
+for (const item of [
+  { width: 1200, height: 630, path: "examples/presets/adaptive-wide.png" },
+  { width: 1080, height: 1080, path: "examples/presets/adaptive-square.png" },
+  { width: 720, height: 1280, path: "examples/presets/adaptive-tall.png" },
+]) {
+  await renderImage({
+    ...presets.adaptive({ ...adaptiveOptions, width: item.width, height: item.height }),
+    output: { path: item.path },
+  });
+}
+```
+
+Results:
+
+![Adaptive wide preset result](./examples/presets/adaptive-wide.png)
+
+![Adaptive square preset result](./examples/presets/adaptive-square.png)
+
+![Adaptive tall preset result](./examples/presets/adaptive-tall.png)
+
 ### `brandAnnouncement`
 
 A branded announcement image with title, subtitle, CTA, a corner logo, and a faint logo watermark.
