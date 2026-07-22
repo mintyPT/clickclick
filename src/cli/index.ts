@@ -3,8 +3,8 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, clearCache, listConfigTemplates, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
-import type { LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
+import { ClickClickError, clearCache, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import type { BrandKit, LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
 import type { ParsedRenderSize } from "./options.js";
 import { registerPresetCommands } from "./presets.js";
@@ -98,6 +98,7 @@ program
   .option("--css <file>", "Optional CSS file to inject")
   .option("--modify-json <json>", "Layer modifications as JSON")
   .option("--modify-file <file>", "Layer modifications JSON file")
+  .option("--brand <file>", "Brand kit JSON file")
   .option("--font <spec...>", "Font registry entry: Family=path-or-url")
   .option("--debug-dir <dir>", "Write source and warning diagnostics")
   .option("--on-missing-layer <mode>", "Missing layer behavior: warn, error, or ignore")
@@ -123,6 +124,7 @@ program
     const input = {
       htmlPath,
       cssPath,
+      brand: await parseBrandKitOption(options),
       modifications: await parseModifications(options),
       fonts: parseFonts(options.font),
       debugDir: typeof options.debugDir === "string" ? options.debugDir : undefined,
@@ -171,6 +173,7 @@ config
   .argument("<name>", "Recipe name")
   .option("--modify-json <json>", "Additional layer modifications as JSON")
   .option("--modify-file <file>", "Additional layer modifications JSON file")
+  .option("--brand <file>", "Brand kit JSON file")
   .option("--debug-dir <dir>", "Write source and warning diagnostics")
   .option("--out, --output <file>", "Output image path")
   .option("--out-dir <dir>", "Directory for multi-size output images")
@@ -187,6 +190,7 @@ config
   .action(async (configFile: string, name: string, options) => {
     const input = {
       modifications: await parseModifications(options),
+      brand: await parseBrandKitOption(options),
       debugDir: typeof options.debugDir === "string" ? options.debugDir : undefined,
       viewport: { width: options.width, height: options.height },
       output: parseOutputOptions(options),
@@ -206,6 +210,7 @@ config
   .argument("<config-file>", "ClickClick config JSON file")
   .argument("<name>", "Template set name")
   .option("--out-dir <dir>", "Directory for generated images")
+  .option("--brand <file>", "Brand kit JSON file")
   .option("--cache", "Reuse cached output for identical deterministic input")
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
@@ -215,6 +220,7 @@ config
     if (outDir) await mkdir(outDir, { recursive: true });
     const results = await renderTemplateSet(resolve(configFile), name, outDir, {
       cache: parseCacheOptions(options),
+      brand: await parseBrandKitOption(options),
     });
     for (const result of results) {
       reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
@@ -385,6 +391,10 @@ async function parseModifications(options: Record<string, unknown>): Promise<Lay
     parts.push(...parseModificationJson(await readFileChecked(resolve(options.modifyFile), "Modification JSON")));
   }
   return parts.length > 0 ? parts : undefined;
+}
+
+async function parseBrandKitOption(options: Record<string, unknown>): Promise<BrandKit | undefined> {
+  return typeof options.brand === "string" ? loadBrandKit(resolve(options.brand)) : undefined;
 }
 
 function parseModificationJson(raw: string): LayerModification[] {

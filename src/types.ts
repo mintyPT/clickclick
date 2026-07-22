@@ -1,4 +1,6 @@
 import type { Browser, LaunchOptions, Page } from "playwright";
+import type { BrandKit } from "./brand-kit/index.js";
+export type { BrandKit } from "./brand-kit/index.js";
 
 export type ImageFormat = "png" | "jpeg";
 export type WaitUntil = "load" | "domcontentloaded" | "networkidle" | "commit";
@@ -158,6 +160,7 @@ export interface LayerModification {
 }
 
 export interface TemplateInput {
+  brand?: BrandKit;
   html?: string;
   css?: string;
   htmlPath?: string;
@@ -177,6 +180,7 @@ export interface TemplateInput {
 
 export interface TemplateRecipe {
   template: string;
+  brand?: BrandKit;
   output?: RenderOutputOptions & { width?: number; height?: number };
   modifications?: LayerModification[];
 }
@@ -186,6 +190,7 @@ export interface TemplateSetItem extends TemplateRecipe {
 }
 
 export interface ClickClickConfig {
+  brand?: BrandKit;
   templates?: Record<string, Omit<TemplateInput, "output" | "viewport">>;
   recipes?: Record<string, TemplateRecipe>;
   templateSets?: Record<string, TemplateSetItem[]>;

@@ -226,6 +226,97 @@ Multi-size renders support the named sizes `og` (`1200x630`), `square` (`1080x10
 `dist/card-1200x630.png` and prints every generated path. URL screenshots also support `--full-page`,
 `--omit-background`, and `--locale`. `--out` and `--output` are aliases.
 
+### Brand Kits
+
+Presets, templates, config recipes, and template sets can share reusable design tokens from a brand
+kit JSON file. Pass it with `--brand ./brand.json` in the CLI, or pass a `brand` object in library
+calls. Brand kits can define `colors`, `fonts`, `logos`, `typography`, `spacing`, visual `defaults`,
+and `templateLayers`. Local font, logo, and background image paths are resolved relative to the
+brand JSON file and validated before rendering. The package also exports `brandKitJsonSchema` for
+tools that want the JSON Schema contract.
+
+Precedence is stable: brand defaults are applied first, recipe/config values are applied next, and
+explicit CLI or library options win last.
+
+Example brand kit:
+
+```json
+{
+  "colors": {
+    "primary": "#0f766e",
+    "accent": "#f59e0b",
+    "background": "#172026",
+    "text": "#f8fafc",
+    "gradientFrom": "#0f766e",
+    "gradientTo": "#334155"
+  },
+  "typography": {
+    "fontFamily": "Inter, ui-sans-serif, system-ui, sans-serif"
+  },
+  "logos": {
+    "primary": {
+      "src": "presets/clickclick-logo.svg",
+      "placement": "top-right",
+      "size": 116
+    }
+  },
+  "defaults": {
+    "align": "left",
+    "logoPlacement": "top-right"
+  }
+}
+```
+
+CLI:
+
+```bash
+clickclick preset solid \
+  --title "One brand kit" \
+  --subtitle "The same tokens drive multiple presets." \
+  --brand examples/brand-kit.json \
+  --out examples/presets/brand-kit-solid.png
+
+clickclick preset gradient \
+  --title "Reusable design tokens" \
+  --subtitle "Colors, logo, typography, and defaults come from one JSON file." \
+  --label "Brand kit" \
+  --brand examples/brand-kit.json \
+  --out examples/presets/brand-kit-gradient.png
+```
+
+Library:
+
+```ts
+import { loadBrandKit, presets, renderImage } from "@maurogoncalo/clickclick";
+
+const brand = await loadBrandKit("examples/brand-kit.json");
+
+await renderImage({
+  ...presets.solid({
+    title: "One brand kit",
+    subtitle: "The same tokens drive multiple presets.",
+    brand,
+  }),
+  output: { path: "examples/presets/brand-kit-solid.png" },
+});
+
+await renderImage({
+  ...presets.gradient({
+    title: "Reusable design tokens",
+    subtitle: "Colors, logo, typography, and defaults come from one JSON file.",
+    label: "Brand kit",
+    brand,
+  }),
+  output: { path: "examples/presets/brand-kit-gradient.png" },
+});
+```
+
+Results:
+
+![Brand kit solid preset result](./examples/presets/brand-kit-solid.png)
+
+![Brand kit gradient preset result](./examples/presets/brand-kit-gradient.png)
+
 ## Advanced Usage
 
 The README keeps quick-start material and the complete built-in preset reference. Longer examples

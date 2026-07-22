@@ -296,6 +296,24 @@ describe("CLI", () => {
     const png = PNG.sync.read(await readFile(out));
     expect([png.data[0], png.data[1], png.data[2]]).toEqual([0x12, 0x34, 0x56]);
   });
+
+  it("renders presets with a brand kit file and explicit CLI overrides win", async () => {
+    const brandPath = join(tempDir, "preset.brand.json");
+    const brandedOut = join(tempDir, "brand-kit-preset.png");
+    const overrideOut = join(tempDir, "brand-kit-override.png");
+    await writeFile(brandPath, JSON.stringify({
+      colors: { background: "#123456", text: "#ffffff", accent: "#abcdef" },
+      typography: { fontFamily: "Inter, sans-serif" },
+    }));
+
+    await runCli(["preset", "solid", "--title", "Brand", "--brand", brandPath, "--out", brandedOut, "--width", "64", "--height", "64"]);
+    await runCli(["preset", "solid", "--title", "Brand", "--brand", brandPath, "--background", "#654321", "--out", overrideOut, "--width", "64", "--height", "64"]);
+
+    const branded = PNG.sync.read(await readFile(brandedOut));
+    const override = PNG.sync.read(await readFile(overrideOut));
+    expect([branded.data[0], branded.data[1], branded.data[2]]).toEqual([0x12, 0x34, 0x56]);
+    expect([override.data[0], override.data[1], override.data[2]]).toEqual([0x65, 0x43, 0x21]);
+  });
 });
 
 function runCli(args: string[]) {

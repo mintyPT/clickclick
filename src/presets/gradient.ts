@@ -1,9 +1,11 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetMediaOptions } from "./utils.js";
 
 export interface GradientPresetOptions extends PresetMediaOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   label?: string;
@@ -18,6 +20,7 @@ export interface GradientPresetOptions extends PresetMediaOptions {
 }
 
 export function gradient(options: GradientPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
   const accentColor = options.accentColor ?? "rgba(255,255,255,0.28)";

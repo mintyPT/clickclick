@@ -1,9 +1,11 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetMediaOptions } from "./utils.js";
 
 export interface SolidPresetOptions extends PresetMediaOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   label?: string;
@@ -17,6 +19,7 @@ export interface SolidPresetOptions extends PresetMediaOptions {
 }
 
 export function solid(options: SolidPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "center";
   const media = renderPresetMedia(options, width, height);

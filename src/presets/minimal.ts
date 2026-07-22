@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface MinimalPresetOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   meta?: string;
@@ -16,6 +18,7 @@ export interface MinimalPresetOptions {
 }
 
 export function minimal(options: MinimalPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
 
