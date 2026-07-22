@@ -2,6 +2,7 @@ import { dirname } from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import type { Page } from "playwright";
 import { chromium } from "playwright";
+import { createCacheKey, readCachedResult, resolveRenderCacheOptions, writeCachedResult } from "../cache/index.js";
 import { ClickClickError } from "../errors.js";
 import { runTextFitting } from "../fit-text/index.js";
 import type {
@@ -41,10 +42,25 @@ export async function screenshotUrl(input: ScreenshotUrlInput, options: Screensh
 export async function createRenderer(options: RendererOptions = {}): Promise<ClickClickRenderer> {
   const ownsBrowser = !options.browser;
   const browser = options.browser ?? await launchBrowser(options.launchOptions);
+  const cache = resolveRenderCacheOptions(options.cache);
 
   return {
     async render(input) {
       const normalized = normalizeInput(input);
+      const cacheKey = cache && (!normalized.render?.beforeScreenshot || cache.keyParts !== undefined)
+        ? createRenderCacheKey(normalized, cache.keyParts)
+        : undefined;
+
+      if (cache && cacheKey) {
+        const cached = await readCachedResult(cache, cacheKey, normalized.output.path);
+        if (cached) {
+          if (normalized.output.path) {
+            await writeOutput(normalized.output.path, cached.buffer);
+          }
+          return cached;
+        }
+      }
+
       const context = await browser.newContext({
         viewport: normalized.viewport,
         deviceScaleFactor: 1,
@@ -75,12 +91,20 @@ export async function createRenderer(options: RendererOptions = {}): Promise<Cli
           throw new ClickClickError("TEXT_FIT_OVERFLOW", strictOverflow.message, strictOverflow);
         }
 
-        return await captureScreenshot(page, {
+        const result = await captureScreenshot(page, {
           selector: normalized.render?.selector,
           output: normalized.output,
           viewport: normalized.viewport,
           warnings,
         });
+        if (cache && cacheKey) {
+          await writeCachedResult(cache, cacheKey, result);
+          return { ...result, cache: { hit: false, key: cacheKey, dir: cache.dir } };
+        }
+        if (cache && !cacheKey) {
+          return { ...result, cache: { hit: false, dir: cache.dir, skippedReason: "beforeScreenshot" } };
+        }
+        return result;
       } catch (error) {
         if (error instanceof ClickClickError) throw error;
         throw new ClickClickError("RENDER_FAILED", error instanceof Error ? error.message : "Rendering failed.", error);
@@ -132,6 +156,25 @@ export async function createRenderer(options: RendererOptions = {}): Promise<Cli
   };
 }
 
+function createRenderCacheKey(normalized: ReturnType<typeof normalizeInput>, keyParts: unknown): string {
+  return createCacheKey({
+    document: normalized.document,
+    viewport: normalized.viewport,
+    output: {
+      format: normalized.output.format,
+      quality: normalized.output.quality,
+      omitBackground: normalized.output.omitBackground,
+    },
+    render: {
+      selector: normalized.render?.selector,
+      waitUntil: normalized.render?.waitUntil,
+      delayMs: normalized.render?.delayMs,
+    },
+    fitText: normalized.fitText,
+    keyParts,
+  });
+}
+
 async function captureScreenshot(page: Page, options: {
   selector?: string;
   fullPage?: boolean;
@@ -154,8 +197,7 @@ async function captureScreenshot(page: Page, options: {
     });
 
   if (options.output.path) {
-    await mkdir(dirname(options.output.path), { recursive: true });
-    await writeFile(options.output.path, buffer);
+    await writeOutput(options.output.path, buffer);
   }
 
   return {
@@ -166,6 +208,11 @@ async function captureScreenshot(page: Page, options: {
     path: options.output.path,
     warnings: options.warnings,
   };
+}
+
+async function writeOutput(path: string, buffer: Buffer): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, buffer);
 }
 
 async function screenshotElement(page: Page, selector: string, output: {

@@ -1,5 +1,5 @@
 import { ClickClickError } from "../errors.js";
-import type { ImageFormat, RenderOutputOptions, WaitUntil } from "../types.js";
+import type { ImageFormat, RenderCacheOptions, RenderOutputOptions, WaitUntil } from "../types.js";
 
 export function parseInteger(value: string): number {
   const parsed = Number(value);
@@ -31,6 +31,14 @@ export function parseRenderOptions(options: Record<string, unknown>) {
     selector: typeof options.selector === "string" ? options.selector : undefined,
     waitUntil: parseWaitUntil(options.waitUntil),
     delayMs: typeof options.delay === "number" ? options.delay : undefined,
+  };
+}
+
+export function parseCacheOptions(options: Record<string, unknown>): RenderCacheOptions | undefined {
+  if (!options.cache) return undefined;
+  return {
+    dir: typeof options.cacheDir === "string" ? options.cacheDir : undefined,
+    info: Boolean(options.cacheInfo),
   };
 }
 

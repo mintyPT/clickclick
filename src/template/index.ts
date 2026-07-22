@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Page } from "playwright";
+import { resolveRenderCacheOptions, writeCachedResult } from "../cache/index.js";
 import { ClickClickError } from "../errors.js";
 import { serializeMediaSource } from "../presets/utils.js";
 import { renderImage } from "../renderer/index.js";
@@ -13,6 +14,7 @@ import type {
   TemplateRecipe,
   TemplateSetItem,
   TemplateWarning,
+  RenderCacheOptions,
 } from "../types.js";
 
 interface PreparedTemplate {
@@ -26,6 +28,12 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
   const warnings: TemplateWarning[] = [];
   const css = [fontFaceCss(input.fonts), template.css].filter(Boolean).join("\n");
   const modifications = serializeLayerModificationSources(input.modifications ?? [], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
+  const cache = input.render?.beforeScreenshot ? undefined : templateCacheOptions(input.cache, {
+    kind: "template",
+    modifications,
+    onMissingLayer: input.onMissingLayer ?? "error",
+    onDuplicateLayer: input.onDuplicateLayer ?? "warn",
+  });
 
   const result = await renderImage({
     document: {
@@ -47,13 +55,31 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
         await input.render?.beforeScreenshot?.(page);
       },
     },
+  }, {
+    cache,
   });
 
-  if (input.debugDir) {
-    await writeDebugBundle(input.debugDir, template, input, [...warnings, ...result.warnings]);
+  const combined = { ...result, warnings: [...warnings, ...result.warnings] };
+  const resolvedCache = resolveRenderCacheOptions(cache);
+  if (resolvedCache && combined.cache?.key && !combined.cache.hit) {
+    await writeCachedResult(resolvedCache, combined.cache.key, combined);
   }
 
-  return { ...result, warnings: [...warnings, ...result.warnings] };
+  if (input.debugDir) {
+    await writeDebugBundle(input.debugDir, template, input, combined.warnings);
+  }
+
+  return combined;
+}
+
+function templateCacheOptions(cache: RenderCacheOptions | undefined, keyParts: unknown): RenderCacheOptions | undefined {
+  if (!cache) return undefined;
+  if (cache === true) return { keyParts };
+  return { ...cache, keyParts: { ...objectKeyParts(cache.keyParts), template: keyParts } };
+}
+
+function objectKeyParts(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : { value };
 }
 
 export async function loadConfig(path: string): Promise<ClickClickConfig> {
@@ -74,7 +100,7 @@ export async function renderRecipe(configPath: string, name: string, overrides: 
   return renderTemplate(resolveRecipe(config, recipe, dirname(resolve(configPath)), overrides));
 }
 
-export async function renderTemplateSet(configPath: string, name: string, outputDir?: string): Promise<RenderImageResult[]> {
+export async function renderTemplateSet(configPath: string, name: string, outputDir?: string, overrides: Pick<TemplateInput, "cache"> = {}): Promise<RenderImageResult[]> {
   const config = await loadConfig(configPath);
   const set = config.templateSets?.[name];
   if (!set) {
@@ -87,6 +113,7 @@ export async function renderTemplateSet(configPath: string, name: string, output
     return renderTemplate(resolveRecipe(config, item, baseDir, {
       output: { ...item.output, path },
       viewport: viewportFromRecipe(item),
+      cache: overrides.cache,
     }));
   }));
 }

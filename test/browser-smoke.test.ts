@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ClickClickError, presets, renderImage, screenshotUrl } from "../src/index.js";
+import { ClickClickError, clearCache, presets, renderImage, screenshotUrl } from "../src/index.js";
 
 let tempDir: string;
 
@@ -43,6 +43,47 @@ describe("browser rendering", () => {
 
     expect(result.format).toBe("jpeg");
     await expect(readFile(path)).resolves.toHaveLength(result.buffer.length);
+  });
+
+  it("reuses cached render output and still writes the requested output path", async () => {
+    const cacheDir = join(tempDir, "cache");
+    const firstPath = join(tempDir, "cached-first.png");
+    const secondPath = join(tempDir, "cached-second.png");
+    const input = {
+      document: {
+        html: "<main></main>",
+        css: "html,body,main{margin:0;width:100%;height:100%;background:#00ff00;}",
+      },
+      viewport: { width: 64, height: 64 },
+    };
+
+    const first = await renderImage({ ...input, output: { path: firstPath } }, { cache: { dir: cacheDir } });
+    await rm(firstPath);
+    const second = await renderImage({ ...input, output: { path: secondPath } }, { cache: { dir: cacheDir } });
+
+    expect(first.cache).toMatchObject({ hit: false });
+    expect(second.cache).toMatchObject({ hit: true, key: first.cache?.key });
+    await expect(readFile(secondPath)).resolves.toHaveLength(second.buffer.length);
+
+    await clearCache({ dir: cacheDir });
+    const third = await renderImage({ ...input, output: { path: firstPath } }, { cache: { dir: cacheDir } });
+    expect(third.cache).toMatchObject({ hit: false });
+  });
+
+  it("does not cache renders with a user beforeScreenshot hook", async () => {
+    const cacheDir = join(tempDir, "hook-cache");
+    const input = {
+      document: { html: "<main>Hook</main>" },
+      render: {
+        beforeScreenshot: async () => undefined,
+      },
+    };
+
+    const first = await renderImage(input, { cache: { dir: cacheDir } });
+    const second = await renderImage(input, { cache: { dir: cacheDir } });
+
+    expect(first.cache).toMatchObject({ hit: false, skippedReason: "beforeScreenshot" });
+    expect(second.cache).toMatchObject({ hit: false, skippedReason: "beforeScreenshot" });
   });
 
   it("reports missing selectors with a stable code", async () => {

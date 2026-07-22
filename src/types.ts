@@ -60,6 +60,7 @@ export interface RendererOptions {
   browser?: Browser;
   launchOptions?: LaunchOptions;
   fonts?: FontRegistryEntry[];
+  cache?: RenderCacheOptions;
 }
 
 export interface RenderImageOptions extends RendererOptions {}
@@ -92,12 +93,26 @@ export interface RenderImageResult {
   height: number;
   path?: string;
   warnings: RenderWarning[];
+  cache?: RenderCacheInfo;
 }
 
 export interface ClickClickRenderer {
   render(input: RenderImageInput): Promise<RenderImageResult>;
   screenshotUrl(input: ScreenshotUrlInput): Promise<RenderImageResult>;
   close(): Promise<void>;
+}
+
+export type RenderCacheOptions = boolean | {
+  dir?: string;
+  info?: boolean;
+  keyParts?: unknown;
+};
+
+export interface RenderCacheInfo {
+  hit: boolean;
+  key?: string;
+  dir?: string;
+  skippedReason?: "disabled" | "beforeScreenshot";
 }
 
 export interface FontRegistryEntry {
@@ -157,6 +172,7 @@ export interface TemplateInput {
   output?: RenderOutputOptions;
   render?: RenderLifecycleOptions;
   fitText?: FitTextTarget[];
+  cache?: RenderCacheOptions;
 }
 
 export interface TemplateRecipe {

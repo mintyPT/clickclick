@@ -62,6 +62,27 @@ describe("template rendering", () => {
     ]);
   });
 
+  it("preserves template warnings on cache hits", async () => {
+    const cacheDir = join(tempDir, "template-cache");
+    const input = {
+      html: '<div data-layer="title">A</div><div data-layer="title">B</div>',
+      viewport: { width: 80, height: 40 },
+      modifications: [{ name: "title", text: "Changed" }, { name: "missing", text: "Nope" }],
+      onMissingLayer: "warn" as const,
+      cache: { dir: cacheDir },
+    };
+
+    const first = await renderTemplate(input);
+    const second = await renderTemplate(input);
+
+    expect(first.cache).toMatchObject({ hit: false });
+    expect(second.cache).toMatchObject({ hit: true });
+    expect(second.warnings).toMatchObject([
+      { code: "DUPLICATE_LAYER", layer: "title" },
+      { code: "MISSING_LAYER", layer: "missing" },
+    ]);
+  });
+
   it("renders recipes and template sets from a config file", async () => {
     const htmlPath = join(tempDir, "recipe.html");
     const configPath = join(tempDir, "clickclick.config.json");
