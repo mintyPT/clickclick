@@ -1,9 +1,11 @@
+import { join, resolve } from "node:path";
 import type { Command } from "commander";
 import { ClickClickError, presets } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { RenderImageInput } from "../types.js";
-import { parseCacheOptions, parseInteger, parseNumber, parseOutputOptions } from "./options.js";
+import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseSizeOptions } from "./options.js";
+import type { ParsedRenderSize } from "./options.js";
 
 interface PresetCliDependencies {
   runRender: (input: RenderImageInput, strict: boolean, cache?: ReturnType<typeof parseCacheOptions>) => Promise<void>;
@@ -223,10 +225,7 @@ function registerLegacyPresetCommands(parent: Command, dependencies: PresetCliDe
     let command = addCommandOptions(parent.command(definition.command), definition.options);
     command = addPresetRenderOptions(command);
     command.action(async (options) => {
-      await dependencies.runRender({
-        ...definition.render(options),
-        output: parseOutputOptions(options),
-      }, Boolean(options.strict), parseCacheOptions(options));
+      await runPresetCommand(definition, options, dependencies);
     });
   }
 }
@@ -454,10 +453,7 @@ function registerBrandPresetCommands(parent: Command, dependencies: PresetCliDep
     command = addPresetColorOptions(command);
     command = addPresetRenderOptions(command);
     command.action(async (options) => {
-      await dependencies.runRender({
-        ...definition.render(options),
-        output: parseOutputOptions(options),
-      }, Boolean(options.strict), parseCacheOptions(options));
+      await runPresetCommand(definition, options, dependencies);
     });
   }
 }
@@ -470,10 +466,7 @@ function registerPhotoPresetCommands(parent: Command, dependencies: PresetCliDep
     command = addPhotoStyleOptions(command);
     command = addPresetRenderOptions(command);
     command.action(async (options) => {
-      await dependencies.runRender({
-        ...definition.render(options),
-        output: parseOutputOptions(options),
-      }, Boolean(options.strict), parseCacheOptions(options));
+      await runPresetCommand(definition, options, dependencies);
     });
   }
 }
@@ -484,11 +477,29 @@ function registerRichMediaPresetCommands(parent: Command, dependencies: PresetCl
     command = addRichMediaOptions(command);
     command = addPresetRenderOptions(command);
     command.action(async (options) => {
-      await dependencies.runRender({
-        ...definition.render(options),
-        output: parseOutputOptions(options),
-      }, Boolean(options.strict), parseCacheOptions(options));
+      await runPresetCommand(definition, options, dependencies);
     });
+  }
+}
+
+async function runPresetCommand(definition: PresetCommandDefinition, options: Record<string, unknown>, dependencies: PresetCliDependencies) {
+  const requestedSizes = parseSizeOptions(options);
+  if (requestedSizes.length === 0) {
+    await dependencies.runRender({
+      ...definition.render(options),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+    return;
+  }
+
+  const outDir = multiSizeOutDir(options);
+  for (const size of requestedSizes) {
+    const renderOptions = { ...options, width: size.width, height: size.height, output: multiSizeOutputPath(outDir, definition.command, size, options) };
+    await dependencies.runRender({
+      ...definition.render(renderOptions),
+      output: parseOutputOptions(renderOptions),
+    }, Boolean(options.strict), parseCacheOptions(options));
+    console.log(renderOptions.output);
   }
 }
 
@@ -569,12 +580,33 @@ function addPresetRenderOptions(command: Command): Command {
     .option("--width <px>", "Image width", parseInteger)
     .option("--height <px>", "Image height", parseInteger)
     .option("--out, --output <file>", "Output image path")
+    .option("--out-dir <dir>", "Directory for multi-size output images")
+    .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+    .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
     .option("--format <format>", "Output format: png or jpeg")
     .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
     .option("--cache", "Reuse cached output for identical deterministic input")
     .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
     .option("--cache-info", "Print cache hit/miss information")
     .option("--strict", "Exit non-zero when renderer warnings are produced");
+}
+
+function multiSizeOutDir(options: Record<string, unknown>): string {
+  if (typeof options.output === "string") {
+    throw new ClickClickError("INVALID_INPUT", "--out cannot be combined with --size or --sizes. Use --out-dir for multi-size output.");
+  }
+  if (typeof options.outDir !== "string") {
+    throw new ClickClickError("INVALID_INPUT", "--out-dir is required when --size or --sizes is used.");
+  }
+  if (options.format !== undefined && options.format !== "png" && options.format !== "jpeg") {
+    throw new ClickClickError("INVALID_INPUT", "Format must be png or jpeg.");
+  }
+  return resolve(options.outDir);
+}
+
+function multiSizeOutputPath(outDir: string, commandName: string, size: ParsedRenderSize, options: Record<string, unknown>): string {
+  const extension = options.format === "jpeg" ? "jpg" : "png";
+  return join(outDir, `${commandName}-${size.label}.${extension}`);
 }
 
 function brandMediaOptions(options: Record<string, unknown>) {

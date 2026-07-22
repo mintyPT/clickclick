@@ -55,6 +55,76 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("renders raw HTML to multiple deterministic output sizes", async () => {
+    const htmlPath = join(tempDir, "multi-card.html");
+    const outDir = join(tempDir, "multi-raw");
+
+    await writeFile(htmlPath, "<main>Multi</main><style>html,body,main{margin:0;width:100%;height:100%;background:#00ff00;}</style>");
+
+    const result = await runCli(["render", htmlPath, "--sizes", "64x64,96x48", "--out-dir", outDir]);
+
+    const firstPath = join(outDir, "multi-card-64x64.png");
+    const secondPath = join(outDir, "multi-card-96x48.png");
+    expect(result.stdout).toContain(firstPath);
+    expect(result.stdout).toContain(secondPath);
+    expect(PNG.sync.read(await readFile(firstPath))).toMatchObject({ width: 64, height: 64 });
+    expect(PNG.sync.read(await readFile(secondPath))).toMatchObject({ width: 96, height: 48 });
+  });
+
+  it("renders presets to named multi-size outputs", async () => {
+    const outDir = join(tempDir, "multi-preset");
+
+    const result = await runCli(["preset", "solid", "--title", "Hello", "--size", "og", "--size", "square", "--out-dir", outDir]);
+
+    const ogPath = join(outDir, "solid-og.png");
+    const squarePath = join(outDir, "solid-square.png");
+    expect(result.stdout).toContain(ogPath);
+    expect(result.stdout).toContain(squarePath);
+    expect(PNG.sync.read(await readFile(ogPath))).toMatchObject({ width: 1200, height: 630 });
+    expect(PNG.sync.read(await readFile(squarePath))).toMatchObject({ width: 1080, height: 1080 });
+  });
+
+  it("renders templates to multiple sizes and reuses the cache per size", async () => {
+    const htmlPath = join(tempDir, "multi-template.html");
+    const outDir = join(tempDir, "multi-template-out");
+    const cacheDir = join(tempDir, "multi-template-cache");
+
+    await writeFile(htmlPath, '<main data-layer="card">Template</main><style>html,body,main{margin:0;width:100%;height:100%;background:#ff0000;}</style>');
+
+    const args = [
+      "template",
+      htmlPath,
+      "--modify-json",
+      JSON.stringify({ name: "card", text: "Changed" }),
+      "--size",
+      "64x64",
+      "--size",
+      "96x48",
+      "--out-dir",
+      outDir,
+      "--cache",
+      "--cache-dir",
+      cacheDir,
+      "--cache-info",
+    ];
+    const miss = await runCli(args);
+    const hit = await runCli(args);
+
+    expect(miss.stderr).toContain("cache miss");
+    expect(hit.stderr).toContain("cache hit");
+    expect(PNG.sync.read(await readFile(join(outDir, "multi-template-64x64.png")))).toMatchObject({ width: 64, height: 64 });
+    expect(PNG.sync.read(await readFile(join(outDir, "multi-template-96x48.png")))).toMatchObject({ width: 96, height: 48 });
+  });
+
+  it("requires an output directory for multi-size renders", async () => {
+    const htmlPath = join(tempDir, "multi-missing-dir.html");
+    await writeFile(htmlPath, "<main>Missing dir</main>");
+
+    await expect(runCli(["render", htmlPath, "--size", "64x64"])).rejects.toMatchObject({
+      stderr: expect.stringContaining("--out-dir is required"),
+    });
+  });
+
   it("reports cache misses and hits, recreates output paths, and clears cache", async () => {
     const htmlPath = join(tempDir, "cached-card.html");
     const cacheDir = join(tempDir, "cli-cache");
@@ -121,6 +191,7 @@ describe("CLI", () => {
     const htmlPath = join(tempDir, "config-template.html");
     const configPath = join(tempDir, "clickclick.config.json");
     const out = join(tempDir, "config-recipe.png");
+    const multiOutDir = join(tempDir, "config-recipe-multi");
 
     await writeFile(htmlPath, '<main data-layer="card">Recipe</main>');
     await writeFile(configPath, JSON.stringify({
@@ -142,9 +213,12 @@ describe("CLI", () => {
     const list = await runCli(["config", "templates", configPath]);
     expect(list.stdout).toContain("card");
     await runCli(["config", "recipe", configPath, "card", "--width", "64", "--height", "64"]);
+    const multi = await runCli(["config", "recipe", configPath, "card", "--sizes", "64x64,96x48", "--out-dir", multiOutDir]);
 
     await expect(readFile(out)).resolves.toHaveProperty("length");
-  });
+    expect(multi.stdout).toContain(join(multiOutDir, "card-64x64.png"));
+    expect(PNG.sync.read(await readFile(join(multiOutDir, "card-96x48.png")))).toMatchObject({ width: 96, height: 48 });
+  }, 60000);
 
   it("screenshots a URL", async () => {
     const out = join(tempDir, "url.png");

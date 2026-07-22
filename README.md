@@ -205,6 +205,13 @@ Generate a built-in preset:
 clickclick preset gradient --title "Hello" --subtitle "From ClickClick" --out og.png
 ```
 
+Generate several sizes in one command:
+
+```bash
+clickclick preset gradient --title "Launch" --size og --size square --size story --out-dir dist
+clickclick render ./examples/card.html --sizes 1200x630,1080x1080,720x1280 --out-dir dist
+```
+
 List presets:
 
 ```bash
@@ -212,8 +219,12 @@ clickclick preset list
 ```
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
-`--wait-until`, `--delay`, `--omit-background`, and `--strict`. URL screenshots also support
-`--full-page`, `--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+`--wait-until`, `--delay`, `--omit-background`, `--size`, `--sizes`, `--out-dir`, and `--strict`.
+Multi-size renders support the named sizes `og` (`1200x630`), `square` (`1080x1080`), and `story`
+(`1080x1920`), plus explicit `WIDTHxHEIGHT` values. When `--size` or `--sizes` is used, pass
+`--out-dir`; ClickClick writes deterministic names such as `dist/gradient-og.png` and
+`dist/card-1200x630.png` and prints every generated path. URL screenshots also support `--full-page`,
+`--omit-background`, and `--locale`. `--out` and `--output` are aliases.
 
 ## Advanced Usage
 

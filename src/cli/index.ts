@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import { mkdir, readFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { ClickClickError, clearCache, listConfigTemplates, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
-import { parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions } from "./options.js";
+import { collectOption, parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
+import type { ParsedRenderSize } from "./options.js";
 import { registerPresetCommands } from "./presets.js";
 
 const program = new Command();
@@ -20,6 +21,9 @@ program
   .argument("<html-file>", "HTML file to render")
   .option("--css <file>", "Optional CSS file to inject")
   .option("--out, --output <file>", "Output image path")
+  .option("--out-dir <dir>", "Directory for multi-size output images")
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
   .option("--width <px>", "Viewport width", parseInteger)
   .option("--height <px>", "Viewport height", parseInteger)
   .option("--format <format>", "Output format: png or jpeg")
@@ -37,7 +41,7 @@ program
     const cssPath = options.css ? resolve(options.css) : undefined;
     const html = await readFileChecked(htmlPath, "HTML");
     const css = cssPath ? await readFileChecked(cssPath, "CSS") : undefined;
-    await runRender({
+    const input = {
       document: {
         html,
         css,
@@ -49,7 +53,13 @@ program
       },
       output: parseOutputOptions(options),
       render: parseRenderOptions(options),
-    }, Boolean(options.strict), parseCacheOptions(options));
+    };
+    const sizes = parseSizeOptions(options);
+    if (sizes.length > 0) {
+      await runMultiSizeRender(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), Boolean(options.strict), parseCacheOptions(options));
+      return;
+    }
+    await runRender(input, Boolean(options.strict), parseCacheOptions(options));
   });
 
 program
@@ -93,6 +103,9 @@ program
   .option("--on-missing-layer <mode>", "Missing layer behavior: warn, error, or ignore")
   .option("--on-duplicate-layer <mode>", "Duplicate layer behavior: warn, error, or ignore")
   .option("--out, --output <file>", "Output image path")
+  .option("--out-dir <dir>", "Directory for multi-size output images")
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
   .option("--width <px>", "Viewport width", parseInteger)
   .option("--height <px>", "Viewport height", parseInteger)
   .option("--format <format>", "Output format: png or jpeg")
@@ -107,7 +120,7 @@ program
   .action(async (htmlFile: string, options) => {
     const htmlPath = resolve(htmlFile);
     const cssPath = options.css ? resolve(options.css) : undefined;
-    await runTemplate({
+    const input = {
       htmlPath,
       cssPath,
       modifications: await parseModifications(options),
@@ -122,7 +135,13 @@ program
       output: parseOutputOptions(options),
       render: parseRenderOptions(options),
       cache: parseCacheOptions(options),
-    }, Boolean(options.strict));
+    };
+    const sizes = parseSizeOptions(options);
+    if (sizes.length > 0) {
+      await runMultiSizeTemplate(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), Boolean(options.strict));
+      return;
+    }
+    await runTemplate(input, Boolean(options.strict));
   });
 
 program
@@ -154,6 +173,9 @@ config
   .option("--modify-file <file>", "Additional layer modifications JSON file")
   .option("--debug-dir <dir>", "Write source and warning diagnostics")
   .option("--out, --output <file>", "Output image path")
+  .option("--out-dir <dir>", "Directory for multi-size output images")
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
   .option("--width <px>", "Viewport width", parseInteger)
   .option("--height <px>", "Viewport height", parseInteger)
   .option("--format <format>", "Output format: png or jpeg")
@@ -163,13 +185,19 @@ config
   .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (configFile: string, name: string, options) => {
-    const result = await renderRecipe(resolve(configFile), name, {
+    const input = {
       modifications: await parseModifications(options),
       debugDir: typeof options.debugDir === "string" ? options.debugDir : undefined,
       viewport: { width: options.width, height: options.height },
       output: parseOutputOptions(options),
       cache: parseCacheOptions(options),
-    });
+    };
+    const sizes = parseSizeOptions(options);
+    if (sizes.length > 0) {
+      await runMultiSizeRecipe(resolve(configFile), name, input, sizes, multiSizeOutputOptions(options, name), Boolean(options.strict));
+      return;
+    }
+    const result = await renderRecipe(resolve(configFile), name, input);
     reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
   });
 
@@ -244,6 +272,79 @@ async function runRender(input: RenderImageInput, strict: boolean, cache?: Rende
 async function runTemplate(input: TemplateInput, strict: boolean) {
   const result = await renderTemplate(input);
   reportResult(result, strict, isCacheInfoEnabled(input.cache));
+}
+
+async function runMultiSizeRender(input: RenderImageInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean, cache?: RenderCacheOptions) {
+  await mkdir(output.dir, { recursive: true });
+  for (const size of sizes) {
+    const path = multiSizePath(output, size);
+    const result = await renderImage({
+      ...input,
+      viewport: { width: size.width, height: size.height },
+      output: { ...input.output, path },
+    }, { cache });
+    reportResult(result, strict, isCacheInfoEnabled(cache));
+    console.log(path);
+  }
+}
+
+async function runMultiSizeTemplate(input: TemplateInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean) {
+  await mkdir(output.dir, { recursive: true });
+  for (const size of sizes) {
+    const path = multiSizePath(output, size);
+    const result = await renderTemplate({
+      ...input,
+      viewport: { width: size.width, height: size.height },
+      output: { ...input.output, path },
+    });
+    reportResult(result, strict, isCacheInfoEnabled(input.cache));
+    console.log(path);
+  }
+}
+
+async function runMultiSizeRecipe(configPath: string, name: string, input: Partial<TemplateInput>, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean) {
+  await mkdir(output.dir, { recursive: true });
+  for (const size of sizes) {
+    const path = multiSizePath(output, size);
+    const result = await renderRecipe(configPath, name, {
+      ...input,
+      viewport: { width: size.width, height: size.height },
+      output: { ...input.output, path },
+    });
+    reportResult(result, strict, isCacheInfoEnabled(input.cache));
+    console.log(path);
+  }
+}
+
+interface MultiSizeOutputOptions {
+  dir: string;
+  baseName: string;
+  extension: "png" | "jpg";
+}
+
+function multiSizeOutputOptions(options: Record<string, unknown>, baseName: string): MultiSizeOutputOptions {
+  if (typeof options.output === "string") {
+    throw new ClickClickError("INVALID_INPUT", "--out cannot be combined with --size or --sizes. Use --out-dir for multi-size output.");
+  }
+  if (typeof options.outDir !== "string") {
+    throw new ClickClickError("INVALID_INPUT", "--out-dir is required when --size or --sizes is used.");
+  }
+  if (options.format !== undefined && options.format !== "png" && options.format !== "jpeg") {
+    throw new ClickClickError("INVALID_INPUT", "Format must be png or jpeg.");
+  }
+  return {
+    dir: resolve(options.outDir),
+    baseName,
+    extension: options.format === "jpeg" ? "jpg" : "png",
+  };
+}
+
+function multiSizePath(output: MultiSizeOutputOptions, size: ParsedRenderSize): string {
+  return join(output.dir, `${output.baseName}-${size.label}.${output.extension}`);
+}
+
+function basenameWithoutExtension(path: string): string {
+  return basename(path).replace(/\.[^.]+$/, "");
 }
 
 function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) {
