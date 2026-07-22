@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import type { Page } from "playwright";
 import { resolveRenderCacheOptions, writeCachedResult } from "../cache/index.js";
 import { ClickClickError } from "../errors.js";
-import { serializeMediaSource } from "../presets/utils.js";
+import { serializeMediaSource } from "../media/index.js";
 import { renderImage } from "../renderer/index.js";
 import type {
   ClickClickConfig,

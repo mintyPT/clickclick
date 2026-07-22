@@ -1,6 +1,7 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml, serializeMediaSource } from "./utils.js";
+import { serializeMediaSource } from "../media/index.js";
+import { defaultSansFont, escapeHtml } from "./utils.js";
 
 export interface PresetSizeOptions {
   width?: number;

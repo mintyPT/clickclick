@@ -1,5 +1,6 @@
 export { clearCache } from "./cache/index.js";
 export { ClickClickError } from "./errors.js";
+export { serializeMediaSource } from "./media/index.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
 export { presets } from "./presets/index.js";
