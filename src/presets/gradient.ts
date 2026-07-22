@@ -1,5 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { renderPresetDocument, resolvePresetSize, textLayer } from "./layout.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetMediaOptions } from "./utils.js";
 

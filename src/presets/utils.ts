@@ -1,18 +1,5 @@
 import { serializeMediaSource } from "../media/index.js";
-
-export function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-export const defaultSansFont =
-  'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-
-export const defaultMonoFont = '"SFMono-Regular", Consolas, "Liberation Mono", monospace';
+import { escapeHtml } from "../preset-document/index.js";
 
 export interface PresetBackgroundMediaOptions {
   src: string;

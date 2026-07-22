@@ -1,5 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "./layout.js";
+import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 

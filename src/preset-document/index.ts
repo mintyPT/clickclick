@@ -1,7 +1,11 @@
-import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
 import { serializeMediaSource } from "../media/index.js";
-import { defaultSansFont, escapeHtml } from "./utils.js";
+import { sizes } from "../shared/sizes.js";
+import type { RenderImageInput } from "../types.js";
+
+export const defaultSansFont =
+  'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+export const defaultMonoFont = '"SFMono-Regular", Consolas, "Liberation Mono", monospace';
 
 export interface PresetSizeOptions {
   width?: number;
@@ -28,6 +32,15 @@ export interface PresetTextLayerOptions {
   fit?: boolean;
   minFontSize?: number;
   attributes?: Record<string, string | number | boolean>;
+}
+
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 export function resolvePresetSize(options: PresetSizeOptions): ResolvedPresetSize {

@@ -1,6 +1,6 @@
 import type { RenderImageInput } from "../types.js";
 import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "./utils.js";
+import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
 
 export interface AnnouncementPresetOptions {
   title: string;
