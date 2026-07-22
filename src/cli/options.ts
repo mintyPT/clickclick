@@ -1,5 +1,12 @@
 import { ClickClickError } from "../errors.js";
+import { sizes } from "../shared/sizes.js";
 import type { ImageFormat, RenderCacheOptions, RenderOutputOptions, WaitUntil } from "../types.js";
+
+export interface ParsedRenderSize {
+  label: string;
+  width: number;
+  height: number;
+}
 
 export function parseInteger(value: string): number {
   const parsed = Number(value);
@@ -39,6 +46,51 @@ export function parseCacheOptions(options: Record<string, unknown>): RenderCache
   return {
     dir: typeof options.cacheDir === "string" ? options.cacheDir : undefined,
     info: Boolean(options.cacheInfo),
+  };
+}
+
+export function collectOption(value: string, previous: string[] = []): string[] {
+  return [...previous, value];
+}
+
+export function parseSizeOptions(options: Record<string, unknown>): ParsedRenderSize[] {
+  const rawValues = [
+    ...stringArray(options.size),
+    ...stringArray(options.sizes),
+  ].flatMap((value) => value.split(",").map((part) => part.trim()).filter(Boolean));
+
+  const parsed = rawValues.map(parseSize);
+  const seen = new Set<string>();
+  for (const size of parsed) {
+    if (seen.has(size.label)) {
+      throw new ClickClickError("INVALID_INPUT", `Duplicate size requested: ${size.label}`);
+    }
+    seen.add(size.label);
+  }
+  return parsed;
+}
+
+function stringArray(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value) && value.every((item) => typeof item === "string")) return value;
+  return [];
+}
+
+function parseSize(value: string): ParsedRenderSize {
+  if (value in sizes) {
+    const named = sizes[value as keyof typeof sizes];
+    return { label: value, width: named.width, height: named.height };
+  }
+
+  const match = /^([1-9]\d*)x([1-9]\d*)$/i.exec(value);
+  if (!match) {
+    throw new ClickClickError("INVALID_INPUT", `Size must be one of ${Object.keys(sizes).join(", ")} or WIDTHxHEIGHT.`);
+  }
+
+  return {
+    label: `${match[1]}x${match[2]}`,
+    width: Number(match[1]),
+    height: Number(match[2]),
   };
 }
 
