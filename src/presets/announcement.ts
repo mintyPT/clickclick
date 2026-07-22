@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface AnnouncementPresetOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   badge?: string;
@@ -17,6 +19,7 @@ export interface AnnouncementPresetOptions {
 }
 
 export function announcement(options: AnnouncementPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const accent = options.accentColor ?? "#2563eb";
 

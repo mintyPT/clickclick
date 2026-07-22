@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { defaultSansFont, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface QuotePresetOptions {
+  brand?: BrandKit;
   quote: string;
   attribution?: string;
   source?: string;
@@ -16,6 +18,7 @@ export interface QuotePresetOptions {
 }
 
 export function quote(options: QuotePresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
 

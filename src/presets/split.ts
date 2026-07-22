@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface SplitPresetOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   label?: string;
@@ -16,6 +18,7 @@ export interface SplitPresetOptions {
 }
 
 export function split(options: SplitPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const panelSide = options.panelSide ?? "right";
   const copyFirst = panelSide === "right";

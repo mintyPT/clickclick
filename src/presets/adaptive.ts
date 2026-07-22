@@ -1,9 +1,11 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetMediaOptions } from "./utils.js";
 
 export interface AdaptivePresetOptions extends PresetMediaOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   eyebrow?: string;
@@ -18,6 +20,7 @@ export interface AdaptivePresetOptions extends PresetMediaOptions {
 }
 
 export function adaptive(options: AdaptivePresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const { width, height } = size;
   const media = renderPresetMedia(options, width, height);

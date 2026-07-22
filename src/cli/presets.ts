@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import type { Command } from "commander";
-import { ClickClickError, presets } from "../index.js";
+import { ClickClickError, loadBrandKit, presets } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { RenderImageInput } from "../types.js";
@@ -51,6 +51,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--muted-color <color>", description: "Muted text color" },
       ],
       render: (options) => presets.announcement({
+        brand: optionalBrand(options),
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         badge: optionalString(options.badge),
@@ -75,6 +76,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--checker-color <color>", description: "Checker pattern color" },
       ],
       render: (options) => presets.checkerboard({
+        brand: optionalBrand(options),
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         label: optionalString(options.label),
@@ -100,6 +102,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--after-color <color>", description: "After panel color" },
       ],
       render: (options) => presets.compare({
+        brand: optionalBrand(options),
         title: optionalString(options.title),
         beforeTitle: requiredString(options.beforeTitle, "before-title"),
         beforeText: optionalString(options.beforeText),
@@ -126,6 +129,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--align <align>", description: "Text alignment: left or center" },
       ],
       render: (options) => presets.quote({
+        brand: optionalBrand(options),
         quote: requiredString(options.quote, "quote"),
         attribution: optionalString(options.attribution),
         source: optionalString(options.source),
@@ -150,6 +154,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--panel-side <side>", description: "Panel side: left or right" },
       ],
       render: (options) => presets.split({
+        brand: optionalBrand(options),
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         label: optionalString(options.label),
@@ -177,6 +182,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--mono-font-family <value>", description: "CSS monospace font-family value" },
       ],
       render: (options) => presets.terminal({
+        brand: optionalBrand(options),
         title: requiredString(options.title, "title"),
         command: requiredString(options.command, "command"),
         subtitle: optionalString(options.subtitle),
@@ -204,6 +210,7 @@ function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
         { flags: "--align <align>", description: "Text alignment: left or center" },
       ],
       render: (options) => presets.minimal({
+        brand: optionalBrand(options),
         title: requiredString(options.title, "title"),
         subtitle: optionalString(options.subtitle),
         meta: optionalString(options.meta),
@@ -483,10 +490,12 @@ function registerRichMediaPresetCommands(parent: Command, dependencies: PresetCl
 }
 
 async function runPresetCommand(definition: PresetCommandDefinition, options: Record<string, unknown>, dependencies: PresetCliDependencies) {
+  const brand = typeof options.brand === "string" ? await loadBrandKit(resolve(options.brand)) : undefined;
+  const brandedOptions = { ...options, brand };
   const requestedSizes = parseSizeOptions(options);
   if (requestedSizes.length === 0) {
     await dependencies.runRender({
-      ...definition.render(options),
+      ...definition.render(brandedOptions),
       output: parseOutputOptions(options),
     }, Boolean(options.strict), parseCacheOptions(options));
     return;
@@ -494,7 +503,7 @@ async function runPresetCommand(definition: PresetCommandDefinition, options: Re
 
   const outDir = multiSizeOutDir(options);
   for (const size of requestedSizes) {
-    const renderOptions = { ...options, width: size.width, height: size.height, output: multiSizeOutputPath(outDir, definition.command, size, options) };
+    const renderOptions = { ...brandedOptions, width: size.width, height: size.height, output: multiSizeOutputPath(outDir, definition.command, size, options) };
     await dependencies.runRender({
       ...definition.render(renderOptions),
       output: parseOutputOptions(renderOptions),
@@ -577,6 +586,7 @@ function addRichMediaOptions(command: Command): Command {
 
 function addPresetRenderOptions(command: Command): Command {
   return command
+    .option("--brand <file>", "Brand kit JSON file")
     .option("--width <px>", "Image width", parseInteger)
     .option("--height <px>", "Image height", parseInteger)
     .option("--out, --output <file>", "Output image path")
@@ -611,6 +621,7 @@ function multiSizeOutputPath(outDir: string, commandName: string, size: ParsedRe
 
 function brandMediaOptions(options: Record<string, unknown>) {
   return {
+    brand: optionalBrand(options),
     logo: parseLogoOption(options),
     watermark: parseWatermarkOption(options),
     backgroundColor: optionalBackgroundColor(options),
@@ -624,6 +635,7 @@ function brandMediaOptions(options: Record<string, unknown>) {
 
 function photoMediaOptions(options: Record<string, unknown>) {
   return {
+    brand: optionalBrand(options),
     image: optionalString(options.image),
     overlay: optionalString(options.overlay),
     logo: parseLogoOption(options),
@@ -638,6 +650,7 @@ function photoMediaOptions(options: Record<string, unknown>) {
 
 function richMediaPresetOptions(options: Record<string, unknown>) {
   return {
+    brand: optionalBrand(options),
     textColor: optionalString(options.textColor),
     accentColor: optionalString(options.accent),
     ...parsePresetMediaOptions(options),
@@ -664,6 +677,10 @@ function optionalString(value: unknown): string | undefined {
 
 function optionalNumber(value: unknown): number | undefined {
   return typeof value === "number" ? value : undefined;
+}
+
+function optionalBrand(options: Record<string, unknown>) {
+  return options.brand && typeof options.brand === "object" ? options.brand : undefined;
 }
 
 function optionalBackgroundColor(options: Record<string, unknown>): string | undefined {

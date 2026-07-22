@@ -1,9 +1,11 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 
 interface BrandBaseOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   logo?: PresetLogoOptions;
@@ -40,6 +42,7 @@ export interface BadgeGridPresetOptions extends BrandBaseOptions {
 }
 
 export function brandAnnouncement(options: BrandAnnouncementPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     logo: options.logo,
@@ -61,6 +64,7 @@ ${media.css}`);
 }
 
 export function logoBackdrop(options: LogoBackdropPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     watermark: options.watermark,
@@ -80,6 +84,7 @@ ${media.css}`);
 }
 
 export function partnerCard(options: PartnerCardPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({ watermark: options.watermark }, size.width, size.height);
   return brandDocument(size, options, `
@@ -104,6 +109,7 @@ ${media.css}`);
 }
 
 export function watermarkQuote(options: WatermarkQuotePresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     logo: options.logo,
@@ -123,6 +129,7 @@ ${media.css}`);
 }
 
 export function badgeGrid(options: BadgeGridPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const logo = options.badgeLogo ?? options.logo?.src;
   const media = renderPresetMedia({ logo: options.logo, watermark: options.watermark }, size.width, size.height);

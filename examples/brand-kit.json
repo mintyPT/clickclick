@@ -1,0 +1,43 @@
+{
+  "colors": {
+    "primary": "#0f766e",
+    "accent": "#f59e0b",
+    "background": "#172026",
+    "text": "#f8fafc",
+    "muted": "#cbd5e1",
+    "gradientFrom": "#0f766e",
+    "gradientTo": "#334155",
+    "panel": "rgba(255,255,255,0.14)"
+  },
+  "typography": {
+    "fontFamily": "Inter, ui-sans-serif, system-ui, sans-serif",
+    "monoFontFamily": "\"JetBrains Mono\", ui-monospace, monospace"
+  },
+  "logos": {
+    "primary": {
+      "src": "presets/clickclick-logo.svg",
+      "placement": "top-right",
+      "size": 116
+    },
+    "watermark": {
+      "src": "presets/clickclick-logo.svg",
+      "opacity": 0.08
+    }
+  },
+  "defaults": {
+    "logoPlacement": "top-right",
+    "watermarkPlacement": "center",
+    "watermarkOpacity": 0.08,
+    "watermarkScale": 0.56,
+    "align": "left"
+  },
+  "templateLayers": {
+    "card": {
+      "background": "var(--clickclick-color-background)",
+      "color": "var(--clickclick-color-text)"
+    },
+    "accent": {
+      "background": "var(--clickclick-color-accent)"
+    }
+  }
+}

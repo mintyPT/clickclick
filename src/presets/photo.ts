@@ -1,9 +1,11 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { imageLayer, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 import { renderPresetMedia } from "./utils.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "./utils.js";
 
 interface PhotoBaseOptions {
+  brand?: BrandKit;
   title: string;
   image?: string;
   overlay?: string;
@@ -40,6 +42,7 @@ export interface CaseStudyPresetOptions extends PhotoBaseOptions {
 }
 
 export function photoHero(options: PhotoHeroPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(90deg, rgba(3,7,18,.78), rgba(3,7,18,.24))" } : undefined,
@@ -60,6 +63,7 @@ ${media.css}`);
 }
 
 export function editorialFeature(options: EditorialFeaturePresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({ watermark: options.watermark, logo: options.logo }, size.width, size.height);
   return presetDocument(size, options, `
@@ -80,6 +84,7 @@ ${media.css}`);
 }
 
 export function eventPoster(options: EventPosterPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(180deg, rgba(2,6,23,.18), rgba(2,6,23,.88))" } : undefined,
@@ -107,6 +112,7 @@ ${media.css}`);
 }
 
 export function caseStudy(options: CaseStudyPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const size = resolvePresetSize(options);
   const media = renderPresetMedia({
     background: options.image ? { src: options.image, overlay: options.overlay ?? "linear-gradient(90deg, rgba(15,23,42,.82), rgba(15,23,42,.52))" } : undefined,

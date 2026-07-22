@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface ComparePresetOptions {
+  brand?: BrandKit;
   title?: string;
   beforeTitle: string;
   beforeText?: string;
@@ -18,6 +20,7 @@ export interface ComparePresetOptions {
 }
 
 export function compare(options: ComparePresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
 
   return renderPresetDocument({

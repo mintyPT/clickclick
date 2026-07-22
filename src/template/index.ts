@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { Page } from "playwright";
 import { resolveRenderCacheOptions, writeCachedResult } from "../cache/index.js";
+import { brandFonts, brandTemplateCss, brandTemplateModifications, resolveBrandKitSources, validateBrandKit } from "../brand-kit/index.js";
 import { ClickClickError } from "../errors.js";
 import { serializeMediaSource } from "../media/index.js";
 import { renderImage } from "../renderer/index.js";
@@ -26,8 +27,8 @@ interface PreparedTemplate {
 export async function renderTemplate(input: TemplateInput): Promise<RenderImageResult> {
   const template = await prepareTemplate(input);
   const warnings: TemplateWarning[] = [];
-  const css = [fontFaceCss(input.fonts), template.css].filter(Boolean).join("\n");
-  const modifications = serializeLayerModificationSources(input.modifications ?? [], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
+  const css = [fontFaceCss([...(brandFonts(input.brand)), ...(input.fonts ?? [])]), brandTemplateCss(input.brand), template.css].filter(Boolean).join("\n");
+  const modifications = serializeLayerModificationSources([...brandTemplateModifications(input.brand), ...(input.modifications ?? [])], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
   const cache = input.render?.beforeScreenshot ? undefined : templateCacheOptions(input.cache, {
     kind: "template",
     modifications,
@@ -85,8 +86,15 @@ function objectKeyParts(value: unknown): Record<string, unknown> {
 export async function loadConfig(path: string): Promise<ClickClickConfig> {
   const raw = await readFile(path, "utf8");
   try {
-    return JSON.parse(raw) as ClickClickConfig;
+    const config = JSON.parse(raw) as ClickClickConfig;
+    if (config.brand) {
+      const baseDir = dirname(resolve(path));
+      await validateBrandKit(config.brand, baseDir);
+      config.brand = resolveBrandKitSources(config.brand, baseDir);
+    }
+    return config;
   } catch (error) {
+    if (error instanceof ClickClickError) throw error;
     throw new ClickClickError("INVALID_INPUT", `Config file is not valid JSON: ${path}`, error);
   }
 }
@@ -100,7 +108,7 @@ export async function renderRecipe(configPath: string, name: string, overrides: 
   return renderTemplate(resolveRecipe(config, recipe, dirname(resolve(configPath)), overrides));
 }
 
-export async function renderTemplateSet(configPath: string, name: string, outputDir?: string, overrides: Pick<TemplateInput, "cache"> = {}): Promise<RenderImageResult[]> {
+export async function renderTemplateSet(configPath: string, name: string, outputDir?: string, overrides: Pick<TemplateInput, "brand" | "cache"> = {}): Promise<RenderImageResult[]> {
   const config = await loadConfig(configPath);
   const set = config.templateSets?.[name];
   if (!set) {
@@ -131,6 +139,7 @@ function resolveRecipe(config: ClickClickConfig, recipe: TemplateRecipe, baseDir
   return {
     ...template,
     ...overrides,
+    brand: overrides.brand ?? recipe.brand ?? template.brand ?? config.brand,
     htmlPath: resolveOptionalPath(baseDir, overrides.htmlPath ?? template.htmlPath),
     cssPath: resolveOptionalPath(baseDir, overrides.cssPath ?? template.cssPath),
     fonts: [...(config.fonts ?? []), ...(template.fonts ?? []), ...(overrides.fonts ?? [])],

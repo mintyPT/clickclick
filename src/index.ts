@@ -1,10 +1,18 @@
 export { clearCache } from "./cache/index.js";
+export { applyBrandToPresetOptions, brandFonts, brandKitJsonSchema, brandTemplateCss, brandTemplateModifications, loadBrandKit, validateBrandKit } from "./brand-kit/index.js";
 export { ClickClickError } from "./errors.js";
 export { serializeMediaSource } from "./media/index.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
 export { presets } from "./presets/index.js";
 export { sizes } from "./shared/sizes.js";
+export type {
+  BrandBackgroundToken,
+  BrandFontToken,
+  BrandKit,
+  BrandLogoToken,
+  BrandTemplateLayer,
+} from "./brand-kit/index.js";
 export type {
   ClickClickErrorCode,
 } from "./errors.js";

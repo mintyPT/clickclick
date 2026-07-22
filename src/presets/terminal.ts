@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { defaultMonoFont, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface TerminalPresetOptions {
+  brand?: BrandKit;
   title: string;
   command: string;
   subtitle?: string;
@@ -19,6 +21,7 @@ export interface TerminalPresetOptions {
 }
 
 export function terminal(options: TerminalPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
 
   return renderPresetDocument({

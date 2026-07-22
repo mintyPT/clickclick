@@ -1,7 +1,9 @@
-import type { RenderImageInput } from "../types.js";
+import type { BrandKit, RenderImageInput } from "../types.js";
+import { applyBrandToPresetOptions } from "../brand-kit/index.js";
 import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface CheckerboardPresetOptions {
+  brand?: BrandKit;
   title: string;
   subtitle?: string;
   label?: string;
@@ -15,6 +17,7 @@ export interface CheckerboardPresetOptions {
 }
 
 export function checkerboard(options: CheckerboardPresetOptions): RenderImageInput {
+  options = applyBrandToPresetOptions(options);
   const { width, height } = resolvePresetSize(options);
   const cell = Math.max(34, Math.round(width * 0.055));
   const accent = options.accentColor ?? "#f59e0b";

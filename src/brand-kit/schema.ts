@@ -1,0 +1,153 @@
+export const brandKitJsonSchema = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  $id: "https://github.com/mintyPT/clickclick/schemas/brand-kit.schema.json",
+  title: "ClickClick Brand Kit",
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    colors: {
+      type: "object",
+      additionalProperties: { type: "string", minLength: 1 },
+      properties: {
+        primary: { type: "string", minLength: 1 },
+        accent: { type: "string", minLength: 1 },
+        background: { type: "string", minLength: 1 },
+        text: { type: "string", minLength: 1 },
+        muted: { type: "string", minLength: 1 },
+        panel: { type: "string", minLength: 1 },
+        gradientFrom: { type: "string", minLength: 1 },
+        gradientTo: { type: "string", minLength: 1 },
+        before: { type: "string", minLength: 1 },
+        after: { type: "string", minLength: 1 },
+      },
+    },
+    fonts: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        body: { $ref: "#/$defs/font" },
+        heading: { $ref: "#/$defs/font" },
+        mono: { $ref: "#/$defs/font" },
+      },
+    },
+    logos: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        primary: { $ref: "#/$defs/logo" },
+        watermark: { $ref: "#/$defs/logo" },
+      },
+    },
+    typography: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        fontFamily: { type: "string", minLength: 1 },
+        headingFontFamily: { type: "string", minLength: 1 },
+        monoFontFamily: { type: "string", minLength: 1 },
+      },
+    },
+    spacing: {
+      type: "object",
+      additionalProperties: { type: "number", minimum: 0 },
+      properties: {
+        scale: { type: "number", minimum: 0 },
+        padding: { type: "number", minimum: 0 },
+        gap: { type: "number", minimum: 0 },
+        radius: { type: "number", minimum: 0 },
+      },
+    },
+    defaults: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        backgroundImage: { $ref: "#/$defs/background" },
+        overlay: { type: "string", minLength: 1 },
+        logoPlacement: { $ref: "#/$defs/cornerPlacement" },
+        logoSize: { type: "number", minimum: 0 },
+        logoOpacity: { type: "number", minimum: 0, maximum: 1 },
+        watermarkPlacement: { $ref: "#/$defs/placement" },
+        watermarkOpacity: { type: "number", minimum: 0, maximum: 1 },
+        watermarkScale: { type: "number" },
+        watermarkRotation: { type: "number" },
+        align: { enum: ["left", "center"] },
+      },
+    },
+    templateLayers: {
+      type: "object",
+      additionalProperties: { $ref: "#/$defs/templateLayer" },
+    },
+  },
+  $defs: {
+    font: {
+      type: "object",
+      additionalProperties: false,
+      required: ["family"],
+      properties: {
+        family: { type: "string", minLength: 1 },
+        source: {
+          oneOf: [
+            { type: "string", minLength: 1 },
+            { type: "array", items: { type: "string", minLength: 1 }, minItems: 1 },
+          ],
+        },
+        weight: { oneOf: [{ type: "string" }, { type: "number" }] },
+        style: { type: "string" },
+        display: { enum: ["auto", "block", "swap", "fallback", "optional"] },
+      },
+    },
+    logo: {
+      type: "object",
+      additionalProperties: false,
+      required: ["src"],
+      properties: {
+        src: { type: "string", minLength: 1 },
+        alt: { type: "string" },
+        placement: { $ref: "#/$defs/cornerPlacement" },
+        size: { type: "number", minimum: 0 },
+        opacity: { type: "number", minimum: 0, maximum: 1 },
+      },
+    },
+    background: {
+      type: "object",
+      additionalProperties: false,
+      required: ["src"],
+      properties: {
+        src: { type: "string", minLength: 1 },
+        fit: { enum: ["cover", "contain", "fill", "none", "scale-down"] },
+        position: { type: "string" },
+        opacity: { type: "number", minimum: 0, maximum: 1 },
+      },
+    },
+    templateLayer: {
+      type: "object",
+      additionalProperties: true,
+      properties: {
+        text: { type: "string" },
+        html: { type: "string" },
+        src: { type: "string" },
+        image_url: { type: "string" },
+        color: { type: "string" },
+        background: { type: "string" },
+        font_family: { type: "string" },
+        alignment: { enum: ["left", "center", "right", "justify"] },
+        hide: { type: "boolean" },
+        show: { type: "boolean" },
+        className: { type: "string" },
+        x: { type: "number" },
+        y: { type: "number" },
+        border: { type: "string" },
+        shadow: { type: "string" },
+        effect: { enum: ["grayscale", "sepia", "blur", "grayscale-blur", "flip-horizontal", "flip-vertical", "invert", "negate"] },
+        fit: { enum: ["cover", "contain", "fill", "none", "scale-down"] },
+        anchor: { type: "string" },
+      },
+    },
+    cornerPlacement: {
+      enum: ["top-left", "top-right", "bottom-left", "bottom-right"],
+    },
+    placement: {
+      enum: ["center", "top-left", "top-right", "bottom-left", "bottom-right"],
+    },
+  },
+} as const;
