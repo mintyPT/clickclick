@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultMonoFont, defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { defaultMonoFont, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface TerminalPresetOptions {
   title: string;
@@ -20,41 +19,25 @@ export interface TerminalPresetOptions {
 }
 
 export function terminal(options: TerminalPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeCommand = escapeHtml(options.command);
-  const safePrompt = escapeHtml(options.prompt ?? "$");
-  const safeOutput = options.output ? escapeHtml(options.output) : "";
+  const { width, height } = resolvePresetSize(options);
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
-    <main>
-      <section>
-        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${safeTitle}</h1>
-        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeSubtitle}</p>` : ""}
-      </section>
-      <pre><span>${safePrompt}</span> <code data-clickclick-fit data-clickclick-min-font-size="18">${safeCommand}</code>${safeOutput ? `<small>${safeOutput}</small>` : ""}</pre>
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#f8fafc",
+    fontFamily: options.fontFamily,
+    bodyCss: `
   background:
     linear-gradient(120deg, rgba(255,255,255,0.05), transparent 42%),
-    ${options.backgroundColor ?? "#0b1020"};
-  color: ${options.textColor ?? "#f8fafc"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+    ${options.backgroundColor ?? "#0b1020"};`,
+    html: `
+    <main>
+      <section>
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 32 })}
+        ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 20 })}
+      </section>
+      <pre>${textLayer(options.prompt ?? "$", { tag: "span" })} ${textLayer(options.command, { tag: "code", fit: true, minFontSize: 18 })}${textLayer(options.output, { tag: "small" })}</pre>
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -90,7 +73,5 @@ span { color: ${options.accentColor ?? "#22c55e"}; font-weight: 800; }
 code { display: block; max-width: calc(100% - ${Math.round(width * 0.032)}px); overflow: hidden; white-space: nowrap; color: ${options.commandColor ?? "#e5e7eb"}; }
 small { display: block; flex-basis: 100%; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: rgba(229,231,235,0.7); font-size: ${Math.round(width * 0.021)}px; line-height: 1.2; }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

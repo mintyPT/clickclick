@@ -25,6 +25,7 @@ describe("preset document assembly", () => {
         inert: true,
       },
     })).toBe('<h1 class="hero" data-clickclick-fit data-clickclick-min-font-size="24" data-kind="title" inert>&lt;Launch&gt;</h1>');
+    expect(textLayer("npm test", { tag: "code", fit: true, minFontSize: 18 })).toBe('<code data-clickclick-fit data-clickclick-min-font-size="18">npm test</code>');
   });
 
   it("renders escaped image layers", () => {

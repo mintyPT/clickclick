@@ -27,7 +27,7 @@ export interface PresetDocumentOptions {
 }
 
 export interface PresetTextLayerOptions {
-  tag?: "h1" | "p" | "div" | "span" | "strong" | "blockquote";
+  tag?: "h1" | "p" | "div" | "span" | "strong" | "blockquote" | "footer" | "code" | "small";
   className?: string;
   fit?: boolean;
   minFontSize?: number;

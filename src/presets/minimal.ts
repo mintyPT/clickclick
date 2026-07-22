@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface MinimalPresetOptions {
   title: string;
@@ -17,36 +16,21 @@ export interface MinimalPresetOptions {
 }
 
 export function minimal(options: MinimalPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
+  const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeMeta = options.meta ? escapeHtml(options.meta) : "";
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#111827",
+    fontFamily: options.fontFamily,
+    bodyCss: `background: ${options.backgroundColor ?? "#ffffff"};`,
+    html: `
     <main class="${align}">
-      ${safeMeta ? `<div class="meta">${safeMeta}</div>` : ""}
-      <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
-      ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
-  background: ${options.backgroundColor ?? "#ffffff"};
-  color: ${options.textColor ?? "#111827"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+      ${textLayer(options.meta, { className: "meta" })}
+      ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 34 })}
+      ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 22 })}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -74,7 +58,5 @@ h1, p { margin: 0; width: 100%; max-width: 100%; overflow: hidden; }
 h1 { max-height: ${Math.round(height * 0.42)}px; font-size: ${Math.round(width * 0.068)}px; line-height: 1.06; font-weight: 760; }
 p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.032)}px; line-height: 1.25; color: ${options.mutedColor ?? "#4b5563"}; }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

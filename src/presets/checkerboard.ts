@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface CheckerboardPresetOptions {
   title: string;
@@ -16,33 +15,15 @@ export interface CheckerboardPresetOptions {
 }
 
 export function checkerboard(options: CheckerboardPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeLabel = options.label ? escapeHtml(options.label) : "";
+  const { width, height } = resolvePresetSize(options);
   const cell = Math.max(34, Math.round(width * 0.055));
   const accent = options.accentColor ?? "#f59e0b";
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
-    <main>
-      ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
-      <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
-      ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor,
+    fontFamily: options.fontFamily,
+    bodyCss: `
   background-color: ${options.backgroundColor ?? "#111827"};
   background-image:
     linear-gradient(45deg, ${options.checkerColor ?? "rgba(255,255,255,0.08)"} 25%, transparent 25%),
@@ -50,10 +31,14 @@ body {
     linear-gradient(45deg, transparent 75%, ${options.checkerColor ?? "rgba(255,255,255,0.08)"} 75%),
     linear-gradient(-45deg, transparent 75%, ${options.checkerColor ?? "rgba(255,255,255,0.08)"} 75%);
   background-size: ${cell}px ${cell}px;
-  background-position: 0 0, 0 ${cell / 2}px, ${cell / 2}px -${cell / 2}px, -${cell / 2}px 0;
-  color: ${options.textColor ?? "#ffffff"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+  background-position: 0 0, 0 ${cell / 2}px, ${cell / 2}px -${cell / 2}px, -${cell / 2}px 0;`,
+    html: `
+    <main>
+      ${textLayer(options.label, { className: "label" })}
+      ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 34 })}
+      ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 22 })}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -83,7 +68,5 @@ h1, p { margin: 0; width: 100%; max-width: 100%; overflow: hidden; }
 h1 { max-height: ${Math.round(height * 0.42)}px; font-size: ${Math.round(width * 0.074)}px; line-height: 1.02; font-weight: 900; }
 p { max-height: ${Math.round(height * 0.16)}px; font-size: ${Math.round(width * 0.034)}px; line-height: 1.2; opacity: 0.86; }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface ComparePresetOptions {
   title?: string;
@@ -19,45 +18,28 @@ export interface ComparePresetOptions {
 }
 
 export function compare(options: ComparePresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
-  const safeTitle = options.title ? escapeHtml(options.title) : "";
-  const safeBeforeTitle = escapeHtml(options.beforeTitle);
-  const safeBeforeText = options.beforeText ? escapeHtml(options.beforeText) : "";
-  const safeAfterTitle = escapeHtml(options.afterTitle);
-  const safeAfterText = options.afterText ? escapeHtml(options.afterText) : "";
+  const { width, height } = resolvePresetSize(options);
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#0f172a",
+    fontFamily: options.fontFamily,
+    bodyCss: `background: ${options.backgroundColor ?? "#f1f5f9"};`,
+    html: `
     <main>
-      ${safeTitle ? `<h1 data-clickclick-fit data-clickclick-min-font-size="26">${safeTitle}</h1>` : ""}
+      ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 26 })}
       <section>
         <article class="before">
-          <strong>${safeBeforeTitle}</strong>
-          ${safeBeforeText ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeBeforeText}</p>` : ""}
+          ${textLayer(options.beforeTitle, { tag: "strong" })}
+          ${textLayer(options.beforeText, { tag: "p", fit: true, minFontSize: 20 })}
         </article>
         <article class="after">
-          <strong>${safeAfterTitle}</strong>
-          ${safeAfterText ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeAfterText}</p>` : ""}
+          ${textLayer(options.afterTitle, { tag: "strong" })}
+          ${textLayer(options.afterText, { tag: "p", fit: true, minFontSize: 20 })}
         </article>
       </section>
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
-  background: ${options.backgroundColor ?? "#f1f5f9"};
-  color: ${options.textColor ?? "#0f172a"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -108,7 +90,5 @@ p {
   font-weight: 760;
 }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface AnnouncementPresetOptions {
   title: string;
@@ -18,46 +17,30 @@ export interface AnnouncementPresetOptions {
 }
 
 export function announcement(options: AnnouncementPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeBadge = options.badge ? escapeHtml(options.badge) : "";
-  const safeMeta = options.meta ? escapeHtml(options.meta) : "";
-  const safeCta = options.cta ? escapeHtml(options.cta) : "";
+  const { width, height } = resolvePresetSize(options);
   const accent = options.accentColor ?? "#2563eb";
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
-    <main>
-      <header>
-        ${safeBadge ? `<strong>${safeBadge}</strong>` : ""}
-        ${safeMeta ? `<span>${safeMeta}</span>` : ""}
-      </header>
-      <section>
-        <h1 data-clickclick-fit data-clickclick-min-font-size="34">${safeTitle}</h1>
-        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="22">${safeSubtitle}</p>` : ""}
-      </section>
-      ${safeCta ? `<footer>${safeCta}</footer>` : ""}
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#0f172a",
+    fontFamily: options.fontFamily,
+    bodyCss: `
   background:
     linear-gradient(90deg, ${accent} 0 ${Math.round(width * 0.018)}px, transparent ${Math.round(width * 0.018)}px),
-    ${options.backgroundColor ?? "#f8fafc"};
-  color: ${options.textColor ?? "#0f172a"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+    ${options.backgroundColor ?? "#f8fafc"};`,
+    html: `
+    <main>
+      <header>
+        ${textLayer(options.badge, { tag: "strong" })}
+        ${textLayer(options.meta, { tag: "span" })}
+      </header>
+      <section>
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 34 })}
+        ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 22 })}
+      </section>
+      ${textLayer(options.cta, { tag: "footer" })}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -88,7 +71,5 @@ h1 { max-height: ${Math.round(height * 0.4)}px; font-size: ${Math.round(width * 
 p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.034)}px; line-height: 1.22; color: ${options.mutedColor ?? "#475569"}; }
 footer { width: fit-content; max-width: 100%; padding-top: ${Math.round(height * 0.025)}px; border-top: ${Math.max(4, Math.round(width * 0.006))}px solid ${accent}; font-weight: 750; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

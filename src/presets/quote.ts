@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { defaultSansFont, renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface QuotePresetOptions {
   quote: string;
@@ -17,37 +16,21 @@ export interface QuotePresetOptions {
 }
 
 export function quote(options: QuotePresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
+  const { width, height } = resolvePresetSize(options);
   const align = options.align ?? "left";
-  const safeQuote = escapeHtml(options.quote);
-  const safeAttribution = options.attribution ? escapeHtml(options.attribution) : "";
-  const safeSource = options.source ? escapeHtml(options.source) : "";
-  const safeMark = escapeHtml(options.mark ?? "“");
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#1c1917",
+    fontFamily: options.fontFamily ?? 'Georgia, "Times New Roman", serif',
+    bodyCss: `background: ${options.backgroundColor ?? "#fff7ed"};`,
+    html: `
     <main class="${align}">
-      <div class="mark">${safeMark}</div>
-      <blockquote data-clickclick-fit data-clickclick-min-font-size="30">${safeQuote}</blockquote>
-      ${safeAttribution || safeSource ? `<footer>${safeAttribution ? `<strong>${safeAttribution}</strong>` : ""}${safeSource ? `<span>${safeSource}</span>` : ""}</footer>` : ""}
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
-  background: ${options.backgroundColor ?? "#fff7ed"};
-  color: ${options.textColor ?? "#1c1917"};
-  font-family: ${options.fontFamily ?? 'Georgia, "Times New Roman", serif'};
-}
+      ${textLayer(options.mark ?? "“", { className: "mark" })}
+      ${textLayer(options.quote, { tag: "blockquote", fit: true, minFontSize: 30 })}
+      ${options.attribution || options.source ? `<footer>${textLayer(options.attribution, { tag: "strong" })}${textLayer(options.source, { tag: "span" })}</footer>` : ""}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -89,7 +72,5 @@ strong, span { max-width: 100%; overflow: hidden; white-space: nowrap; text-over
 strong { font-size: ${Math.round(width * 0.03)}px; line-height: 1.1; }
 span { font-size: ${Math.round(width * 0.023)}px; line-height: 1.1; opacity: 0.7; }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }

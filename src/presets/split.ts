@@ -1,6 +1,5 @@
 import type { RenderImageInput } from "../types.js";
-import { sizes } from "../shared/sizes.js";
-import { defaultSansFont, escapeHtml } from "../preset-document/index.js";
+import { renderPresetDocument, resolvePresetSize, textLayer } from "../preset-document/index.js";
 
 export interface SplitPresetOptions {
   title: string;
@@ -17,48 +16,30 @@ export interface SplitPresetOptions {
 }
 
 export function split(options: SplitPresetOptions): RenderImageInput {
-  const width = options.width ?? sizes.og.width;
-  const height = options.height ?? sizes.og.height;
-  const safeTitle = escapeHtml(options.title);
-  const safeSubtitle = options.subtitle ? escapeHtml(options.subtitle) : "";
-  const safeLabel = options.label ? escapeHtml(options.label) : "";
+  const { width, height } = resolvePresetSize(options);
   const panelSide = options.panelSide ?? "right";
   const copyFirst = panelSide === "right";
+  const copy = `<section class="copy">
+        ${textLayer(options.label, { className: "label" })}
+        ${textLayer(options.title, { tag: "h1", fit: true, minFontSize: 32 })}
+        ${textLayer(options.subtitle, { tag: "p", fit: true, minFontSize: 20 })}
+      </section>`;
 
-  return {
-    document: {
-      html: `<!doctype html>
-<html>
-  <head><meta charset="utf-8" /></head>
-  <body>
+  return renderPresetDocument({
+    size: { width, height },
+    textColor: options.textColor ?? "#0f172a",
+    fontFamily: options.fontFamily,
+    bodyCss: `background: ${options.backgroundColor ?? "#f8fafc"};`,
+    html: `
     <main>
-      ${copyFirst ? `<section class="copy">
-        ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${safeTitle}</h1>
-        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeSubtitle}</p>` : ""}
-      </section>` : ""}
+      ${copyFirst ? copy : ""}
       <aside>
         <div class="rule"></div>
         <div class="dot"></div>
       </aside>
-      ${copyFirst ? "" : `<section class="copy">
-        ${safeLabel ? `<div class="label">${safeLabel}</div>` : ""}
-        <h1 data-clickclick-fit data-clickclick-min-font-size="32">${safeTitle}</h1>
-        ${safeSubtitle ? `<p data-clickclick-fit data-clickclick-min-font-size="20">${safeSubtitle}</p>` : ""}
-      </section>`}
-    </main>
-  </body>
-</html>`,
-      css: `
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; }
-body {
-  width: ${width}px;
-  height: ${height}px;
-  background: ${options.backgroundColor ?? "#f8fafc"};
-  color: ${options.textColor ?? "#0f172a"};
-  font-family: ${options.fontFamily ?? defaultSansFont};
-}
+      ${copyFirst ? "" : copy}
+    </main>`,
+    css: `
 main {
   width: ${width}px;
   height: ${height}px;
@@ -110,7 +91,5 @@ h1, p { margin: 0; max-width: 100%; overflow: hidden; }
 h1 { max-height: ${Math.round(height * 0.42)}px; font-size: ${Math.round(width * 0.064)}px; line-height: 1.04; font-weight: 850; }
 p { max-height: ${Math.round(height * 0.18)}px; font-size: ${Math.round(width * 0.031)}px; line-height: 1.25; color: color-mix(in srgb, currentColor 76%, transparent); }
 `,
-    },
-    viewport: { width, height },
-  };
+  });
 }
