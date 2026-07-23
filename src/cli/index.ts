@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, createContactSheet, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
@@ -205,6 +205,37 @@ program
       reportResult(result, Boolean(options.strict), false);
       if (result.path) console.log(result.path);
     }
+  });
+
+program
+  .command("contact-sheet")
+  .argument("<images...>", "PNG or JPEG image paths to arrange into a contact sheet")
+  .requiredOption("--out, --output <file>", "Output image path")
+  .option("--columns <count>", "Number of grid columns", parseInteger)
+  .option("--spacing <px>", "Spacing between tiles", parseInteger)
+  .option("--padding <px>", "Outer padding", parseInteger)
+  .option("--label <label>", "Optional image label. Repeat once per image.", collectOption, [])
+  .option("--background <color>", "Sheet background color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--tile-width <px>", "Force tile width", parseInteger)
+  .option("--tile-height <px>", "Force tile height", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .action(async (images: string[], options) => {
+    const labels = stringArrayOption(options.label);
+    const result = await createContactSheet({
+      images: images.map((path, index) => ({ path, label: labels[index] })),
+      output: parseOutputOptions(options),
+      columns: options.columns,
+      spacing: options.spacing,
+      padding: options.padding,
+      background: typeof options.background === "string" ? options.background : undefined,
+      textColor: typeof options.textColor === "string" ? options.textColor : undefined,
+      tileWidth: options.tileWidth,
+      tileHeight: options.tileHeight,
+    });
+    reportResult(result, false, false);
+    if (result.path) console.log(result.path);
   });
 
 program

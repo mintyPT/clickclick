@@ -56,6 +56,47 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("generates a contact sheet from local image paths", async () => {
+    const pngPath = join(tempDir, "contact-source.png");
+    const jpegPath = join(tempDir, "contact-source.jpg");
+    const out = join(tempDir, "contact-sheet.png");
+
+    await writeSizedPng(pngPath, 32, 24, [0, 255, 0, 255]);
+    await runCli([
+      "screenshot-url",
+      `data:text/html,${encodeURIComponent("<main></main><style>html,body,main{margin:0;width:100%;height:100%;background:#0000ff}</style>")}`,
+      "--out",
+      jpegPath,
+      "--width",
+      "32",
+      "--height",
+      "24",
+      "--format",
+      "jpeg",
+      "--quality",
+      "80",
+    ]);
+
+    const result = await runCli([
+      "contact-sheet",
+      pngPath,
+      jpegPath,
+      "--out",
+      out,
+      "--columns",
+      "2",
+      "--spacing",
+      "4",
+      "--label",
+      "PNG",
+      "--label",
+      "JPEG",
+    ]);
+
+    expect(result.stdout).toContain(out);
+    expect(PNG.sync.read(await readFile(out))).toMatchObject({ width: 76, height: 56 });
+  }, 60000);
+
   it("renders raw HTML to multiple deterministic output sizes", async () => {
     const htmlPath = join(tempDir, "multi-card.html");
     const outDir = join(tempDir, "multi-raw");
@@ -519,7 +560,11 @@ function runCli(args: string[]) {
 }
 
 async function writeSolidPng(path: string, rgba: [number, number, number, number]) {
-  const png = new PNG({ width: 4, height: 4 });
+  await writeSizedPng(path, 4, 4, rgba);
+}
+
+async function writeSizedPng(path: string, width: number, height: number, rgba: [number, number, number, number]) {
+  const png = new PNG({ width, height });
   for (let offset = 0; offset < png.data.length; offset += 4) {
     png.data[offset] = rgba[0];
     png.data[offset + 1] = rgba[1];

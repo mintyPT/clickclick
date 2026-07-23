@@ -212,6 +212,49 @@ media. Use fictional copy and pass any needed assets through modification JSON o
 Palettes may be shifted when that keeps the composition recognizable without copying the source
 branding.
 
+### Contact Sheet From Local Images
+
+Use the supported contact sheet command when reviewing generated variants from local PNG or JPEG
+files. Pass each image path explicitly and provide labels in the same order when captions help.
+
+CLI:
+
+```bash
+clickclick contact-sheet \
+  examples/presets/solid.png \
+  examples/presets/gradient.png \
+  examples/presets/quote.png \
+  --out examples/use-cases/contact-sheet-cli.png \
+  --columns 3 \
+  --spacing 12 \
+  --padding 16 \
+  --label Solid \
+  --label Gradient \
+  --label Quote
+```
+
+Library:
+
+```ts
+import { createContactSheet } from "@maurogoncalo/clickclick";
+
+await createContactSheet({
+  images: [
+    { path: "examples/presets/solid.png", label: "Solid" },
+    { path: "examples/presets/gradient.png", label: "Gradient" },
+    { path: "examples/presets/quote.png", label: "Quote" },
+  ],
+  output: { path: "examples/use-cases/contact-sheet-cli.png" },
+  columns: 3,
+  spacing: 12,
+  padding: 16,
+});
+```
+
+Result:
+
+![Contact sheet CLI result](../examples/use-cases/contact-sheet-cli.png)
+
 ### Capture a Live Website
 
 Use URL screenshots when you need a reproducible image of a product page, docs page, landing page,
