@@ -207,6 +207,79 @@ npm run examples:readme -- examples/use-cases/orbit-social.manifest.json
 npm run examples:contact-sheet -- examples/use-cases/orbit-social.manifest.json examples/use-cases/orbit-social-contact-sheet.png
 ```
 
+For first-class composition output, render contact sheets, collages, QR codes, and simple charts
+through the CLI or library. Media paths stay in flags or options, so preset code remains reusable.
+
+```bash
+clickclick composition contact-sheet \
+  --image examples/use-cases/orbit-social-coral.png --caption "Coral" \
+  --image examples/use-cases/orbit-social-indigo.png --caption "Indigo" \
+  --image examples/use-cases/orbit-social-lime.png --caption "Lime" \
+  --columns 3 \
+  --width 900 \
+  --background "#eef2f3" \
+  --out examples/use-cases/composition-contact-sheet.png
+
+clickclick composition qr https://github.com/mintyPT/clickclick \
+  --caption "ClickClick docs" \
+  --width 360 \
+  --out examples/use-cases/composition-qr.png
+
+clickclick composition bar-chart \
+  --data '[{"label":"Launch","value":42},{"label":"Gallery","value":68},{"label":"Docs","value":55}]' \
+  --title "Campaign views" \
+  --width 720 \
+  --height 420 \
+  --background "#fbfaf7" \
+  --bar-color "#0f766e" \
+  --out examples/use-cases/composition-chart.png
+```
+
+```ts
+import { barChart, collage, qrCode, renderImage } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...collage({
+    images: [
+      { src: "examples/use-cases/orbit-social-coral.png", caption: "Coral" },
+      { src: "examples/use-cases/orbit-social-indigo.png", caption: "Indigo" },
+      { src: "examples/use-cases/orbit-social-lime.png", caption: "Lime" },
+    ],
+    columns: 3,
+    width: 900,
+    background: "#eef2f3",
+  }),
+  output: { path: "examples/use-cases/composition-contact-sheet.png" },
+});
+
+await renderImage({
+  ...qrCode({ text: "https://github.com/mintyPT/clickclick", caption: "ClickClick docs", width: 360 }),
+  output: { path: "examples/use-cases/composition-qr.png" },
+});
+
+await renderImage({
+  ...barChart({
+    title: "Campaign views",
+    data: [
+      { label: "Launch", value: 42 },
+      { label: "Gallery", value: 68 },
+      { label: "Docs", value: 55 },
+    ],
+    width: 720,
+    height: 420,
+    background: "#fbfaf7",
+    barColor: "#0f766e",
+  }),
+  output: { path: "examples/use-cases/composition-chart.png" },
+});
+```
+
+![Composition contact sheet](../examples/use-cases/composition-contact-sheet.png)
+
+![Composition QR code](../examples/use-cases/composition-qr.png)
+
+![Composition chart](../examples/use-cases/composition-chart.png)
+
 When adapting external references, replace source-specific names, logos, slogans, URLs, and direct
 media. Use fictional copy and pass any needed assets through modification JSON or documented options.
 Palettes may be shifted when that keeps the composition recognizable without copying the source

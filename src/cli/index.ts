@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, createContactSheet, createRenderer, dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPattern, listConfigTemplates, loadBrandKit, presets, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, contactSheet, createContactSheet, createRenderer, dataRowToLayerModifications, generateTemplateBatch, imageGrid, interpolateOutputPattern, listConfigTemplates, loadBrandKit, presets, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
@@ -380,6 +380,169 @@ quality
     reportQualityResult(result, Boolean(options.strict));
   });
 
+const composition = program.command("composition").description("Render deterministic composition utilities.");
+
+composition
+  .command("contact-sheet")
+  .description("Render a captioned image grid for gallery review")
+  .requiredOption("--image <file-or-url>", "Image source. Repeat for multiple images.", collectOption, [])
+  .option("--caption <text>", "Caption for the matching --image. Repeat to label multiple images.", collectOption, [])
+  .option("--columns <count>", "Grid column count", parseInteger)
+  .option("--gap <px>", "Gap between tiles", parseInteger)
+  .option("--padding <px>", "Outer padding", parseInteger)
+  .option("--background <color>", "Canvas background color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...contactSheet({
+        images: compositionImages(options),
+        columns: options.columns,
+        width: options.width,
+        gap: options.gap,
+        padding: options.padding,
+        background: stringOption(options.background),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
+composition
+  .command("grid")
+  .description("Render a captioned image grid")
+  .requiredOption("--image <file-or-url>", "Image source. Repeat for multiple images.", collectOption, [])
+  .option("--caption <text>", "Caption for the matching --image. Repeat to label multiple images.", collectOption, [])
+  .option("--columns <count>", "Grid column count", parseInteger)
+  .option("--gap <px>", "Gap between tiles", parseInteger)
+  .option("--padding <px>", "Outer padding", parseInteger)
+  .option("--background <color>", "Canvas background color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...imageGrid({
+        images: compositionImages(options),
+        columns: options.columns,
+        width: options.width,
+        gap: options.gap,
+        padding: options.padding,
+        background: stringOption(options.background),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
+composition
+  .command("collage")
+  .description("Render a compact image collage")
+  .requiredOption("--image <file-or-url>", "Image source. Repeat for multiple images.", collectOption, [])
+  .option("--caption <text>", "Caption for the matching --image. Repeat to label multiple images.", collectOption, [])
+  .option("--columns <count>", "Grid column count", parseInteger)
+  .option("--gap <px>", "Gap between tiles", parseInteger)
+  .option("--padding <px>", "Outer padding", parseInteger)
+  .option("--background <color>", "Canvas background color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...collage({
+        images: compositionImages(options),
+        columns: options.columns,
+        width: options.width,
+        gap: options.gap,
+        padding: options.padding,
+        background: stringOption(options.background),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
+composition
+  .command("qr")
+  .description("Render a deterministic QR code for a URL or short text")
+  .argument("<text>", "URL or short text to encode")
+  .option("--caption <text>", "Caption below the QR code")
+  .option("--background <color>", "Canvas and light module color")
+  .option("--foreground <color>", "Dark module color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (text: string, options) => {
+    await runRender({
+      ...qrCode({
+        text,
+        width: options.width,
+        caption: stringOption(options.caption),
+        background: stringOption(options.background),
+        foreground: stringOption(options.foreground),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
+composition
+  .command("bar-chart")
+  .description("Render a simple static bar chart from JSON data")
+  .requiredOption("--data <json>", "JSON array, object with rows, or path to a JSON file")
+  .option("--title <text>", "Chart title")
+  .option("--background <color>", "Canvas background color")
+  .option("--bar-color <color>", "Bar fill color")
+  .option("--text-color <color>", "Text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--height <px>", "Output height", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...barChart({
+        data: await parseChartData(options.data),
+        title: stringOption(options.title),
+        width: options.width,
+        height: options.height,
+        background: stringOption(options.background),
+        barColor: stringOption(options.barColor),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
 const config = program.command("config").description("Render local templates from a project config.");
 
 config
@@ -725,6 +888,35 @@ function numberValue(value: unknown): number | undefined {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function compositionImages(options: Record<string, unknown>) {
+  const images = stringArrayOption(options.image);
+  const captions = stringArrayOption(options.caption);
+  return images.map((src, index) => ({ src, caption: captions[index] }));
+}
+
+function stringOption(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+async function parseChartData(value: unknown) {
+  if (typeof value !== "string") {
+    throw new ClickClickError("INVALID_INPUT", "--data must be a JSON string or JSON file path.");
+  }
+  const trimmed = value.trim();
+  const raw = trimmed.startsWith("[") || trimmed.startsWith("{")
+    ? value
+    : await readFileChecked(resolve(value), "Chart data");
+  const rows = normalizeDataRows(parseJsonData(raw), "Chart data");
+  return rows.map((row) => {
+    const label = row.label;
+    const datumValue = row.value;
+    if (typeof label !== "string" || typeof datumValue !== "number") {
+      throw new ClickClickError("INVALID_INPUT", "Chart data rows must include string label and numeric value fields.");
+    }
+    return { label, value: datumValue };
+  });
 }
 
 function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) {
