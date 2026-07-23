@@ -208,8 +208,9 @@ clickclick preset gradient --title "Hello" --subtitle "From ClickClick" --out og
 Generate several sizes in one command:
 
 ```bash
-clickclick preset gradient --title "Launch" --size og --size square --size story --out-dir dist
-clickclick render ./examples/card.html --sizes 1200x630,1080x1080,720x1280 --out-dir dist
+clickclick preset solid --size og --title "Launch" --out og.png
+clickclick preset gradient --title "Launch" --sizes og,instagram-square,linkedin --out-dir dist
+clickclick render ./examples/card.html --sizes twitter-card,youtube-thumb,1200x630 --out-dir dist
 ```
 
 List presets:
@@ -220,11 +221,54 @@ clickclick preset list
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
 `--wait-until`, `--delay`, `--omit-background`, `--size`, `--sizes`, `--out-dir`, and `--strict`.
-Multi-size renders support the named sizes `og` (`1200x630`), `square` (`1080x1080`), and `story`
-(`1080x1920`), plus explicit `WIDTHxHEIGHT` values. When `--size` or `--sizes` is used, pass
-`--out-dir`; ClickClick writes deterministic names such as `dist/gradient-og.png` and
-`dist/card-1200x630.png` and prints every generated path. URL screenshots also support `--full-page`,
-`--omit-background`, and `--locale`. `--out` and `--output` are aliases.
+Multi-size renders support named platform sizes plus explicit `WIDTHxHEIGHT` values. When `--size`
+or `--sizes` is used, pass `--out-dir`; ClickClick writes deterministic names such as
+`dist/gradient-og.png`, `dist/gradient-instagram-square.png`, and `dist/card-youtube-thumb.png` and
+prints every generated path. URL screenshots also support `--full-page`, `--omit-background`, and
+`--locale`. `--out` and `--output` are aliases.
+
+### Named Sizes
+
+The same built-in sizes are available to the CLI and library through the exported `sizes` registry.
+The `square` and `story` names remain available as aliases for existing projects.
+
+| Name | Dimensions |
+| --- | --- |
+| `og` | `1200x630` |
+| `twitter-card` | `1200x675` |
+| `instagram-square` | `1080x1080` |
+| `instagram-story` | `1080x1920` |
+| `linkedin` | `1200x627` |
+| `youtube-thumb` | `1280x720` |
+| `square` | `1080x1080` |
+| `story` | `1080x1920` |
+
+CLI:
+
+```bash
+clickclick preset solid --size og --title "Launch" --out og.png
+clickclick preset solid --title "Launch" --sizes og,instagram-square,linkedin --out-dir dist
+```
+
+Library:
+
+```ts
+import { renderImage, presets, sizes } from "@maurogoncalo/clickclick";
+
+await renderImage({
+  ...presets.solid({ title: "Launch" }),
+  viewport: sizes["instagram-square"],
+  output: { path: "dist/launch-instagram-square.png" },
+});
+```
+
+Resulting multi-size output paths:
+
+```text
+dist/solid-og.png
+dist/solid-instagram-square.png
+dist/solid-linkedin.png
+```
 
 ### Brand Kits
 
