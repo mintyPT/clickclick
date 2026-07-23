@@ -56,6 +56,41 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("renders composition contact sheets, QR codes, and charts", async () => {
+    const imagePath = join(tempDir, "composition-tile.png");
+    const sheetOut = join(tempDir, "composition-sheet.png");
+    const qrOut = join(tempDir, "composition-qr.png");
+    const chartOut = join(tempDir, "composition-chart.png");
+    const dataPath = join(tempDir, "composition-chart.json");
+
+    await writeSolidPng(imagePath, [30, 120, 220, 255]);
+    await writeFile(dataPath, JSON.stringify([
+      { label: "Gallery", value: 8 },
+      { label: "Campaign", value: 12 },
+    ]));
+
+    await runCli([
+      "composition",
+      "contact-sheet",
+      "--image",
+      imagePath,
+      "--caption",
+      "Hero",
+      "--out",
+      sheetOut,
+      "--width",
+      "128",
+      "--columns",
+      "1",
+    ]);
+    await runCli(["composition", "qr", "https://github.com/mintyPT/clickclick", "--caption", "Docs", "--out", qrOut, "--width", "128"]);
+    await runCli(["composition", "bar-chart", "--data", dataPath, "--title", "Results", "--out", chartOut, "--width", "180", "--height", "120"]);
+
+    expect(PNG.sync.read(await readFile(sheetOut))).toMatchObject({ width: 128 });
+    expect(PNG.sync.read(await readFile(qrOut))).toMatchObject({ width: 128 });
+    expect(PNG.sync.read(await readFile(chartOut))).toMatchObject({ width: 180, height: 120 });
+  }, 60000);
+
   it("renders raw HTML to multiple deterministic output sizes", async () => {
     const htmlPath = join(tempDir, "multi-card.html");
     const outDir = join(tempDir, "multi-raw");
