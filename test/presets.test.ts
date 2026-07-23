@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pathToFileURL } from "node:url";
 import { presets, sizeNames, sizes } from "../src/index.js";
+import { createPresetSchema, resolvePresetValues, validatePresetDefinition } from "../src/presets/schema.js";
 import { presetMetadata } from "../src/presets/index.js";
 
 describe("solid preset", () => {
@@ -217,5 +218,46 @@ describe("new social presets", () => {
       "split",
       "terminal",
     ]);
+  });
+
+  it("validates preset schema values and defaults", () => {
+    const schema = createPresetSchema({
+      name: "campaign-card",
+      description: "Local campaign card",
+      options: [
+        { name: "title", description: "Title text", type: "string", required: true },
+        { name: "columns", description: "Grid columns", type: "integer", default: 2 },
+        { name: "theme", description: "Theme", type: "string", choices: ["light", "dark"], default: "light" },
+      ],
+    });
+
+    expect(resolvePresetValues(schema, { title: "Launch", columns: "3" })).toEqual({
+      title: "Launch",
+      columns: 3,
+      theme: "light",
+    });
+    expect(() => resolvePresetValues(schema, { columns: 2 })).toThrow("Missing required preset option: title");
+    expect(() => resolvePresetValues(schema, { title: "Launch", theme: "blue" })).toThrow("theme must be one of: light, dark.");
+  });
+
+  it("validates local preset module definitions", () => {
+    expect(() => validatePresetDefinition({
+      name: "local-card",
+      command: "local-card",
+      description: "Local card",
+      options: [
+        { name: "title", type: "string", required: true, description: "Title text" },
+        { name: "tone", type: "enum", choices: ["calm", "bold"], default: "calm", description: "Tone" },
+      ],
+      render: () => presets.solid({ title: "Hello" }),
+    })).not.toThrow();
+
+    expect(() => validatePresetDefinition({
+      name: "broken",
+      command: "broken",
+      description: "Broken",
+      options: [{ name: "tone", type: "enum", description: "Tone" }],
+      render: () => presets.solid({ title: "Hello" }),
+    })).toThrow("choices");
   });
 });

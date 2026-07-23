@@ -129,6 +129,101 @@ describe("CLI", () => {
     expect(PNG.sync.read(await readFile(linkedinPath))).toMatchObject({ width: 1200, height: 627 });
   });
 
+  it("discovers and renders a local preset from schema metadata", async () => {
+    const configPath = join(tempDir, "clickclick.presets.json");
+    const out = join(tempDir, "local-preset.png");
+    await writeFile(configPath, JSON.stringify({
+      presets: [
+        {
+          name: "campaign-card",
+          description: "Local campaign card",
+          html: '<main><h1 data-layer="title">Title</h1><p data-layer="subtitle">Subtitle</p></main>',
+          css: "html,body,main{margin:0;width:100%;height:100%;background:#f8fafc;color:#111827}main{display:grid;place-content:center;text-align:center;font-family:Arial}h1{font-size:18px}p{font-size:12px}",
+          viewport: { width: 96, height: 64 },
+          options: [
+            { name: "title", description: "Title text", type: "string", required: true, layer: "title" },
+            { name: "subtitle", description: "Subtitle text", type: "string", default: "From local schema", layer: "subtitle" },
+          ],
+        },
+      ],
+    }));
+
+    const list = await runCli(["preset", "list", "--local", "--preset-config", configPath]);
+    await runCli(["preset", "local", "campaign-card", "--preset-config", configPath, "--title", "Local launch", "--out", out]);
+
+    expect(list.stdout).toContain("campaign-card\tLocal campaign card (local)");
+    expect(PNG.sync.read(await readFile(out))).toMatchObject({ width: 96, height: 64 });
+  });
+
+  it("discovers and renders a local preset module with schema-validated options", async () => {
+    const presetFile = join(tempDir, "local-presets.mjs");
+    const out = join(tempDir, "local-module-preset.png");
+    await writeFile(presetFile, `
+      export default {
+        name: "local-card",
+        command: "local-card",
+        description: "Local card preset",
+        options: [
+          { name: "title", type: "string", required: true, description: "Title text" },
+          { name: "count", type: "integer", default: 1, description: "Item count" },
+          { name: "tone", type: "enum", choices: ["calm", "bold"], default: "calm", description: "Tone" }
+        ],
+        render(options) {
+          return {
+            document: {
+              html: "<main>" + options.title + " " + options.count + " " + options.tone + "</main>",
+              css: "html,body,main{margin:0;width:100%;height:100%;background:#123456;color:white}",
+            },
+            viewport: { width: options.width, height: options.height },
+          };
+        },
+      };
+    `);
+
+    const list = await runCli(["preset", "list", "--local", "--preset-file", presetFile]);
+    await runCli([
+      "preset",
+      "run",
+      "local-card",
+      "--preset-file",
+      presetFile,
+      "--title",
+      "Hello",
+      "--count",
+      "3",
+      "--tone",
+      "bold",
+      "--out",
+      out,
+      "--width",
+      "64",
+      "--height",
+      "64",
+    ]);
+
+    expect(list.stdout).toContain("local-card\tLocal card preset (local module)");
+    expect(PNG.sync.read(await readFile(out))).toMatchObject({ width: 64, height: 64 });
+  });
+
+  it("reports local preset module schema validation errors", async () => {
+    const presetFile = join(tempDir, "invalid-local-presets.mjs");
+    await writeFile(presetFile, `
+      export default {
+        name: "broken",
+        command: "broken",
+        description: "Broken preset",
+        options: [{ name: "tone", type: "enum", description: "Tone" }],
+        render() {
+          return { document: { html: "<main>Broken</main>" } };
+        },
+      };
+    `);
+
+    await expect(runCli(["preset", "list", "--local", "--preset-file", presetFile])).rejects.toMatchObject({
+      stderr: expect.stringContaining("choices"),
+    });
+  });
+
   it("parses every built-in platform size name", () => {
     expect(parseSizeOptions({ sizes: "og,twitter-card,instagram-square,instagram-story,linkedin,youtube-thumb" })).toEqual([
       { label: "og", width: 1200, height: 630 },
