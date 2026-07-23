@@ -27,6 +27,7 @@ export type {
   LocalPresetConfig,
   LocalPresetOptionTarget,
   LocalPresetSchema,
+  PresetModuleDefinition,
   PresetOptionSchema,
   PresetOptionType,
   PresetSchema,

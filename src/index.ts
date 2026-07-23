@@ -6,7 +6,7 @@ export { dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPa
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
 export { presets } from "./presets/index.js";
-export { createPresetSchema, loadLocalPresetConfig, renderLocalPreset, resolvePresetValues, validatePresetSchema } from "./presets/schema.js";
+export { createPresetSchema, loadLocalPresetConfig, loadLocalPresetModule, renderLocalPreset, resolvePresetValues, validatePresetDefinition, validatePresetSchema } from "./presets/schema.js";
 export { checkImageQuality, checkRenderQuality } from "./quality/index.js";
 export { sizeNames, sizes } from "./shared/sizes.js";
 export type {
@@ -32,6 +32,7 @@ export type {
   LocalPresetConfig,
   LocalPresetOptionTarget,
   LocalPresetSchema,
+  PresetModuleDefinition,
   PresetBackgroundMediaOptions,
   PresetLogoOptions,
   PresetMediaOptions,

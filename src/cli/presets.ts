@@ -2,8 +2,8 @@ import { join, resolve } from "node:path";
 import type { Command } from "commander";
 import { ClickClickError, loadBrandKit, presets, renderTemplate } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
-import { coercePresetOption, loadLocalPresetConfig, renderLocalPreset, resolvePresetValues, validatePresetSchema } from "../presets/schema.js";
-import type { LocalPresetSchema, PresetOptionSchema, PresetSchema } from "../presets/schema.js";
+import { coercePresetOption, loadLocalPresetConfig, loadLocalPresetModule, renderLocalPreset, resolvePresetValues, validatePresetSchema } from "../presets/schema.js";
+import type { LocalPresetSchema, PresetModuleDefinition, PresetOptionSchema, PresetSchema } from "../presets/schema.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { RenderImageInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseSizeOptions } from "./options.js";
@@ -31,24 +31,33 @@ export function registerPresetCommands(parent: Command, dependencies: PresetCliD
     .description("List built-in presets")
     .option("--local", "Include local presets from a config file")
     .option("--preset-config <file>", "Local preset config JSON file", "clickclick.presets.json")
+    .option("--preset-file <file>", "Local preset module file")
     .action(async (options) => {
     for (const item of presetMetadata) {
       console.log(`${item.name}\t${item.description}`);
     }
-    if (options.local) {
+    if (options.local && (options.presetConfig !== "clickclick.presets.json" || typeof options.presetFile !== "string")) {
       const config = await loadLocalPresetConfig(options.presetConfig);
       for (const item of config.presets) {
         console.log(`${item.name}\t${item.description} (local)`);
       }
     }
+    if (typeof options.presetFile === "string") {
+      for (const item of await loadLocalPresetModule(options.presetFile)) {
+        console.log(`${item.name}\t${item.description} (local module)`);
+      }
+    }
   });
 
   registerLocalPresetCommand(parent, dependencies);
+  registerLocalPresetModuleCommand(parent, dependencies);
   registerBrandPresetCommands(parent, dependencies);
   registerLegacyPresetCommands(parent, dependencies);
   registerPhotoPresetCommands(parent, dependencies);
   registerRichMediaPresetCommands(parent, dependencies);
 }
+
+export const builtinPresetDefinitions = builtInPresetSchemas;
 
 export function builtInPresetSchemas(): PresetSchema[] {
   return [
@@ -567,6 +576,27 @@ function registerLocalPresetCommand(parent: Command, dependencies: PresetCliDepe
   });
 }
 
+function registerLocalPresetModuleCommand(parent: Command, dependencies: PresetCliDependencies) {
+  let command = parent.command("run <name>")
+    .description("Render a local preset module")
+    .allowUnknownOption(true)
+    .requiredOption("--preset-file <file>", "Local preset module file");
+  command = addPresetRenderOptions(command);
+  command.action(async (name: string, options: Record<string, unknown>, actionCommand: Command) => {
+    const definitions = await loadLocalPresetModule(requiredString(options.presetFile, "preset-file"));
+    const definition = definitions.find((preset) => preset.name === name || preset.command === name);
+    if (!definition) {
+      throw new ClickClickError("INVALID_INPUT", `Local preset module not found: ${name}`);
+    }
+    const values = {
+      ...resolvePresetValues(definition, parseModulePresetArgs(definition, actionCommand.args)),
+      width: optionalNumber(options.width),
+      height: optionalNumber(options.height),
+    } as Record<string, string | number | boolean | undefined>;
+    await runModulePreset(definition, values, options, dependencies);
+  });
+}
+
 function schemaWithViewportOverrides(schema: LocalPresetSchema, options: Record<string, unknown>): LocalPresetSchema {
   return {
     ...schema,
@@ -589,6 +619,17 @@ async function runLocalPreset(input: ReturnType<typeof renderLocalPreset>, optio
   if (options.strict && result.warnings.length > 0) {
     process.exitCode = 1;
   }
+}
+
+async function runModulePreset(definition: PresetModuleDefinition, values: Record<string, string | number | boolean | undefined>, options: Record<string, unknown>, dependencies: PresetCliDependencies) {
+  await dependencies.runRender({
+    ...definition.render(values),
+    output: parseOutputOptions(options),
+  }, Boolean(options.strict), parseCacheOptions(options));
+}
+
+function parseModulePresetArgs(schema: PresetModuleDefinition, args: string[]): Record<string, string | number | boolean> {
+  return parseLocalPresetArgs(schema as LocalPresetSchema, args);
 }
 
 function parseLocalPresetArgs(schema: LocalPresetSchema, args: string[]): Record<string, string | number | boolean> {

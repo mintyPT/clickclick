@@ -1,9 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { ClickClickError } from "../errors.js";
 import type { LayerModification, RenderImageInput, TemplateInput, ViewportSize } from "../types.js";
 
-export type PresetOptionType = "string" | "number" | "integer" | "boolean";
+export type PresetOptionType = "string" | "number" | "integer" | "boolean" | "enum";
 export type LocalPresetOptionTarget = "text" | "html" | "src" | "color" | "background";
 
 export interface PresetOptionSchema {
@@ -37,6 +38,10 @@ export interface LocalPresetConfig {
   presets: LocalPresetSchema[];
 }
 
+export interface PresetModuleDefinition extends PresetSchema {
+  render: (values: PresetSchemaValues) => RenderImageInput;
+}
+
 export type PresetSchemaValues = Record<string, string | number | boolean | undefined>;
 
 export function createPresetSchema(schema: PresetSchema): PresetSchema {
@@ -67,6 +72,23 @@ export async function loadLocalPresetConfig(path = "clickclick.presets.json"): P
   const baseDir = dirname(resolvedPath);
   const presets = parsed.presets.map((preset) => validateLocalPresetSchema(preset, baseDir));
   return { presets };
+}
+
+export async function loadLocalPresetModule(path: string): Promise<PresetModuleDefinition[]> {
+  const moduleUrl = pathToFileURL(resolve(path)).href;
+  let loaded: unknown;
+  try {
+    loaded = await import(moduleUrl) as unknown;
+  } catch (error) {
+    throw new ClickClickError("INVALID_INPUT", `Local preset module could not be loaded: ${path}`, error);
+  }
+  const exported = isRecord(loaded) && "default" in loaded ? loaded.default : loaded;
+  const definitions = Array.isArray(exported)
+    ? exported
+    : isRecord(exported) && Array.isArray(exported.presets)
+      ? exported.presets
+      : [exported];
+  return definitions.map(validatePresetModuleDefinition);
 }
 
 export function renderLocalPreset(schema: LocalPresetSchema, values: PresetSchemaValues, output?: RenderImageInput["output"]): TemplateInput {
@@ -163,12 +185,27 @@ function validatePresetOptionSchema(presetName: string, value: unknown): asserts
   if (typeof value.description !== "string") {
     throw new ClickClickError("INVALID_INPUT", `Preset ${presetName} option ${value.name} must include a description.`);
   }
-  if (!["string", "number", "integer", "boolean"].includes(String(value.type))) {
+  if (!["string", "number", "integer", "boolean", "enum"].includes(String(value.type))) {
     throw new ClickClickError("INVALID_INPUT", `Preset ${presetName} option ${value.name} has an invalid type.`);
+  }
+  if (value.type === "enum" && (!Array.isArray(value.choices) || value.choices.length === 0)) {
+    throw new ClickClickError("INVALID_INPUT", `Preset ${presetName} option ${value.name} enum options must include choices.`);
   }
   if (value.target !== undefined && !["text", "html", "src", "color", "background"].includes(String(value.target))) {
     throw new ClickClickError("INVALID_INPUT", `Preset ${presetName} option ${value.name} has an invalid target.`);
   }
+}
+
+export function validatePresetDefinition(value: unknown): PresetModuleDefinition {
+  return validatePresetModuleDefinition(value);
+}
+
+function validatePresetModuleDefinition(value: unknown): PresetModuleDefinition {
+  validatePresetSchema(value);
+  if (!isRecord(value) || typeof value.render !== "function") {
+    throw new ClickClickError("INVALID_INPUT", `Preset schema ${(value as { name?: unknown }).name ?? ""} must include a render function.`);
+  }
+  return value as unknown as PresetModuleDefinition;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
