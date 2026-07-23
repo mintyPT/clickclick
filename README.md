@@ -213,6 +213,43 @@ clickclick preset gradient --title "Launch" --sizes og,instagram-square,linkedin
 clickclick render ./examples/card.html --sizes twitter-card,youtube-thumb,1200x630 --out-dir dist
 ```
 
+Generate a campaign from data rows:
+
+```bash
+clickclick generate examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --data examples/use-cases/batch-campaign.json \
+  --size og \
+  --size square \
+  --out-dir examples/use-cases/batch-campaign \
+  --out-pattern "{{slug}}-{{size}}.png"
+```
+
+Library:
+
+```ts
+import { generateTemplateBatch } from "@maurogoncalo/clickclick";
+import rows from "./examples/use-cases/batch-campaign.json" with { type: "json" };
+
+await generateTemplateBatch({
+  template: {
+    htmlPath: "examples/use-cases/product-card.html",
+    cssPath: "examples/use-cases/product-card.css",
+  },
+  rows,
+  sizes: [
+    { label: "og", width: 1200, height: 630 },
+    { label: "square", width: 1080, height: 1080 },
+  ],
+  outputDir: "examples/use-cases/batch-campaign",
+  outputPattern: "{{slug}}-{{size}}.png",
+});
+```
+
+Result:
+
+![Batch generation result](./examples/use-cases/batch-campaign/batch-launch-og.png)
+
 List presets:
 
 ```bash
@@ -226,6 +263,10 @@ or `--sizes` is used, pass `--out-dir`; ClickClick writes deterministic names su
 `dist/gradient-og.png`, `dist/gradient-instagram-square.png`, and `dist/card-youtube-thumb.png` and
 prints every generated path. URL screenshots also support `--full-page`, `--omit-background`, and
 `--locale`. `--out` and `--output` are aliases.
+The `generate` command accepts JSON, CSV, and simple YAML data files. By default scalar row fields
+become same-named template layer text modifications, while a row-level `modifications` array can pass
+full layer modification objects. Use `--layer-field` to apply only selected CSV/YAML fields as
+layers. Output patterns support `{{field}}`, `{{index}}`, `{{size}}`, `{{width}}`, and `{{height}}`.
 
 ### Named Sizes
 

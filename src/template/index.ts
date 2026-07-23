@@ -16,6 +16,7 @@ import type {
   TemplateSetItem,
   TemplateWarning,
   RenderCacheOptions,
+  ClickClickRenderer,
 } from "../types.js";
 
 interface PreparedTemplate {
@@ -24,19 +25,23 @@ interface PreparedTemplate {
   baseUrl?: string;
 }
 
-export async function renderTemplate(input: TemplateInput): Promise<RenderImageResult> {
+export interface RenderTemplateOptions {
+  renderer?: ClickClickRenderer;
+}
+
+export async function renderTemplate(input: TemplateInput, options: RenderTemplateOptions = {}): Promise<RenderImageResult> {
   const template = await prepareTemplate(input);
   const warnings: TemplateWarning[] = [];
   const css = [fontFaceCss([...(brandFonts(input.brand)), ...(input.fonts ?? [])]), brandTemplateCss(input.brand), template.css].filter(Boolean).join("\n");
   const modifications = serializeLayerModificationSources([...brandTemplateModifications(input.brand), ...(input.modifications ?? [])], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
-  const cache = input.render?.beforeScreenshot ? undefined : templateCacheOptions(input.cache, {
+  const cache = options.renderer || input.render?.beforeScreenshot ? undefined : templateCacheOptions(input.cache, {
     kind: "template",
     modifications,
     onMissingLayer: input.onMissingLayer ?? "error",
     onDuplicateLayer: input.onDuplicateLayer ?? "warn",
   });
 
-  const result = await renderImage({
+  const renderInput = {
     document: {
       html: template.html,
       css,
@@ -47,7 +52,7 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
     fitText: input.fitText,
     render: {
       ...input.render,
-      beforeScreenshot: async (page) => {
+      beforeScreenshot: async (page: Page) => {
         const layerWarnings = await applyLayerModifications(page, modifications, {
           onMissingLayer: input.onMissingLayer ?? "error",
           onDuplicateLayer: input.onDuplicateLayer ?? "warn",
@@ -56,9 +61,8 @@ export async function renderTemplate(input: TemplateInput): Promise<RenderImageR
         await input.render?.beforeScreenshot?.(page);
       },
     },
-  }, {
-    cache,
-  });
+  };
+  const result = options.renderer ? await options.renderer.render(renderInput) : await renderImage(renderInput, { cache });
 
   const combined = { ...result, warnings: [...warnings, ...result.warnings] };
   const resolvedCache = resolveRenderCacheOptions(cache);
