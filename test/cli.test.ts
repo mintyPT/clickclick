@@ -293,6 +293,68 @@ describe("CLI", () => {
     });
   });
 
+  it("batch renders preset outputs from JSON data with a JSON summary", async () => {
+    const dataPath = join(tempDir, "batch-preset.json");
+    const outDir = join(tempDir, "batch-preset-out");
+    await writeFile(dataPath, JSON.stringify([
+      { slug: "launch", title: "Launch", subtitle: "First" },
+      { slug: "docs", title: "Docs", subtitle: "Second" },
+    ]));
+
+    const result = await runCli([
+      "batch",
+      "preset",
+      "solid",
+      "--data",
+      dataPath,
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{slug}}.png",
+      "--width",
+      "64",
+      "--height",
+      "64",
+      "--json",
+    ]);
+
+    const summary = JSON.parse(result.stdout);
+    expect(summary).toMatchObject({ ok: true, errors: [] });
+    expect(summary.outputs).toHaveLength(2);
+    expect(PNG.sync.read(await readFile(join(outDir, "launch.png")))).toMatchObject({ width: 64, height: 64 });
+    expect(PNG.sync.read(await readFile(join(outDir, "docs.png")))).toMatchObject({ width: 64, height: 64 });
+  }, 60000);
+
+  it("batch renders template outputs from CSV data and mapped fields", async () => {
+    const htmlPath = join(tempDir, "batch-template.html");
+    const dataPath = join(tempDir, "batch-template.csv");
+    const outDir = join(tempDir, "batch-template-out");
+
+    await writeFile(htmlPath, '<main data-layer="title">Old</main><style>html,body,main{margin:0;width:100%;height:100%;background:#123456;color:white}</style>');
+    await writeFile(dataPath, "slug,headline\nfirst,First headline\nsecond,Second headline\n");
+
+    const result = await runCli([
+      "batch",
+      "template",
+      htmlPath,
+      "--data",
+      dataPath,
+      "--map",
+      "title=headline",
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{slug}}-{{size}}.png",
+      "--sizes",
+      "64x64,96x48",
+    ]);
+
+    expect(result.stdout).toContain(join(outDir, "first-64x64.png"));
+    expect(result.stdout).toContain(join(outDir, "second-96x48.png"));
+    expect(PNG.sync.read(await readFile(join(outDir, "first-64x64.png")))).toMatchObject({ width: 64, height: 64 });
+    expect(PNG.sync.read(await readFile(join(outDir, "second-96x48.png")))).toMatchObject({ width: 96, height: 48 });
+  }, 60000);
+
   it("requires an output directory for multi-size renders", async () => {
     const htmlPath = join(tempDir, "multi-missing-dir.html");
     await writeFile(htmlPath, "<main>Missing dir</main>");

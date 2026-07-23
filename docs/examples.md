@@ -1099,6 +1099,36 @@ Result:
 
 ![Batch docs square result](../examples/use-cases/batch-campaign/batch-docs-square.png)
 
+### Batch Preset And Template Commands
+
+Use `batch preset` and `batch template` when CI or release scripts need deterministic outputs from
+many rows while reusing a single browser session.
+
+CLI:
+
+```bash
+clickclick batch preset solid \
+  --data examples/use-cases/batch-campaign.json \
+  --out-dir examples/use-cases/batch-command \
+  --out-pattern "{{slug}}-preset.png" \
+  --width 320 \
+  --height 180 \
+  --json
+
+clickclick batch template examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --data posts.csv \
+  --map title=headline \
+  --map subtitle=excerpt \
+  --sizes og,instagram-square \
+  --out-dir dist/social \
+  --out-pattern "{{slug}}-{{size}}.png"
+```
+
+Result:
+
+![Batch preset command result](../examples/use-cases/batch-command/batch-launch-preset.png)
+
 ### Render a Config Recipe
 
 Use recipes when the template, output size, and standard modifications should live in a project
