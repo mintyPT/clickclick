@@ -385,6 +385,64 @@ describe("CLI", () => {
     await expect(readFile(out)).resolves.toHaveProperty("length");
   });
 
+  it("runs image quality gates with structured diagnostics and strict exits", async () => {
+    const baseline = join(tempDir, "quality-baseline.png");
+    const changed = join(tempDir, "quality-changed.png");
+    await writeSolidPng(baseline, [0, 0, 0, 255]);
+    await writeSolidPng(changed, [255, 255, 255, 255]);
+
+    const pass = await runCli(["quality", "image", changed, "--baseline", changed, "--strict"]);
+    expect(JSON.parse(pass.stdout)).toMatchObject({ passed: true, diagnostics: [] });
+
+    await expect(runCli(["quality", "image", changed, "--baseline", baseline, "--strict"])).rejects.toMatchObject({
+      stdout: expect.stringContaining("VISUAL_DIFF"),
+    });
+  });
+
+  it("runs render quality gates for CI", async () => {
+    const htmlPath = join(tempDir, "quality-render.html");
+    await writeFile(htmlPath, `
+      <main><h1 id="title">Long headline that cannot fit</h1></main>
+      <style>
+        html, body { margin: 0; }
+        main { width: 120px; height: 80px; background: #fff; }
+        h1 { margin: 0; width: 40px; height: 20px; overflow: hidden; color: #aaa; background: #fff; font: 16px sans-serif; }
+      </style>
+    `);
+
+    const pass = await runCli([
+      "quality",
+      "render",
+      htmlPath,
+      "--text-selector",
+      "h1",
+      "--deterministic",
+      "--width",
+      "120",
+      "--height",
+      "80",
+    ]);
+    expect(JSON.parse(pass.stdout)).toMatchObject({ passed: false });
+    expect(pass.stdout).toContain("TEXT_OVERFLOW");
+
+    await expect(runCli([
+      "quality",
+      "render",
+      htmlPath,
+      "--text-selector",
+      "h1",
+      "--safe-area",
+      "48,12,12,12",
+      "--width",
+      "120",
+      "--height",
+      "80",
+      "--strict",
+    ])).rejects.toMatchObject({
+      stdout: expect.stringContaining("SAFE_AREA_VIOLATION"),
+    });
+  });
+
   it.each([
     ["announcement", ["--title", "Hello", "--badge", "New"]],
     ["brand-announcement", ["--title", "Hello", "--logo", "data:image/svg+xml,%3Csvg%3E%3C/svg%3E"]],
@@ -458,4 +516,15 @@ function runCli(args: string[]) {
     timeout: 60_000,
     killSignal: "SIGKILL",
   });
+}
+
+async function writeSolidPng(path: string, rgba: [number, number, number, number]) {
+  const png = new PNG({ width: 4, height: 4 });
+  for (let offset = 0; offset < png.data.length; offset += 4) {
+    png.data[offset] = rgba[0];
+    png.data[offset + 1] = rgba[1];
+    png.data[offset + 2] = rgba[2];
+    png.data[offset + 3] = rgba[3];
+  }
+  await writeFile(path, PNG.sync.write(png));
 }

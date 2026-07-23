@@ -196,3 +196,50 @@ export interface ClickClickConfig {
   templateSets?: Record<string, TemplateSetItem[]>;
   fonts?: FontRegistryEntry[];
 }
+
+export type QualityDiagnosticCode =
+  | "VISUAL_DIFF"
+  | "DIMENSION_MISMATCH"
+  | "TEXT_OVERFLOW"
+  | "LOW_CONTRAST"
+  | "SAFE_AREA_VIOLATION"
+  | "NON_DETERMINISTIC_RENDER";
+
+export type QualityDiagnosticSeverity = "warning" | "error";
+
+export interface QualityDiagnostic {
+  code: QualityDiagnosticCode;
+  severity: QualityDiagnosticSeverity;
+  message: string;
+  selector?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface QualitySafeArea {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
+export interface VisualDiffOptions {
+  baselinePath?: string;
+  maxDiffRatio?: number;
+  maxPixelDelta?: number;
+}
+
+export interface ImageQualityInput extends VisualDiffOptions {
+  actualPath: string;
+}
+
+export interface RenderQualityInput extends RenderImageInput, VisualDiffOptions {
+  safeArea?: QualitySafeArea;
+  textSelector?: string;
+  minContrastRatio?: number;
+  deterministic?: boolean;
+}
+
+export interface QualityResult {
+  passed: boolean;
+  diagnostics: QualityDiagnostic[];
+}
