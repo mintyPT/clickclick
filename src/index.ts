@@ -1,5 +1,6 @@
 export { clearCache } from "./cache/index.js";
 export { applyBrandToPresetOptions, brandFonts, brandKitJsonSchema, brandTemplateCss, brandTemplateModifications, loadBrandKit, validateBrandKit } from "./brand-kit/index.js";
+export { createContactSheet } from "./composition/contact-sheet.js";
 export { ClickClickError } from "./errors.js";
 export { serializeMediaSource } from "./media/index.js";
 export { dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPattern } from "./generate/index.js";
@@ -21,6 +22,10 @@ export type {
 export type {
   ClickClickErrorCode,
 } from "./errors.js";
+export type {
+  ContactSheetImageInput,
+  ContactSheetInput,
+} from "./composition/contact-sheet.js";
 export type {
   BatchDataRow,
   BatchDataValue,
