@@ -1,9 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { pathToFileURL } from "node:url";
-import { presets, sizes } from "../src/index.js";
+import { presets, sizeNames, sizes } from "../src/index.js";
 import { presetMetadata } from "../src/presets/index.js";
 
 describe("solid preset", () => {
+  it("exports platform size names for library users", () => {
+    expect(sizes).toMatchObject({
+      og: { width: 1200, height: 630 },
+      "twitter-card": { width: 1200, height: 675 },
+      "instagram-square": { width: 1080, height: 1080 },
+      "instagram-story": { width: 1080, height: 1920 },
+      linkedin: { width: 1200, height: 627 },
+      "youtube-thumb": { width: 1280, height: 720 },
+    });
+    expect(sizeNames).toEqual([
+      "og",
+      "twitter-card",
+      "instagram-square",
+      "instagram-story",
+      "linkedin",
+      "youtube-thumb",
+      "square",
+      "story",
+    ]);
+  });
+
   it("returns a renderer input with default Open Graph size", () => {
     const input = presets.solid({ title: "Hello", subtitle: "World" });
 

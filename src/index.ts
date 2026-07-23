@@ -5,7 +5,10 @@ export { serializeMediaSource } from "./media/index.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
 export { presets } from "./presets/index.js";
-export { sizes } from "./shared/sizes.js";
+export { sizeNames, sizes } from "./shared/sizes.js";
+export type {
+  SizeName,
+} from "./shared/sizes.js";
 export type {
   BrandBackgroundToken,
   BrandFontToken,

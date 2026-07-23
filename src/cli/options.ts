@@ -1,5 +1,5 @@
 import { ClickClickError } from "../errors.js";
-import { sizes } from "../shared/sizes.js";
+import { sizeNames, sizes } from "../shared/sizes.js";
 import type { ImageFormat, RenderCacheOptions, RenderOutputOptions, WaitUntil } from "../types.js";
 
 export interface ParsedRenderSize {
@@ -84,7 +84,7 @@ function parseSize(value: string): ParsedRenderSize {
 
   const match = /^([1-9]\d*)x([1-9]\d*)$/i.exec(value);
   if (!match) {
-    throw new ClickClickError("INVALID_INPUT", `Size must be one of ${Object.keys(sizes).join(", ")} or WIDTHxHEIGHT.`);
+    throw new ClickClickError("INVALID_INPUT", `Size must be one of ${sizeNames.join(", ")} or WIDTHxHEIGHT.`);
   }
 
   return {

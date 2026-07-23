@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { execa } from "execa";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { parseSizeOptions } from "../src/cli/options.js";
 
 let tempDir: string;
 
@@ -74,14 +75,34 @@ describe("CLI", () => {
   it("renders presets to named multi-size outputs", async () => {
     const outDir = join(tempDir, "multi-preset");
 
-    const result = await runCli(["preset", "solid", "--title", "Hello", "--size", "og", "--size", "square", "--out-dir", outDir]);
+    const result = await runCli(["preset", "solid", "--title", "Hello", "--size", "og", "--size", "instagram-square", "--size", "linkedin", "--out-dir", outDir]);
 
     const ogPath = join(outDir, "solid-og.png");
-    const squarePath = join(outDir, "solid-square.png");
+    const squarePath = join(outDir, "solid-instagram-square.png");
+    const linkedinPath = join(outDir, "solid-linkedin.png");
     expect(result.stdout).toContain(ogPath);
     expect(result.stdout).toContain(squarePath);
+    expect(result.stdout).toContain(linkedinPath);
     expect(PNG.sync.read(await readFile(ogPath))).toMatchObject({ width: 1200, height: 630 });
     expect(PNG.sync.read(await readFile(squarePath))).toMatchObject({ width: 1080, height: 1080 });
+    expect(PNG.sync.read(await readFile(linkedinPath))).toMatchObject({ width: 1200, height: 627 });
+  });
+
+  it("parses every built-in platform size name", () => {
+    expect(parseSizeOptions({ sizes: "og,twitter-card,instagram-square,instagram-story,linkedin,youtube-thumb" })).toEqual([
+      { label: "og", width: 1200, height: 630 },
+      { label: "twitter-card", width: 1200, height: 675 },
+      { label: "instagram-square", width: 1080, height: 1080 },
+      { label: "instagram-story", width: 1080, height: 1920 },
+      { label: "linkedin", width: 1200, height: 627 },
+      { label: "youtube-thumb", width: 1280, height: 720 },
+    ]);
+  });
+
+  it("rejects invalid named sizes with the built-in names in the error", () => {
+    expect(() => parseSizeOptions({ size: ["facebook-post"] })).toThrow(
+      "og, twitter-card, instagram-square, instagram-story, linkedin, youtube-thumb",
+    );
   });
 
   it("renders templates to multiple sizes and reuses the cache per size", async () => {
@@ -319,5 +340,7 @@ describe("CLI", () => {
 function runCli(args: string[]) {
   return execa("node", ["--import", "tsx", "src/cli/index.ts", ...args], {
     cwd: process.cwd(),
+    timeout: 60_000,
+    killSignal: "SIGKILL",
   });
 }
