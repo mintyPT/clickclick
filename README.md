@@ -250,6 +250,65 @@ Result:
 
 ![Batch generation result](./examples/use-cases/batch-campaign/batch-launch-og.png)
 
+Run CI-friendly quality gates:
+
+```bash
+clickclick quality image dist/card.png \
+  --baseline baselines/card.png \
+  --max-diff-ratio 0.001 \
+  --strict
+
+clickclick quality render ./examples/card.html \
+  --css ./examples/card.css \
+  --text-selector "[data-clickclick-fit]" \
+  --safe-area 48,24,48,24 \
+  --min-contrast-ratio 4.5 \
+  --deterministic \
+  --strict
+```
+
+Library:
+
+```ts
+import { checkImageQuality, checkRenderQuality } from "@maurogoncalo/clickclick";
+
+const imageResult = await checkImageQuality({
+  actualPath: "dist/card.png",
+  baselinePath: "baselines/card.png",
+  maxDiffRatio: 0.001,
+});
+
+const renderResult = await checkRenderQuality({
+  document: {
+    html: "<main><h1>Launch</h1></main>",
+    css: "main{width:1200px;height:630px;background:#fff}h1{color:#111}",
+  },
+  viewport: { width: 1200, height: 630 },
+  output: { format: "png" },
+  textSelector: "h1",
+  safeArea: { top: 48, right: 24, bottom: 48, left: 24 },
+  minContrastRatio: 4.5,
+  deterministic: true,
+});
+
+console.log(imageResult.passed, renderResult.diagnostics);
+```
+
+Resulting diagnostic output:
+
+```json
+{
+  "passed": false,
+  "diagnostics": [
+    {
+      "code": "VISUAL_DIFF",
+      "severity": "error",
+      "message": "Visual diff exceeded threshold: 2.500% changed, allowed 0.100%."
+    }
+  ]
+}
+```
+
 List presets:
 
 ```bash
@@ -309,6 +368,73 @@ Resulting multi-size output paths:
 dist/solid-og.png
 dist/solid-instagram-square.png
 dist/solid-linkedin.png
+```
+
+### Quality Gates
+
+Use quality gates in CI to catch visual regressions, text overflow, low text contrast, unsafe text
+placement, and non-deterministic renders. The commands emit structured JSON diagnostics and
+`--strict` turns any error diagnostic into a non-zero exit.
+
+CLI:
+
+```bash
+clickclick quality image dist/social-card.png \
+  --baseline test/baselines/social-card.png \
+  --max-diff-ratio 0.001 \
+  --strict
+
+clickclick quality render examples/card.html \
+  --css examples/card.css \
+  --baseline test/baselines/card.png \
+  --text-selector "[data-clickclick-fit], h1, p" \
+  --safe-area 48,48,72,48 \
+  --deterministic \
+  --width 1200 \
+  --height 630 \
+  --strict
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { checkImageQuality, checkRenderQuality } from "@maurogoncalo/clickclick";
+
+const image = await checkImageQuality({
+  actualPath: "dist/social-card.png",
+  baselinePath: "test/baselines/social-card.png",
+  maxDiffRatio: 0.001,
+});
+
+const render = await checkRenderQuality({
+  document: {
+    html: await readFile("examples/card.html", "utf8"),
+    css: await readFile("examples/card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  baselinePath: "test/baselines/card.png",
+  textSelector: "[data-clickclick-fit], h1, p",
+  safeArea: { top: 48, right: 48, bottom: 72, left: 48 },
+  deterministic: true,
+});
+
+if (!image.passed || !render.passed) process.exitCode = 1;
+```
+
+Example output:
+
+```json
+{
+  "passed": false,
+  "diagnostics": [
+    {
+      "code": "VISUAL_DIFF",
+      "severity": "error",
+      "message": "Visual diff exceeded threshold: 0.250% changed, allowed 0.100%."
+    }
+  ]
+}
 ```
 
 ### Brand Kits

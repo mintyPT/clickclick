@@ -3,10 +3,10 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, clearCache, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
-import type { BrandKit, LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
-import { collectOption, parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
+import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
+import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
 import type { ParsedRenderSize } from "./options.js";
 import { registerPresetCommands } from "./presets.js";
 
@@ -214,6 +214,71 @@ program
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .action(async (options) => {
     await clearCache({ dir: typeof options.cacheDir === "string" ? options.cacheDir : undefined });
+  });
+
+const quality = program.command("quality").description("Run CI-friendly image quality gates.");
+
+quality
+  .command("image")
+  .argument("<actual-image>", "Rendered PNG image to check")
+  .option("--baseline <file>", "Baseline PNG for visual diffing")
+  .option("--max-diff-ratio <ratio>", "Allowed changed-pixel ratio from 0 to 1", parseNumber)
+  .option("--max-pixel-delta <number>", "Per-channel pixel delta ignored by visual diffing", parseInteger)
+  .option("--strict", "Exit non-zero when quality diagnostics are produced")
+  .action(async (actualImage: string, options) => {
+    const result = await checkImageQuality({
+      actualPath: resolve(actualImage),
+      baselinePath: typeof options.baseline === "string" ? resolve(options.baseline) : undefined,
+      maxDiffRatio: options.maxDiffRatio,
+      maxPixelDelta: options.maxPixelDelta,
+    });
+    reportQualityResult(result, Boolean(options.strict));
+  });
+
+quality
+  .command("render")
+  .argument("<html-file>", "HTML file to render and inspect")
+  .option("--css <file>", "Optional CSS file to inject")
+  .option("--baseline <file>", "Baseline PNG for visual diffing")
+  .option("--max-diff-ratio <ratio>", "Allowed changed-pixel ratio from 0 to 1", parseNumber)
+  .option("--max-pixel-delta <number>", "Per-channel pixel delta ignored by visual diffing", parseInteger)
+  .option("--text-selector <selector>", "Selector for text quality checks", "body *")
+  .option("--min-contrast-ratio <ratio>", "Minimum contrast ratio for text checks", parseNumber)
+  .option("--safe-area <insets>", "Safe area insets as all, vertical,horizontal, or top,right,bottom,left pixels")
+  .option("--deterministic", "Render twice and fail when pixels differ")
+  .option("--width <px>", "Viewport width", parseInteger)
+  .option("--height <px>", "Viewport height", parseInteger)
+  .option("--selector <selector>", "Screenshot a specific element for pixel checks")
+  .option("--wait-until <event>", "Playwright wait event")
+  .option("--delay <ms>", "Delay before screenshot", parseInteger)
+  .option("--omit-background", "Allow transparent PNG backgrounds")
+  .option("--strict", "Exit non-zero when quality diagnostics are produced")
+  .action(async (htmlFile: string, options) => {
+    const htmlPath = resolve(htmlFile);
+    const cssPath = options.css ? resolve(options.css) : undefined;
+    const result = await checkRenderQuality({
+      document: {
+        html: await readFileChecked(htmlPath, "HTML"),
+        css: cssPath ? await readFileChecked(cssPath, "CSS") : undefined,
+        baseUrl: pathToFileURL(dirname(htmlPath)).href + "/",
+      },
+      viewport: {
+        width: options.width,
+        height: options.height,
+      },
+      output: {
+        omitBackground: Boolean(options.omitBackground),
+      },
+      render: parseRenderOptions(options),
+      baselinePath: typeof options.baseline === "string" ? resolve(options.baseline) : undefined,
+      maxDiffRatio: options.maxDiffRatio,
+      maxPixelDelta: options.maxPixelDelta,
+      safeArea: parseSafeArea(options.safeArea),
+      textSelector: typeof options.textSelector === "string" ? options.textSelector : undefined,
+      minContrastRatio: options.minContrastRatio,
+      deterministic: Boolean(options.deterministic),
+    });
+    reportQualityResult(result, Boolean(options.strict));
   });
 
 const config = program.command("config").description("Render local templates from a project config.");
@@ -439,6 +504,13 @@ function isCacheInfoEnabled(cache: RenderCacheOptions | undefined): boolean {
   return Boolean(cache && cache !== true && cache.info);
 }
 
+function reportQualityResult(result: QualityResult, strict: boolean) {
+  console.log(JSON.stringify(result, null, 2));
+  if (strict && !result.passed) {
+    process.exitCode = 1;
+  }
+}
+
 async function readFileChecked(path: string, label: string): Promise<string> {
   try {
     return await readFile(path, "utf8");
@@ -655,6 +727,24 @@ function parseLayerBehavior(value: unknown): "warn" | "error" | "ignore" | undef
   if (value === undefined) return undefined;
   if (value === "warn" || value === "error" || value === "ignore") return value;
   throw new ClickClickError("INVALID_INPUT", "Layer behavior must be warn, error, or ignore.");
+}
+
+function parseSafeArea(value: unknown): QualitySafeArea | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== "string" || value.length === 0) {
+    throw new ClickClickError("INVALID_INPUT", "Safe area must be a comma-separated pixel inset list.");
+  }
+  const parts = value.split(",").map((part) => {
+    const parsed = Number(part.trim());
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      throw new ClickClickError("INVALID_INPUT", "Safe area insets must be non-negative numbers.");
+    }
+    return parsed;
+  });
+  if (parts.length === 1) return { top: parts[0], right: parts[0], bottom: parts[0], left: parts[0] };
+  if (parts.length === 2) return { top: parts[0], right: parts[1], bottom: parts[0], left: parts[1] };
+  if (parts.length === 4) return { top: parts[0], right: parts[1], bottom: parts[2], left: parts[3] };
+  throw new ClickClickError("INVALID_INPUT", "Safe area must use one, two, or four comma-separated values.");
 }
 
 function reportError(error: unknown) {

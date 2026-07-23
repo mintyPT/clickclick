@@ -58,6 +58,74 @@ await renderImage({
 
 ![Selector output](../examples/use-cases/selector-card.png)
 
+## Quality Gate Workflow
+
+Use quality gates after rendering examples or template sets to fail CI on visual regressions,
+overflowing text, low text contrast, unsafe social-platform margins, or non-deterministic renders.
+Baseline and media paths stay outside preset code and are passed through CLI flags or library
+options.
+
+CLI:
+
+```bash
+clickclick quality image examples/use-cases/selector-card.png \
+  --baseline test/baselines/selector-card.png \
+  --max-diff-ratio 0.001 \
+  --strict
+
+clickclick quality render examples/card.html \
+  --css examples/card.css \
+  --baseline test/baselines/card.png \
+  --text-selector "[data-clickclick-fit], h1, p" \
+  --safe-area 48,48,72,48 \
+  --deterministic \
+  --width 1200 \
+  --height 630 \
+  --strict
+```
+
+Library:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { checkImageQuality, checkRenderQuality } from "@maurogoncalo/clickclick";
+
+const image = await checkImageQuality({
+  actualPath: "examples/use-cases/selector-card.png",
+  baselinePath: "test/baselines/selector-card.png",
+  maxDiffRatio: 0.001,
+});
+
+const render = await checkRenderQuality({
+  document: {
+    html: await readFile("examples/card.html", "utf8"),
+    css: await readFile("examples/card.css", "utf8"),
+  },
+  viewport: { width: 1200, height: 630 },
+  baselinePath: "test/baselines/card.png",
+  textSelector: "[data-clickclick-fit], h1, p",
+  safeArea: { top: 48, right: 48, bottom: 72, left: 48 },
+  deterministic: true,
+});
+
+console.log(JSON.stringify({ image, render }, null, 2));
+```
+
+Result:
+
+```json
+{
+  "image": {
+    "passed": true,
+    "diagnostics": []
+  },
+  "render": {
+    "passed": true,
+    "diagnostics": []
+  }
+}
+```
+
 Use transparent PNG output when the document background should stay transparent:
 
 ```bash

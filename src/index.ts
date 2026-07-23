@@ -6,6 +6,7 @@ export { dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPa
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
 export { presets } from "./presets/index.js";
+export { checkImageQuality, checkRenderQuality } from "./quality/index.js";
 export { sizeNames, sizes } from "./shared/sizes.js";
 export type {
   SizeName,
@@ -40,6 +41,12 @@ export type {
   ImageFormat,
   LayerEffect,
   LayerModification,
+  ImageQualityInput,
+  QualityDiagnostic,
+  QualityDiagnosticCode,
+  QualityDiagnosticSeverity,
+  QualityResult,
+  QualitySafeArea,
   RenderDocumentInput,
   RenderCacheInfo,
   RenderCacheOptions,
@@ -49,6 +56,7 @@ export type {
   RenderLifecycleOptions,
   RendererOptions,
   RenderOutputOptions,
+  RenderQualityInput,
   RenderWarning,
   ScreenshotUrlInput,
   ScreenshotUrlLifecycleOptions,
@@ -59,5 +67,6 @@ export type {
   TemplateSetItem,
   TemplateWarning,
   ViewportSize,
+  VisualDiffOptions,
   WaitUntil,
 } from "./types.js";
