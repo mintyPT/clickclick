@@ -1,5 +1,15 @@
 # Attribution
 
+## Apex Auto Social Posts
+
+The Apex Auto example set uses source-neutral Unsplash photos passed through template modification JSON files:
+
+- `examples/use-cases/assets/automotive-showroom-unsplash.jpg` - Photo by Chelaxy Designs on Unsplash: https://unsplash.com/photos/9rdfLAZXW2E
+- `examples/use-cases/assets/automotive-detailing-unsplash.jpg` - Photo by Matt Reiter on Unsplash: https://unsplash.com/photos/f0UG8TQS2SM
+- `examples/use-cases/assets/automotive-trade-in-unsplash.jpg` - Photo by Rana Singh on Unsplash: https://unsplash.com/photos/InZmV1fb72k
+
+Unsplash License: https://unsplash.com/license
+
 ## Weave Home Retail Social Posts
 
 The Weave Home example set uses source-neutral Unsplash photos passed through template modification JSON files:
