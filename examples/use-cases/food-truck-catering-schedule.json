@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-schedule" },
+  { "name": "brand", "text": "Copper Cart" },
+  { "name": "tagline", "text": "Mobile kitchen and catering" },
+  { "name": "eyebrow", "text": "This week" },
+  { "name": "title", "html": "Lunch route<br>drop" },
+  { "name": "subtitle", "text": "Three stops, one brisket taco special, preorders open now." },
+  { "name": "hero_image", "src": "./assets/food-truck-catering-truck-unsplash.jpg", "fit": "cover", "anchor": "50% 54%" },
+  { "name": "route_label", "text": "Route" },
+  { "name": "route_one", "text": "Mon - Foundry Yard" },
+  { "name": "route_two", "text": "Wed - Arcade Park" },
+  { "name": "route_three", "text": "Fri - Harbor Lawn" },
+  { "name": "offer_label", "text": "Preorder" },
+  { "name": "offer_value", "text": "$12 lunch box" },
+  { "name": "cta", "text": "Order by 10am at coppercart.example" }
+]

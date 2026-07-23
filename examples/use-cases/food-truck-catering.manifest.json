@@ -1,0 +1,31 @@
+{
+  "name": "Food Truck Catering Social Posts",
+  "description": "Use a reusable mixed photo-and-graphic template for a fictional food truck monetization campaign: route preorders, office catering inquiries, and private event deposits. Source-neutral Unsplash photos are passed through JSON image layers, while the route cards, offer badges, borders, and pattern work are intentional CSS geometry.",
+  "template": "./food-truck-catering.html",
+  "css": "./food-truck-catering.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    {
+      "id": "schedule",
+      "title": "Route Preorder Post",
+      "modifyFile": "./food-truck-catering-schedule.json",
+      "output": "./food-truck-catering-schedule.png",
+      "alt": "Food truck route preorder social post result"
+    },
+    {
+      "id": "catering",
+      "title": "Office Catering Inquiry Post",
+      "modifyFile": "./food-truck-catering-catering.json",
+      "output": "./food-truck-catering-catering.png",
+      "alt": "Food truck office catering inquiry social post result"
+    },
+    {
+      "id": "booking",
+      "title": "Private Event Booking Post",
+      "modifyFile": "./food-truck-catering-booking.json",
+      "output": "./food-truck-catering-booking.png",
+      "alt": "Food truck private event booking social post result"
+    }
+  ]
+}
