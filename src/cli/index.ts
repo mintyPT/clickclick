@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, checkImageQuality, checkRenderQuality, clearCache, createRenderer, dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPattern, listConfigTemplates, loadBrandKit, presets, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
@@ -204,6 +204,74 @@ program
     for (const result of results) {
       reportResult(result, Boolean(options.strict), false);
       if (result.path) console.log(result.path);
+    }
+  });
+
+const batch = program.command("batch").description("Render preset or template images from structured data.");
+
+batch
+  .command("preset")
+  .argument("<preset-name>", "Built-in preset name")
+  .requiredOption("--data <file>", "JSON, CSV, or YAML data file")
+  .option("--data-format <format>", "Data format: json, csv, or yaml")
+  .requiredOption("--out-dir <dir>", "Directory for generated images")
+  .option("--out-pattern <pattern>", "Output filename pattern with {{field}} and {{size}} placeholders")
+  .option("--map <target=field>", "Map a preset option to a data field. Repeat for multiple fields.", collectOption, [])
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
+  .option("--width <px>", "Viewport width when --size/--sizes are not used", parseInteger)
+  .option("--height <px>", "Viewport height when --size/--sizes are not used", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--json", "Print a JSON summary")
+  .option("--strict", "Exit non-zero when any row fails or renderer warnings are produced")
+  .action(async (presetName: string, options) => {
+    const renderer = await createRenderer();
+    try {
+      const rows = await parseDataRows(resolve(options.data), options.dataFormat);
+      const summary = await runBatchPreset(presetName, rows, options, renderer);
+      reportBatchSummary(summary, Boolean(options.json), Boolean(options.strict));
+    } finally {
+      await renderer.close();
+    }
+  });
+
+batch
+  .command("template")
+  .argument("<html-file>", "HTML template file to render for every data row")
+  .requiredOption("--data <file>", "JSON, CSV, or YAML data file")
+  .option("--data-format <format>", "Data format: json, csv, or yaml")
+  .option("--css <file>", "Optional CSS file to inject")
+  .option("--map <layer=field>", "Map a template layer name to a data field. Repeat for multiple fields.", collectOption, [])
+  .requiredOption("--out-dir <dir>", "Directory for generated images")
+  .option("--out-pattern <pattern>", "Output filename pattern with {{field}} and {{size}} placeholders")
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
+  .option("--width <px>", "Viewport width when --size/--sizes are not used", parseInteger)
+  .option("--height <px>", "Viewport height when --size/--sizes are not used", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--selector <selector>", "Screenshot a specific element")
+  .option("--wait-until <event>", "Playwright wait event")
+  .option("--delay <ms>", "Delay before screenshot", parseInteger)
+  .option("--json", "Print a JSON summary")
+  .option("--strict", "Exit non-zero when any row fails or renderer warnings are produced")
+  .action(async (htmlFile: string, options) => {
+    const renderer = await createRenderer();
+    try {
+      const htmlPath = resolve(htmlFile);
+      const cssPath = options.css ? resolve(options.css) : undefined;
+      const rows = await parseDataRows(resolve(options.data), options.dataFormat);
+      const summary = await runBatchTemplate({
+        htmlPath,
+        cssPath,
+        rows,
+        options,
+        renderer,
+      });
+      reportBatchSummary(summary, Boolean(options.json), Boolean(options.strict));
+    } finally {
+      await renderer.close();
     }
   });
 
@@ -481,6 +549,151 @@ function basenameWithoutExtension(path: string): string {
 
 function stringArrayOption(value: unknown): string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string") ? value : [];
+}
+
+interface BatchItemSummary {
+  index: number;
+  path?: string;
+  warnings: RenderWarning[];
+  error?: string;
+}
+
+interface BatchSummary {
+  ok: boolean;
+  outputs: BatchItemSummary[];
+  errors: BatchItemSummary[];
+}
+
+async function runBatchPreset(presetName: string, rows: BatchDataRow[], options: Record<string, unknown>, renderer: Awaited<ReturnType<typeof createRenderer>>): Promise<BatchSummary> {
+  const preset = presetByName(presetName);
+  const outputDir = resolveRequiredDir(options.outDir);
+  const sizes = batchSizes(options);
+  const pattern = typeof options.outPattern === "string" ? options.outPattern : sizes.length > 1 ? "{{slug}}-{{size}}.png" : "{{slug}}.png";
+  const maps = parseFieldMappings(options.map);
+  await mkdir(outputDir, { recursive: true });
+
+  const outputs: BatchItemSummary[] = [];
+  const errors: BatchItemSummary[] = [];
+  for (const [index, row] of rows.entries()) {
+    for (const size of sizes) {
+      try {
+        const presetOptions = rowToOptions(row, maps);
+        const result = await renderer.render({
+          ...preset(presetOptions),
+          viewport: { width: size.width ?? numberOption(presetOptions.width), height: size.height ?? numberOption(presetOptions.height) },
+          output: { ...parseOutputOptions(options), path: join(outputDir, interpolateOutputPattern(pattern, row, index, size)) },
+        });
+        outputs.push({ index, path: result.path, warnings: result.warnings });
+      } catch (error) {
+        errors.push({ index, warnings: [], error: errorMessage(error) });
+      }
+    }
+  }
+  return { ok: errors.length === 0, outputs, errors };
+}
+
+async function runBatchTemplate(input: { htmlPath: string; cssPath?: string; rows: BatchDataRow[]; options: Record<string, unknown>; renderer: Awaited<ReturnType<typeof createRenderer>> }): Promise<BatchSummary> {
+  const outputDir = resolveRequiredDir(input.options.outDir);
+  const sizes = batchSizes(input.options);
+  const pattern = typeof input.options.outPattern === "string" ? input.options.outPattern : sizes.length > 1 ? "{{slug}}-{{size}}.png" : "{{slug}}.png";
+  const maps = parseFieldMappings(input.options.map);
+  await mkdir(outputDir, { recursive: true });
+
+  const outputs: BatchItemSummary[] = [];
+  const errors: BatchItemSummary[] = [];
+  for (const [index, row] of input.rows.entries()) {
+    for (const size of sizes) {
+      try {
+        const result = await renderTemplate({
+          htmlPath: input.htmlPath,
+          cssPath: input.cssPath,
+          modifications: mappedRowToLayerModifications(row, maps),
+          viewport: { width: size.width ?? numberValue(row.width) ?? numberValue(input.options.width), height: size.height ?? numberValue(row.height) ?? numberValue(input.options.height) },
+          output: { ...parseOutputOptions(input.options), path: join(outputDir, interpolateOutputPattern(pattern, row, index, size)) },
+          render: parseRenderOptions(input.options),
+        }, { renderer: input.renderer });
+        outputs.push({ index, path: result.path, warnings: result.warnings });
+      } catch (error) {
+        errors.push({ index, warnings: [], error: errorMessage(error) });
+      }
+    }
+  }
+  return { ok: errors.length === 0, outputs, errors };
+}
+
+function reportBatchSummary(summary: BatchSummary, asJson: boolean, strict: boolean) {
+  if (asJson) {
+    console.log(JSON.stringify(summary, null, 2));
+  } else {
+    for (const output of summary.outputs) {
+      if (output.path) console.log(output.path);
+      for (const warning of output.warnings) console.error(`warning ${warning.code}: ${warning.message}`);
+    }
+    for (const error of summary.errors) console.error(`row ${error.index + 1}: ${error.error}`);
+  }
+  if (strict && (!summary.ok || summary.outputs.some((output) => output.warnings.length > 0))) {
+    process.exitCode = 1;
+  }
+}
+
+function batchSizes(options: Record<string, unknown>) {
+  const sizes = parseSizeOptions(options);
+  return sizes.length > 0 ? sizes : [{ label: "default", width: numberValue(options.width), height: numberValue(options.height) }];
+}
+
+function resolveRequiredDir(value: unknown): string {
+  if (typeof value !== "string" || value.length === 0) {
+    throw new ClickClickError("INVALID_INPUT", "--out-dir is required.");
+  }
+  return resolve(value);
+}
+
+function parseFieldMappings(value: unknown): Map<string, string> {
+  const result = new Map<string, string>();
+  for (const item of stringArrayOption(value)) {
+    const [target, source] = item.split("=");
+    if (!target || !source) {
+      throw new ClickClickError("INVALID_INPUT", "--map entries must use target=field.");
+    }
+    result.set(target, source);
+  }
+  return result;
+}
+
+function rowToOptions(row: BatchDataRow, maps: Map<string, string>): Record<string, unknown> {
+  if (maps.size === 0) return { ...row };
+  return Object.fromEntries([...maps.entries()].map(([target, source]) => [target, row[source]]));
+}
+
+function mappedRowToLayerModifications(row: BatchDataRow, maps: Map<string, string>) {
+  if (maps.size === 0) return dataRowToLayerModifications(row);
+  return [...maps.entries()].map(([layer, source]) => {
+    const value = row[source];
+    if (value === undefined || value === null || typeof value === "object") {
+      throw new ClickClickError("INVALID_INPUT", `Data row is missing scalar field for layer ${layer}: ${source}`);
+    }
+    return { name: layer, text: String(value) };
+  });
+}
+
+function presetByName(name: string): (options: Record<string, unknown>) => RenderImageInput {
+  const preset = (presets as Record<string, unknown>)[name];
+  if (typeof preset !== "function") {
+    throw new ClickClickError("INVALID_INPUT", `Unknown preset: ${name}`);
+  }
+  return preset as (options: Record<string, unknown>) => RenderImageInput;
+}
+
+function numberOption(value: unknown): number | undefined {
+  return typeof value === "number" ? value : undefined;
+}
+
+function numberValue(value: unknown): number | undefined {
+  return typeof value === "number" ? value : undefined;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) {

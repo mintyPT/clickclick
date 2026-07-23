@@ -250,6 +250,38 @@ Result:
 
 ![Batch generation result](./examples/use-cases/batch-campaign/batch-launch-og.png)
 
+Run a batch preset workflow with a reusable renderer and per-item summary:
+
+```bash
+clickclick batch preset solid \
+  --data examples/use-cases/batch-campaign.json \
+  --out-dir examples/use-cases/batch-command \
+  --out-pattern "{{slug}}-preset.png" \
+  --width 320 \
+  --height 180 \
+  --json
+```
+
+Batch templates can map data fields to layer names:
+
+```bash
+clickclick batch template examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --data posts.csv \
+  --map title=headline \
+  --map subtitle=excerpt \
+  --sizes og,instagram-square \
+  --out-dir dist/social \
+  --out-pattern "{{slug}}-{{size}}.png"
+```
+
+The batch preset and batch template commands use the same data formats and output pattern tokens,
+reuse one browser across rows, and can print a JSON summary with `--json`.
+
+Result:
+
+![Batch preset command result](./examples/use-cases/batch-command/batch-launch-preset.png)
+
 Run CI-friendly quality gates:
 
 ```bash
