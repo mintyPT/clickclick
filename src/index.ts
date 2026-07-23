@@ -1,7 +1,7 @@
 export { clearCache } from "./cache/index.js";
 export { applyBrandToPresetOptions, brandFonts, brandKitJsonSchema, brandTemplateCss, brandTemplateModifications, loadBrandKit, validateBrandKit } from "./brand-kit/index.js";
 export { ClickClickError } from "./errors.js";
-export { barChart, collage, imageGrid, qrCode } from "./composition/index.js";
+export { barChart, collage, contactSheet, imageGrid, qrCode } from "./composition/index.js";
 export { serializeMediaSource } from "./media/index.js";
 export { dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPattern } from "./generate/index.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";

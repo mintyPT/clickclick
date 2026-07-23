@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, dataRowToLayerModifications, generateTemplateBatch, imageGrid, listConfigTemplates, loadBrandKit, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, contactSheet, dataRowToLayerModifications, generateTemplateBatch, imageGrid, listConfigTemplates, loadBrandKit, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
@@ -286,6 +286,39 @@ const composition = program.command("composition").description("Render determini
 composition
   .command("contact-sheet")
   .description("Render a captioned image grid for gallery review")
+  .requiredOption("--image <file-or-url>", "Image source. Repeat for multiple images.", collectOption, [])
+  .option("--caption <text>", "Caption for the matching --image. Repeat to label multiple images.", collectOption, [])
+  .option("--columns <count>", "Grid column count", parseInteger)
+  .option("--gap <px>", "Gap between tiles", parseInteger)
+  .option("--padding <px>", "Outer padding", parseInteger)
+  .option("--background <color>", "Canvas background color")
+  .option("--text-color <color>", "Caption text color")
+  .option("--out, --output <file>", "Output image path")
+  .option("--width <px>", "Output width", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--cache", "Reuse cached output for identical deterministic input")
+  .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
+  .option("--cache-info", "Print cache hit/miss information")
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (options) => {
+    await runRender({
+      ...contactSheet({
+        images: compositionImages(options),
+        columns: options.columns,
+        width: options.width,
+        gap: options.gap,
+        padding: options.padding,
+        background: stringOption(options.background),
+        textColor: stringOption(options.textColor),
+      }),
+      output: parseOutputOptions(options),
+    }, Boolean(options.strict), parseCacheOptions(options));
+  });
+
+composition
+  .command("grid")
+  .description("Render a captioned image grid")
   .requiredOption("--image <file-or-url>", "Image source. Repeat for multiple images.", collectOption, [])
   .option("--caption <text>", "Caption for the matching --image. Repeat to label multiple images.", collectOption, [])
   .option("--columns <count>", "Grid column count", parseInteger)

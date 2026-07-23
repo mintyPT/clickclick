@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { mkdtemp } from "node:fs/promises";
 import { PNG } from "pngjs";
 import { describe, expect, it } from "vitest";
-import { barChart, collage, imageGrid, qrCode } from "../src/index.js";
+import { barChart, collage, contactSheet, imageGrid, qrCode } from "../src/index.js";
 
 describe("composition library helpers", () => {
   it("builds an image grid document with deterministic layout, captions, spacing, and background", async () => {
@@ -26,6 +26,11 @@ describe("composition library helpers", () => {
     expect(input.document.css).toContain("background: #102030");
     expect(input.document.html).toContain("Launch");
     expect(input.document.html).toContain("data:image/png;base64,");
+    expect(contactSheet({
+      images: [{ src: imagePath, caption: "Launch" }],
+      columns: 1,
+      width: 120,
+    }).document.html).toContain("Launch");
   });
 
   it("exposes collages as a named image-grid workflow", async () => {

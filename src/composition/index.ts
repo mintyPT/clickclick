@@ -111,6 +111,8 @@ export function imageGrid(options: ImageGridOptions): RenderImageInput {
   };
 }
 
+export const contactSheet = imageGrid;
+
 export function collage(options: ImageGridOptions): RenderImageInput {
   const input = imageGrid(options);
   input.document.html = input.document.html.replace('class="image-grid"', 'class="image-grid collage"');
