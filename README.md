@@ -10,11 +10,12 @@ The v1 surface is intentionally small:
 - render user-authored HTML/CSS to PNG or JPEG;
 - screenshot arbitrary URLs to PNG or JPEG;
 - render built-in social image presets;
+- discover and render local schema-backed presets from project config files;
 - opt in to text fitting for elements that should shrink to fit;
 - opt in to a local render cache for deterministic HTML, template, config, and preset renders;
 - report structured warnings and stable error codes.
 
-It does not manage user preset registries or publish anything externally.
+It does not manage hosted preset registries or publish anything externally.
 
 ## Setup
 
@@ -313,6 +314,7 @@ List presets:
 
 ```bash
 clickclick preset list
+clickclick preset list --local --preset-config examples/presets/local-presets.json
 ```
 
 Common render flags include `--width`, `--height`, `--format`, `--quality`, `--selector`,
@@ -326,6 +328,39 @@ The `generate` command accepts JSON, CSV, and simple YAML data files. By default
 become same-named template layer text modifications, while a row-level `modifications` array can pass
 full layer modification objects. Use `--layer-field` to apply only selected CSV/YAML fields as
 layers. Output patterns support `{{field}}`, `{{index}}`, `{{size}}`, `{{width}}`, and `{{height}}`.
+
+Render a project-local preset from schema metadata:
+
+```bash
+clickclick preset local campaign-card \
+  --preset-config examples/presets/local-presets.json \
+  --title "Schema-backed campaign presets" \
+  --subtitle "Project presets can be discovered, validated, and rendered from JSON." \
+  --label "Local" \
+  --out examples/presets/local-campaign-card.png
+```
+
+Library:
+
+```ts
+import { loadLocalPresetConfig, renderLocalPreset, renderTemplate } from "@maurogoncalo/clickclick";
+
+const config = await loadLocalPresetConfig("examples/presets/local-presets.json");
+const schema = config.presets.find((preset) => preset.name === "campaign-card");
+if (!schema) throw new Error("Missing preset");
+
+await renderTemplate(renderLocalPreset(schema, {
+  title: "Schema-backed campaign presets",
+  subtitle: "Project presets can be discovered, validated, and rendered from JSON.",
+  label: "Local",
+}, {
+  path: "examples/presets/local-campaign-card.png",
+}));
+```
+
+Result:
+
+![Local preset schema result](./examples/presets/local-campaign-card.png)
 
 ### Named Sizes
 

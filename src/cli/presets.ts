@@ -1,7 +1,9 @@
 import { join, resolve } from "node:path";
 import type { Command } from "commander";
-import { ClickClickError, loadBrandKit, presets } from "../index.js";
+import { ClickClickError, loadBrandKit, presets, renderTemplate } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
+import { coercePresetOption, loadLocalPresetConfig, renderLocalPreset, resolvePresetValues, validatePresetSchema } from "../presets/schema.js";
+import type { LocalPresetSchema, PresetOptionSchema, PresetSchema } from "../presets/schema.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
 import type { RenderImageInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseSizeOptions } from "./options.js";
@@ -25,16 +27,36 @@ interface PresetCommandDefinition {
 }
 
 export function registerPresetCommands(parent: Command, dependencies: PresetCliDependencies) {
-  parent.command("list").description("List built-in presets").action(() => {
+  parent.command("list")
+    .description("List built-in presets")
+    .option("--local", "Include local presets from a config file")
+    .option("--preset-config <file>", "Local preset config JSON file", "clickclick.presets.json")
+    .action(async (options) => {
     for (const item of presetMetadata) {
       console.log(`${item.name}\t${item.description}`);
     }
+    if (options.local) {
+      const config = await loadLocalPresetConfig(options.presetConfig);
+      for (const item of config.presets) {
+        console.log(`${item.name}\t${item.description} (local)`);
+      }
+    }
   });
 
+  registerLocalPresetCommand(parent, dependencies);
   registerBrandPresetCommands(parent, dependencies);
   registerLegacyPresetCommands(parent, dependencies);
   registerPhotoPresetCommands(parent, dependencies);
   registerRichMediaPresetCommands(parent, dependencies);
+}
+
+export function builtInPresetSchemas(): PresetSchema[] {
+  return [
+    ...brandPresetCommandDefinitions(),
+    ...legacyPresetCommandDefinitions(),
+    ...photoPresetCommandDefinitions(),
+    ...richMediaPresetCommandDefinitions(),
+  ].map(commandDefinitionSchema);
 }
 
 function legacyPresetCommandDefinitions(): PresetCommandDefinition[] {
@@ -510,6 +532,116 @@ async function runPresetCommand(definition: PresetCommandDefinition, options: Re
     }, Boolean(options.strict), parseCacheOptions(options));
     console.log(renderOptions.output);
   }
+}
+
+function registerLocalPresetCommand(parent: Command, dependencies: PresetCliDependencies) {
+  let command = parent.command("local <name>")
+    .description("Render a local preset from a preset config file")
+    .allowUnknownOption(true)
+    .option("--preset-config <file>", "Local preset config JSON file", "clickclick.presets.json");
+  command = addPresetRenderOptions(command);
+  command.action(async (name: string, options: Record<string, unknown>, actionCommand: Command) => {
+    const config = await loadLocalPresetConfig(typeof options.presetConfig === "string" ? options.presetConfig : undefined);
+    const schema = config.presets.find((preset) => preset.name === name);
+    if (!schema) {
+      throw new ClickClickError("INVALID_INPUT", `Local preset not found: ${name}`);
+    }
+    const values = resolvePresetValues(schema, parseLocalPresetArgs(schema, actionCommand.args));
+    const requestedSizes = parseSizeOptions(options);
+    if (requestedSizes.length === 0) {
+      const input = renderLocalPreset(schemaWithViewportOverrides(schema, options), values, parseOutputOptions(options));
+      await runLocalPreset(input, options, dependencies);
+      return;
+    }
+
+    const outDir = multiSizeOutDir(options);
+    for (const size of requestedSizes) {
+      const output = multiSizeOutputPath(outDir, name, size, options);
+      const input = renderLocalPreset({
+        ...schema,
+        viewport: { ...schema.viewport, width: size.width, height: size.height },
+      }, values, parseOutputOptions({ ...options, output }));
+      await runLocalPreset(input, options, dependencies);
+      console.log(output);
+    }
+  });
+}
+
+function schemaWithViewportOverrides(schema: LocalPresetSchema, options: Record<string, unknown>): LocalPresetSchema {
+  return {
+    ...schema,
+    viewport: {
+      ...schema.viewport,
+      width: optionalNumber(options.width) ?? schema.viewport?.width,
+      height: optionalNumber(options.height) ?? schema.viewport?.height,
+    },
+  };
+}
+
+async function runLocalPreset(input: ReturnType<typeof renderLocalPreset>, options: Record<string, unknown>, dependencies: PresetCliDependencies) {
+  const result = await renderTemplate({
+    ...input,
+    cache: parseCacheOptions(options),
+  });
+  for (const warning of result.warnings) {
+    console.warn(warning.message);
+  }
+  if (options.strict && result.warnings.length > 0) {
+    process.exitCode = 1;
+  }
+}
+
+function parseLocalPresetArgs(schema: LocalPresetSchema, args: string[]): Record<string, string | number | boolean> {
+  validatePresetSchema(schema);
+  const values: Record<string, string | number | boolean> = {};
+  const byFlag = new Map(schema.options.map((option) => [`--${option.flag ?? option.name}`, option]));
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    if (token === undefined) continue;
+    if (!token.startsWith("--")) continue;
+    const [flag, inlineValue] = token.split("=", 2) as [string, string?];
+    const option = byFlag.get(flag);
+    if (!option) {
+      throw new ClickClickError("INVALID_INPUT", `Unknown local preset option: ${flag}`);
+    }
+    if (option.type === "boolean") {
+      values[option.name] = inlineValue === undefined ? true : coercePresetOption(option, inlineValue);
+      continue;
+    }
+    const rawValue = inlineValue ?? args[index + 1];
+    if (rawValue === undefined || rawValue.startsWith("--")) {
+      throw new ClickClickError("INVALID_INPUT", `Missing value for local preset option: ${flag}`);
+    }
+    values[option.name] = coercePresetOption(option, rawValue);
+    if (inlineValue === undefined) index += 1;
+  }
+  return values;
+}
+
+function commandDefinitionSchema(definition: PresetCommandDefinition): PresetSchema {
+  return {
+    name: definition.command,
+    command: definition.command,
+    description: presetMetadata.find((item) => item.name === definition.command)?.description ?? definition.command,
+    options: definition.options.map(commandOptionSchema),
+  };
+}
+
+function commandOptionSchema(option: PresetCommandOption): PresetOptionSchema {
+  const name = optionName(option.flags);
+  return {
+    name,
+    flag: name.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`),
+    description: option.description,
+    type: option.parser === parseInteger ? "integer" : option.parser === parseNumber ? "number" : "string",
+    required: option.required,
+  };
+}
+
+function optionName(flags: string): string {
+  const long = flags.split(/[ ,|]+/).find((part) => part.startsWith("--") && !part.includes(","));
+  const normalized = (long ?? flags).replace(/^--/, "").replace(/[ <[].*$/, "");
+  return normalized.replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
 }
 
 function addCommandOptions(command: Command, options: PresetCommandOption[]): Command {

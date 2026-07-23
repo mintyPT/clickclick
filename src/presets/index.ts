@@ -23,6 +23,14 @@ export type { SolidPresetOptions } from "./solid.js";
 export type { SplitPresetOptions } from "./split.js";
 export type { TerminalPresetOptions } from "./terminal.js";
 export type { PresetBackgroundMediaOptions, PresetLogoOptions, PresetMediaOptions, PresetWatermarkOptions } from "./utils.js";
+export type {
+  LocalPresetConfig,
+  LocalPresetOptionTarget,
+  LocalPresetSchema,
+  PresetOptionSchema,
+  PresetOptionType,
+  PresetSchema,
+} from "./schema.js";
 
 export const presets = {
   adaptive,

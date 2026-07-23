@@ -1367,6 +1367,48 @@ await renderTemplateSet(
 
 console.log(templates);
 ```
+
+### Local Preset Schemas
+
+Use local preset schemas when a project needs reusable preset commands without editing ClickClick
+source. The schema declares option names, option types, required/default values, and which template
+layers receive each option value.
+
+CLI:
+
+```bash
+clickclick preset list --local --preset-config examples/presets/local-presets.json
+
+clickclick preset local campaign-card \
+  --preset-config examples/presets/local-presets.json \
+  --title "Schema-backed campaign presets" \
+  --subtitle "Project presets can be discovered, validated, and rendered from JSON." \
+  --label "Local" \
+  --out examples/presets/local-campaign-card.png
+```
+
+Library:
+
+```ts
+import { loadLocalPresetConfig, renderLocalPreset, renderTemplate } from "@maurogoncalo/clickclick";
+
+const config = await loadLocalPresetConfig("examples/presets/local-presets.json");
+const schema = config.presets.find((preset) => preset.name === "campaign-card");
+if (!schema) throw new Error("Missing preset");
+
+await renderTemplate(renderLocalPreset(schema, {
+  title: "Schema-backed campaign presets",
+  subtitle: "Project presets can be discovered, validated, and rendered from JSON.",
+  label: "Local",
+}, {
+  path: "examples/presets/local-campaign-card.png",
+}));
+```
+
+Result:
+
+![Local preset schema result](../examples/presets/local-campaign-card.png)
+
 ## Preset Variations
 
 These examples use the same built-in presets with different option combinations. They are useful
