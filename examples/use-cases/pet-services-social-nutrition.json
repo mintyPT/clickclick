@@ -1,0 +1,13 @@
+[
+  { "name": "post", "className": "post post-nutrition" },
+  { "name": "brand", "html": "<span class=\"brand-mark\" aria-hidden=\"true\"></span>Pawspring" },
+  { "name": "site", "text": "pawspring.example" },
+  { "name": "nutrition_image", "src": "./assets/pet-services-nutrition-unsplash.jpg", "fit": "cover", "anchor": "42% center" },
+  { "name": "nutrition_eyebrow", "text": "PANTRY PICK" },
+  { "name": "nutrition_title", "html": "A better bowl<br>starts here." },
+  { "name": "nutrition_body", "text": "Build a dependable mealtime ritual with a recurring pantry bundle." },
+  { "name": "nutrition_bundle", "text": "THE STEADY BOWL" },
+  { "name": "nutrition_detail", "text": "kibble + topper + treats" },
+  { "name": "nutrition_cta", "text": "Start a bundle" },
+  { "name": "nutrition_price", "html": "$29<span>/delivery</span>" }
+]

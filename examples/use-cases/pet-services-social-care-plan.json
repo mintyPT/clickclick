@@ -1,0 +1,12 @@
+[
+  { "name": "post", "className": "post post-care-plan" },
+  { "name": "brand", "html": "<span class=\"brand-mark\" aria-hidden=\"true\"></span>Pawspring" },
+  { "name": "site", "text": "pawspring.example" },
+  { "name": "care_image", "src": "./assets/pet-services-care-unsplash.jpg", "fit": "cover", "anchor": "56% center" },
+  { "name": "care_eyebrow", "text": "EVERYDAY WELLNESS" },
+  { "name": "care_title", "html": "Care that<br>keeps up." },
+  { "name": "care_body", "text": "Simple monthly care for the dog who keeps your days moving." },
+  { "name": "care_price", "html": "$34<span>/mo</span>" },
+  { "name": "care_detail", "html": "Check-ins, walk credits<br>and member pricing" },
+  { "name": "care_cta", "text": "Build a care plan" }
+]

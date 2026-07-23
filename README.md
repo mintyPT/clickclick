@@ -713,6 +713,100 @@ Results:
 
 ![Brand kit gradient preset result](./examples/presets/brand-kit-gradient.png)
 
+### Render Pawspring Pet Services Social Posts
+
+Use a reusable template for pet services and products social posts with a fictional care studio,
+original conversion copy, photo-led service and retail variants, and intentional CSS geometry for
+badges, pricing panels, and source-neutral brand marks. Unsplash photos are passed through JSON
+image layers instead of being hardcoded into the template.
+
+#### Monthly Care Plan Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/pet-services-social.html \
+  --css examples/use-cases/pet-services-social.css \
+  --modify-file examples/use-cases/pet-services-social-care-plan.json \
+  --out examples/use-cases/pet-services-social-care-plan.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/pet-services-social.html",
+  cssPath: "examples/use-cases/pet-services-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/pet-services-social-care-plan.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/pet-services-social-care-plan.png" },
+});
+```
+
+Result:
+
+![Pawspring monthly care plan social post result](./examples/use-cases/pet-services-social-care-plan.png)
+
+#### Grooming Appointment Promo Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/pet-services-social.html \
+  --css examples/use-cases/pet-services-social.css \
+  --modify-file examples/use-cases/pet-services-social-grooming.json \
+  --out examples/use-cases/pet-services-social-grooming.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/pet-services-social.html",
+  cssPath: "examples/use-cases/pet-services-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/pet-services-social-grooming.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/pet-services-social-grooming.png" },
+});
+```
+
+Result:
+
+![Pawspring grooming appointment promo post result](./examples/use-cases/pet-services-social-grooming.png)
+
+#### Nutrition Bundle Product Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/pet-services-social.html \
+  --css examples/use-cases/pet-services-social.css \
+  --modify-file examples/use-cases/pet-services-social-nutrition.json \
+  --out examples/use-cases/pet-services-social-nutrition.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/pet-services-social.html",
+  cssPath: "examples/use-cases/pet-services-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/pet-services-social-nutrition.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/pet-services-social-nutrition.png" },
+});
+```
+
+Result:
+
+![Pawspring nutrition bundle product post result](./examples/use-cases/pet-services-social-nutrition.png)
+
 ## Advanced Usage
 
 The README keeps quick-start material and the complete built-in preset reference. Longer examples
