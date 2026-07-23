@@ -137,6 +137,121 @@ describe("CLI", () => {
     expect(PNG.sync.read(await readFile(join(outDir, "multi-template-96x48.png")))).toMatchObject({ width: 96, height: 48 });
   });
 
+  it("generates one template output per JSON data object and named size", async () => {
+    const htmlPath = join(tempDir, "generate-json.html");
+    const dataPath = join(tempDir, "generate-json.json");
+    const outDir = join(tempDir, "generate-json-out");
+
+    await writeFile(htmlPath, '<main data-layer="title">Old</main><style>html,body,main{margin:0;width:100%;height:100%;background:#00ff00}</style>');
+    await writeFile(dataPath, JSON.stringify([
+      { slug: "launch", modifications: [{ name: "title", text: "Launch" }] },
+      { slug: "docs", modifications: [{ name: "title", text: "Docs" }] },
+    ]));
+
+    const result = await runCli([
+      "generate",
+      htmlPath,
+      "--data",
+      dataPath,
+      "--size",
+      "64x64",
+      "--size",
+      "96x48",
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{slug}}-{{size}}.png",
+    ]);
+
+    expect(result.stdout).toContain(join(outDir, "launch-64x64.png"));
+    expect(result.stdout).toContain(join(outDir, "docs-96x48.png"));
+    expect(PNG.sync.read(await readFile(join(outDir, "launch-64x64.png")))).toMatchObject({ width: 64, height: 64 });
+    expect(PNG.sync.read(await readFile(join(outDir, "docs-96x48.png")))).toMatchObject({ width: 96, height: 48 });
+  }, 60000);
+
+  it("generates template outputs from CSV and selected layer fields", async () => {
+    const htmlPath = join(tempDir, "generate-csv.html");
+    const dataPath = join(tempDir, "generate-csv.csv");
+    const outDir = join(tempDir, "generate-csv-out");
+
+    await writeFile(htmlPath, '<main data-layer="title">Old</main><style>html,body,main{margin:0;width:100%;height:100%;background:#ff0000}</style>');
+    await writeFile(dataPath, "slug,title\nfirst,First card\nsecond,Second card\n");
+
+    const result = await runCli([
+      "generate",
+      htmlPath,
+      "--data",
+      dataPath,
+      "--layer-field",
+      "title",
+      "--width",
+      "64",
+      "--height",
+      "64",
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{slug}}.png",
+    ]);
+
+    expect(result.stdout).toContain(join(outDir, "first.png"));
+    expect(result.stdout).toContain(join(outDir, "second.png"));
+    expect(PNG.sync.read(await readFile(join(outDir, "second.png")))).toMatchObject({ width: 64, height: 64 });
+  }, 60000);
+
+  it("generates template outputs from simple YAML data", async () => {
+    const htmlPath = join(tempDir, "generate-yaml.html");
+    const dataPath = join(tempDir, "generate-yaml.yaml");
+    const outDir = join(tempDir, "generate-yaml-out");
+
+    await writeFile(htmlPath, '<main data-layer="title">Old</main><style>html,body,main{margin:0;width:100%;height:100%;background:#0000ff}</style>');
+    await writeFile(dataPath, "- slug: yaml-one\n  title: YAML One\n- slug: yaml-two\n  title: YAML Two\n");
+
+    const result = await runCli([
+      "generate",
+      htmlPath,
+      "--data",
+      dataPath,
+      "--layer-field",
+      "title",
+      "--width",
+      "64",
+      "--height",
+      "64",
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{slug}}.png",
+    ]);
+
+    expect(result.stdout).toContain(join(outDir, "yaml-one.png"));
+    expect(PNG.sync.read(await readFile(join(outDir, "yaml-two.png")))).toMatchObject({ width: 64, height: 64 });
+  }, 60000);
+
+  it("reports missing output pattern fields for batch generation", async () => {
+    const htmlPath = join(tempDir, "generate-missing-field.html");
+    const dataPath = join(tempDir, "generate-missing-field.json");
+    const outDir = join(tempDir, "generate-missing-field-out");
+
+    await writeFile(htmlPath, '<main data-layer="title">Old</main>');
+    await writeFile(dataPath, JSON.stringify({ slug: "ok", title: "Title" }));
+
+    await expect(runCli([
+      "generate",
+      htmlPath,
+      "--data",
+      dataPath,
+      "--layer-field",
+      "title",
+      "--out-dir",
+      outDir,
+      "--out-pattern",
+      "{{missing}}.png",
+    ])).rejects.toMatchObject({
+      stderr: expect.stringContaining("Output pattern references missing scalar field: missing"),
+    });
+  });
+
   it("requires an output directory for multi-size renders", async () => {
     const htmlPath = join(tempDir, "multi-missing-dir.html");
     await writeFile(htmlPath, "<main>Missing dir</main>");

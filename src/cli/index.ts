@@ -3,7 +3,8 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { ClickClickError, clearCache, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, clearCache, dataRowToLayerModifications, generateTemplateBatch, listConfigTemplates, loadBrandKit, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
 import type { ParsedRenderSize } from "./options.js";
@@ -144,6 +145,66 @@ program
       return;
     }
     await runTemplate(input, Boolean(options.strict));
+  });
+
+program
+  .command("generate")
+  .argument("<html-file>", "HTML template file to render for every data row")
+  .requiredOption("--data <file>", "JSON, CSV, or YAML data file")
+  .option("--data-format <format>", "Data format: json, csv, or yaml")
+  .option("--css <file>", "Optional CSS file to inject")
+  .option("--modify-json <json>", "Base layer modifications as JSON")
+  .option("--modify-file <file>", "Base layer modifications JSON file")
+  .option("--brand <file>", "Brand kit JSON file")
+  .option("--font <spec...>", "Font registry entry: Family=path-or-url")
+  .option("--layer-field <field>", "Data field to apply as a template layer. Repeat to select multiple fields.", collectOption, [])
+  .option("--on-missing-layer <mode>", "Missing layer behavior: warn, error, or ignore")
+  .option("--on-duplicate-layer <mode>", "Duplicate layer behavior: warn, error, or ignore")
+  .requiredOption("--out-dir <dir>", "Directory for generated images")
+  .option("--out-pattern <pattern>", "Output filename pattern with {{field}} and {{size}} placeholders")
+  .option("--size <size>", "Named size or WIDTHxHEIGHT. Repeat for multiple outputs.", collectOption, [])
+  .option("--sizes <sizes>", "Comma-separated named sizes or WIDTHxHEIGHT values")
+  .option("--width <px>", "Viewport width when --size/--sizes are not used", parseInteger)
+  .option("--height <px>", "Viewport height when --size/--sizes are not used", parseInteger)
+  .option("--format <format>", "Output format: png or jpeg")
+  .option("--quality <number>", "JPEG quality from 0 to 100", parseInteger)
+  .option("--selector <selector>", "Screenshot a specific element")
+  .option("--wait-until <event>", "Playwright wait event")
+  .option("--delay <ms>", "Delay before screenshot", parseInteger)
+  .option("--strict", "Exit non-zero when renderer warnings are produced")
+  .action(async (htmlFile: string, options) => {
+    const htmlPath = resolve(htmlFile);
+    const cssPath = options.css ? resolve(options.css) : undefined;
+    const sizes = parseSizeOptions(options);
+    const outputPattern = typeof options.outPattern === "string"
+      ? options.outPattern
+      : sizes.length > 0
+        ? "{{slug}}-{{size}}.png"
+        : "{{slug}}.png";
+    const layerFields = stringArrayOption(options.layerField);
+    const results = await generateTemplateBatch({
+      template: {
+        htmlPath,
+        cssPath,
+        brand: await parseBrandKitOption(options),
+        modifications: await parseModifications(options),
+        fonts: parseFonts(options.font),
+        onMissingLayer: parseLayerBehavior(options.onMissingLayer),
+        onDuplicateLayer: parseLayerBehavior(options.onDuplicateLayer),
+        viewport: { width: options.width, height: options.height },
+        output: parseOutputOptions(options),
+        render: parseRenderOptions(options),
+      },
+      rows: await parseDataRows(resolve(options.data), options.dataFormat),
+      outputDir: resolve(options.outDir),
+      outputPattern,
+      sizes,
+      rowToModifications: layerFields.length > 0 ? (row) => dataRowToLayerModifications(row, layerFields) : undefined,
+    });
+    for (const result of results) {
+      reportResult(result, Boolean(options.strict), false);
+      if (result.path) console.log(result.path);
+    }
   });
 
 program
@@ -353,6 +414,10 @@ function basenameWithoutExtension(path: string): string {
   return basename(path).replace(/\.[^.]+$/, "");
 }
 
+function stringArrayOption(value: unknown): string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string") ? value : [];
+}
+
 function reportWarnings(result: { warnings: RenderWarning[] }, strict: boolean) {
   for (const warning of result.warnings) {
     const target = "selector" in warning ? warning.selector : "layer" in warning ? warning.layer : undefined;
@@ -411,6 +476,165 @@ function parseModificationJson(raw: string): LayerModification[] {
     }
   }
   return modifications as LayerModification[];
+}
+
+async function parseDataRows(path: string, requestedFormat: unknown): Promise<BatchDataRow[]> {
+  const raw = await readFileChecked(path, "Data");
+  const format = parseDataFormat(requestedFormat, path);
+  if (format === "json") return normalizeDataRows(parseJsonData(raw), "JSON data");
+  if (format === "csv") return parseCsvData(raw);
+  return parseYamlData(raw);
+}
+
+function parseDataFormat(value: unknown, path: string): "json" | "csv" | "yaml" {
+  if (value === "json" || value === "csv" || value === "yaml" || value === "yml") {
+    return value === "yml" ? "yaml" : value;
+  }
+  if (value !== undefined) {
+    throw new ClickClickError("INVALID_INPUT", "Data format must be json, csv, or yaml.");
+  }
+  if (/\.json$/i.test(path)) return "json";
+  if (/\.csv$/i.test(path)) return "csv";
+  if (/\.ya?ml$/i.test(path)) return "yaml";
+  throw new ClickClickError("INVALID_INPUT", "Data format could not be inferred. Use --data-format json, csv, or yaml.");
+}
+
+function parseJsonData(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    throw new ClickClickError("INVALID_INPUT", "Data file is not valid JSON.", error);
+  }
+}
+
+function normalizeDataRows(value: unknown, label: string): BatchDataRow[] {
+  const rows = Array.isArray(value)
+    ? value
+    : value && typeof value === "object" && Array.isArray((value as { rows?: unknown }).rows)
+      ? (value as { rows: unknown[] }).rows
+      : [value];
+  if (rows.length === 0) {
+    throw new ClickClickError("INVALID_INPUT", `${label} must contain at least one row.`);
+  }
+  for (const row of rows) {
+    if (!row || typeof row !== "object" || Array.isArray(row)) {
+      throw new ClickClickError("INVALID_INPUT", `${label} rows must be objects.`);
+    }
+  }
+  return rows as BatchDataRow[];
+}
+
+function parseCsvData(raw: string): BatchDataRow[] {
+  const records = parseCsvRecords(raw).filter((record) => record.some((cell) => cell.trim() !== ""));
+  if (records.length < 2) {
+    throw new ClickClickError("INVALID_INPUT", "CSV data must include a header row and at least one data row.");
+  }
+  const [headers = [], ...rows] = records;
+  if (headers.some((header) => header.trim() === "")) {
+    throw new ClickClickError("INVALID_INPUT", "CSV headers must not be empty.");
+  }
+  return rows.map((row, index) => {
+    if (row.length !== headers.length) {
+      throw new ClickClickError("INVALID_INPUT", `CSV row ${index + 2} has ${row.length} fields, expected ${headers.length}.`);
+    }
+    return Object.fromEntries(headers.map((header, column) => [header.trim(), parseScalar((row[column] ?? "").trim())]));
+  });
+}
+
+function parseCsvRecords(raw: string): string[][] {
+  const records: string[][] = [];
+  let record: string[] = [];
+  let field = "";
+  let quoted = false;
+
+  for (let index = 0; index < raw.length; index += 1) {
+    const char = raw[index];
+    const next = raw[index + 1];
+    if (quoted) {
+      if (char === '"' && next === '"') {
+        field += '"';
+        index += 1;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        field += char;
+      }
+      continue;
+    }
+    if (char === '"') {
+      quoted = true;
+    } else if (char === ",") {
+      record.push(field);
+      field = "";
+    } else if (char === "\n") {
+      record.push(field.replace(/\r$/, ""));
+      records.push(record);
+      record = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+  if (quoted) {
+    throw new ClickClickError("INVALID_INPUT", "CSV data contains an unterminated quoted field.");
+  }
+  if (field !== "" || record.length > 0) {
+    record.push(field.replace(/\r$/, ""));
+    records.push(record);
+  }
+  return records;
+}
+
+function parseYamlData(raw: string): BatchDataRow[] {
+  const lines = raw.split(/\r?\n/).map((line) => line.replace(/\s+#.*$/, "")).filter((line) => line.trim() !== "");
+  if (lines.length === 0) {
+    throw new ClickClickError("INVALID_INPUT", "YAML data must contain at least one row.");
+  }
+
+  if (lines[0]?.trimStart().startsWith("- ") === true) {
+    const rows: BatchDataRow[] = [];
+    let current: BatchDataRow | undefined;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ")) {
+        current = {};
+        rows.push(current);
+        const inline = trimmed.slice(2).trim();
+        if (inline) assignYamlPair(current, inline);
+      } else if (current) {
+        assignYamlPair(current, trimmed);
+      } else {
+        throw new ClickClickError("INVALID_INPUT", "YAML list rows must start with '- '.");
+      }
+    }
+    return rows;
+  }
+
+  const row: BatchDataRow = {};
+  for (const line of lines) assignYamlPair(row, line.trim());
+  return [row];
+}
+
+function assignYamlPair(row: BatchDataRow, line: string) {
+  const match = /^([A-Za-z0-9_-]+):(?:\s*(.*))?$/.exec(line);
+  if (!match) {
+    throw new ClickClickError("INVALID_INPUT", `YAML data supports simple key: value rows only. Could not parse: ${line}`);
+  }
+  const key = match[1];
+  if (!key) {
+    throw new ClickClickError("INVALID_INPUT", `YAML data supports simple key: value rows only. Could not parse: ${line}`);
+  }
+  row[key] = parseScalar(match[2] ?? "");
+}
+
+function parseScalar(value: string): string | number | boolean | null {
+  const unquoted = value.replace(/^(['"])(.*)\1$/, "$2");
+  if (unquoted === "") return "";
+  if (unquoted === "null") return null;
+  if (unquoted === "true") return true;
+  if (unquoted === "false") return false;
+  if (/^-?\d+(?:\.\d+)?$/.test(unquoted)) return Number(unquoted);
+  return unquoted;
 }
 
 function parseFonts(values: unknown) {

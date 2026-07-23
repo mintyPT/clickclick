@@ -912,6 +912,82 @@ Result:
 
 ![Template layer modification result](../examples/use-cases/template-modifications.png)
 
+### Generate Images from Data Rows
+
+Use `generate` when a campaign, launch, docs page, or content feed needs one image per data row.
+JSON rows may include full layer modification arrays. CSV and simple YAML rows can map scalar fields
+to template layers with `--layer-field`.
+
+CLI:
+
+```bash
+clickclick generate examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --data examples/use-cases/batch-campaign.json \
+  --size og \
+  --size square \
+  --out-dir examples/use-cases/batch-campaign \
+  --out-pattern "{{slug}}-{{size}}.png"
+```
+
+CSV:
+
+```csv
+slug,title,subtitle,cta
+launch,Launch cards from data,Render every row to every target size,Generate assets
+docs,Document pages at scale,Use output patterns for deterministic filenames,Publish the set
+```
+
+```bash
+clickclick generate examples/use-cases/product-card.html \
+  --css examples/use-cases/product-card.css \
+  --data campaign.csv \
+  --layer-field title \
+  --layer-field subtitle \
+  --layer-field cta \
+  --size og \
+  --out-dir dist/campaign \
+  --out-pattern "{{slug}}-{{size}}.png"
+```
+
+YAML:
+
+```yaml
+- slug: launch
+  title: Launch cards from data
+  subtitle: Render every row to every target size
+- slug: docs
+  title: Document pages at scale
+  subtitle: Use output patterns for deterministic filenames
+```
+
+Library:
+
+```ts
+import { generateTemplateBatch } from "@maurogoncalo/clickclick";
+import rows from "../examples/use-cases/batch-campaign.json" with { type: "json" };
+
+await generateTemplateBatch({
+  template: {
+    htmlPath: "examples/use-cases/product-card.html",
+    cssPath: "examples/use-cases/product-card.css",
+  },
+  rows,
+  sizes: [
+    { label: "og", width: 1200, height: 630 },
+    { label: "square", width: 1080, height: 1080 },
+  ],
+  outputDir: "examples/use-cases/batch-campaign",
+  outputPattern: "{{slug}}-{{size}}.png",
+});
+```
+
+Result:
+
+![Batch launch OG result](../examples/use-cases/batch-campaign/batch-launch-og.png)
+
+![Batch docs square result](../examples/use-cases/batch-campaign/batch-docs-square.png)
+
 ### Render a Config Recipe
 
 Use recipes when the template, output size, and standard modifications should live in a project
