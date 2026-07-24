@@ -36,6 +36,7 @@ program
   .option("--cache", "Reuse cached output for identical deterministic input")
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
+  .option("--json", "Print a JSON summary")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (htmlFile: string, options) => {
     const htmlPath = resolve(htmlFile);
@@ -57,10 +58,10 @@ program
     };
     const sizes = parseSizeOptions(options);
     if (sizes.length > 0) {
-      await runMultiSizeRender(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), Boolean(options.strict), parseCacheOptions(options));
+      await runMultiSizeRender(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), renderReportOptions(options), parseCacheOptions(options));
       return;
     }
-    await runRender(input, Boolean(options.strict), parseCacheOptions(options));
+    await runRender(input, renderReportOptions(options), parseCacheOptions(options));
   });
 
 program
@@ -118,6 +119,7 @@ program
   .option("--cache", "Reuse cached output for identical deterministic input")
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
+  .option("--json", "Print a JSON summary")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (htmlFile: string, options) => {
     const htmlPath = resolve(htmlFile);
@@ -141,10 +143,10 @@ program
     };
     const sizes = parseSizeOptions(options);
     if (sizes.length > 0) {
-      await runMultiSizeTemplate(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), Boolean(options.strict));
+      await runMultiSizeTemplate(input, sizes, multiSizeOutputOptions(options, basenameWithoutExtension(htmlPath)), renderReportOptions(options));
       return;
     }
-    await runTemplate(input, Boolean(options.strict));
+    await runTemplate(input, renderReportOptions(options));
   });
 
 program
@@ -399,6 +401,7 @@ composition
   .option("--cache", "Reuse cached output for identical deterministic input")
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
+  .option("--json", "Print a JSON summary")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (options) => {
     await runRender({
@@ -586,11 +589,12 @@ config
     };
     const sizes = parseSizeOptions(options);
     if (sizes.length > 0) {
-      await runMultiSizeRecipe(resolve(configFile), name, input, sizes, multiSizeOutputOptions(options, name), Boolean(options.strict));
+      await runMultiSizeRecipe(resolve(configFile), name, input, sizes, multiSizeOutputOptions(options, name), renderReportOptions(options));
       return;
     }
+    const startedAt = performance.now();
     const result = await renderRecipe(resolve(configFile), name, input);
-    reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
+    reportRenderResult(result, renderReportOptions(options), startedAt);
   });
 
 config
@@ -602,17 +606,31 @@ config
   .option("--cache", "Reuse cached output for identical deterministic input")
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
+  .option("--json", "Print a JSON summary")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
   .action(async (configFile: string, name: string, options) => {
+    const startedAt = performance.now();
     const outDir = typeof options.outDir === "string" ? resolve(options.outDir) : undefined;
     if (outDir) await mkdir(outDir, { recursive: true });
     const results = await renderTemplateSet(resolve(configFile), name, outDir, {
       cache: parseCacheOptions(options),
       brand: await parseBrandKitOption(options),
     });
-    for (const result of results) {
-      reportResult(result, Boolean(options.strict), Boolean(options.cacheInfo));
-      if (result.path) console.log(result.path);
+    const reportOptions = renderReportOptions(options);
+    if (reportOptions.json) {
+      writeJson({
+        ok: results.every((result) => result.warnings.length === 0),
+        outputs: results.map((result) => renderJsonSummary(result, startedAt)),
+        durationMs: durationMs(startedAt),
+      });
+    } else {
+      for (const result of results) {
+        reportResult(result, reportOptions.strict, reportOptions.cacheInfo);
+        if (result.path) console.log(result.path);
+      }
+    }
+    if (reportOptions.strict && results.some((result) => result.warnings.length > 0)) {
+      process.exitCode = 1;
     }
   });
 
@@ -658,18 +676,28 @@ program.parseAsync().catch((error: unknown) => {
   process.exitCode = 1;
 });
 
-async function runRender(input: RenderImageInput, strict: boolean, cache?: RenderCacheOptions) {
+interface RenderReportOptions {
+  strict: boolean;
+  cacheInfo: boolean;
+  json: boolean;
+}
+
+async function runRender(input: RenderImageInput, options: RenderReportOptions | boolean, cache?: RenderCacheOptions) {
+  const startedAt = performance.now();
   const result = await renderImage(input, { cache });
-  reportResult(result, strict, isCacheInfoEnabled(cache));
+  reportRenderResult(result, normalizeReportOptions(options, cache), startedAt);
 }
 
-async function runTemplate(input: TemplateInput, strict: boolean) {
+async function runTemplate(input: TemplateInput, options: RenderReportOptions | boolean) {
+  const startedAt = performance.now();
   const result = await renderTemplate(input);
-  reportResult(result, strict, isCacheInfoEnabled(input.cache));
+  reportRenderResult(result, normalizeReportOptions(options, input.cache), startedAt);
 }
 
-async function runMultiSizeRender(input: RenderImageInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean, cache?: RenderCacheOptions) {
+async function runMultiSizeRender(input: RenderImageInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, options: RenderReportOptions, cache?: RenderCacheOptions) {
+  const startedAt = performance.now();
   await mkdir(output.dir, { recursive: true });
+  const results: RenderImageResult[] = [];
   for (const size of sizes) {
     const path = multiSizePath(output, size);
     const result = await renderImage({
@@ -677,13 +705,21 @@ async function runMultiSizeRender(input: RenderImageInput, sizes: ParsedRenderSi
       viewport: { width: size.width, height: size.height },
       output: { ...input.output, path },
     }, { cache });
-    reportResult(result, strict, isCacheInfoEnabled(cache));
-    console.log(path);
+    results.push(result);
+    if (!options.json) {
+      reportResult(result, options.strict, isCacheInfoEnabled(cache));
+      console.log(path);
+    }
+  }
+  if (options.json) {
+    reportRenderResults(results, options, startedAt);
   }
 }
 
-async function runMultiSizeTemplate(input: TemplateInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean) {
+async function runMultiSizeTemplate(input: TemplateInput, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, options: RenderReportOptions) {
+  const startedAt = performance.now();
   await mkdir(output.dir, { recursive: true });
+  const results: RenderImageResult[] = [];
   for (const size of sizes) {
     const path = multiSizePath(output, size);
     const result = await renderTemplate({
@@ -691,13 +727,21 @@ async function runMultiSizeTemplate(input: TemplateInput, sizes: ParsedRenderSiz
       viewport: { width: size.width, height: size.height },
       output: { ...input.output, path },
     });
-    reportResult(result, strict, isCacheInfoEnabled(input.cache));
-    console.log(path);
+    results.push(result);
+    if (!options.json) {
+      reportResult(result, options.strict, isCacheInfoEnabled(input.cache));
+      console.log(path);
+    }
+  }
+  if (options.json) {
+    reportRenderResults(results, options, startedAt);
   }
 }
 
-async function runMultiSizeRecipe(configPath: string, name: string, input: Partial<TemplateInput>, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, strict: boolean) {
+async function runMultiSizeRecipe(configPath: string, name: string, input: Partial<TemplateInput>, sizes: ParsedRenderSize[], output: MultiSizeOutputOptions, options: RenderReportOptions) {
+  const startedAt = performance.now();
   await mkdir(output.dir, { recursive: true });
+  const results: RenderImageResult[] = [];
   for (const size of sizes) {
     const path = multiSizePath(output, size);
     const result = await renderRecipe(configPath, name, {
@@ -705,8 +749,14 @@ async function runMultiSizeRecipe(configPath: string, name: string, input: Parti
       viewport: { width: size.width, height: size.height },
       output: { ...input.output, path },
     });
-    reportResult(result, strict, isCacheInfoEnabled(input.cache));
-    console.log(path);
+    results.push(result);
+    if (!options.json) {
+      reportResult(result, options.strict, isCacheInfoEnabled(input.cache));
+      console.log(path);
+    }
+  }
+  if (options.json) {
+    reportRenderResults(results, options, startedAt);
   }
 }
 
@@ -934,6 +984,70 @@ function reportResult(result: RenderImageResult, strict: boolean, cacheInfo: boo
     console.error(`cache ${result.cache.hit ? "hit" : "miss"}${result.cache.skippedReason ? ` (${result.cache.skippedReason})` : ""}: ${result.cache.key ?? result.cache.dir ?? ""}`.trim());
   }
   reportWarnings(result, strict);
+}
+
+function reportRenderResult(result: RenderImageResult, options: RenderReportOptions, startedAt: number) {
+  if (options.json) {
+    writeJson(renderJsonSummary(result, startedAt));
+  } else {
+    reportResult(result, options.strict, options.cacheInfo);
+  }
+  if (options.strict && result.warnings.length > 0) {
+    process.exitCode = 1;
+  }
+}
+
+function reportRenderResults(results: RenderImageResult[], options: RenderReportOptions, startedAt: number) {
+  writeJson({
+    ok: results.every((result) => result.warnings.length === 0),
+    outputs: results.map((result) => renderJsonSummary(result, startedAt)),
+    durationMs: durationMs(startedAt),
+  });
+  if (options.strict && results.some((result) => result.warnings.length > 0)) {
+    process.exitCode = 1;
+  }
+}
+
+function renderJsonSummary(result: RenderImageResult, startedAt: number) {
+  return {
+    path: result.path,
+    format: result.format,
+    width: result.width,
+    height: result.height,
+    warnings: result.warnings,
+    cache: result.cache
+      ? {
+        hit: result.cache.hit,
+        status: result.cache.hit ? "hit" : "miss",
+        key: result.cache.key,
+        dir: result.cache.dir,
+        skippedReason: result.cache.skippedReason,
+      }
+      : undefined,
+    durationMs: durationMs(startedAt),
+  };
+}
+
+function renderReportOptions(options: Record<string, unknown>): RenderReportOptions {
+  return {
+    strict: Boolean(options.strict),
+    cacheInfo: Boolean(options.cacheInfo),
+    json: Boolean(options.json),
+  };
+}
+
+function normalizeReportOptions(options: RenderReportOptions | boolean, cache: RenderCacheOptions | undefined): RenderReportOptions {
+  return typeof options === "boolean"
+    ? { strict: options, cacheInfo: isCacheInfoEnabled(cache), json: false }
+    : { ...options, cacheInfo: options.cacheInfo || isCacheInfoEnabled(cache) };
+}
+
+function durationMs(startedAt: number): number {
+  return Math.round((performance.now() - startedAt) * 100) / 100;
+}
+
+function writeJson(value: unknown) {
+  console.log(JSON.stringify(value, null, 2));
 }
 
 function isCacheInfoEnabled(cache: RenderCacheOptions | undefined): boolean {
@@ -1184,6 +1298,17 @@ function parseSafeArea(value: unknown): QualitySafeArea | undefined {
 }
 
 function reportError(error: unknown) {
+  if (process.argv.includes("--json")) {
+    const code = error instanceof ClickClickError ? error.code : "ERROR";
+    writeJson({
+      ok: false,
+      error: {
+        code,
+        message: error instanceof Error ? error.message : String(error),
+      },
+    });
+    return;
+  }
   if (error instanceof ClickClickError) {
     console.error(`${error.code}: ${error.message}`);
     return;
