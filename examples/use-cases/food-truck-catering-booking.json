@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-booking" },
+  { "name": "brand", "text": "Copper Cart" },
+  { "name": "tagline", "text": "Private events and festivals" },
+  { "name": "eyebrow", "text": "Bookings open" },
+  { "name": "title", "html": "Bring the<br>truck in" },
+  { "name": "subtitle", "text": "A photo-led booking card for venues turning weekend foot traffic into paid event deposits." },
+  { "name": "hero_image", "src": "./assets/food-truck-catering-event-unsplash.jpg", "fit": "cover", "anchor": "50% 52%" },
+  { "name": "route_label", "text": "Best for" },
+  { "name": "route_one", "text": "Courtyard parties" },
+  { "name": "route_two", "text": "Brewery nights" },
+  { "name": "route_three", "text": "Local festivals" },
+  { "name": "offer_label", "text": "Hold" },
+  { "name": "offer_value", "text": "$250 deposit" },
+  { "name": "cta", "text": "Book a service window at coppercart.example/events" }
+]

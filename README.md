@@ -723,6 +723,100 @@ live in [docs/examples.md](./docs/examples.md):
 - local templates, image layers, custom fonts, debug bundles, config recipes, and multi-size sets;
 - extra preset variations that demonstrate alternate option combinations.
 
+### Render Food Truck Catering Social Posts
+
+Use a reusable mixed photo-and-graphic template for a fictional food truck monetization campaign:
+route preorders, office catering inquiries, and private event deposits. Source-neutral Unsplash
+photos are passed through JSON image layers, while the route cards, offer badges, borders, and
+pattern work are intentional CSS geometry.
+
+#### Route Preorder Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-schedule.json \
+  --out examples/use-cases/food-truck-catering-schedule.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-schedule.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-schedule.png" },
+});
+```
+
+Result:
+
+![Food truck route preorder social post result](./examples/use-cases/food-truck-catering-schedule.png)
+
+#### Office Catering Inquiry Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-catering.json \
+  --out examples/use-cases/food-truck-catering-catering.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-catering.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-catering.png" },
+});
+```
+
+Result:
+
+![Food truck office catering inquiry social post result](./examples/use-cases/food-truck-catering-catering.png)
+
+#### Private Event Booking Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-booking.json \
+  --out examples/use-cases/food-truck-catering-booking.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-booking.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-booking.png" },
+});
+```
+
+Result:
+
+![Food truck private event booking social post result](./examples/use-cases/food-truck-catering-booking.png)
+
 ## Package Release
 
 The npm package is prepared as `@maurogoncalo/clickclick` with MIT licensing, public npm access,

@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-catering" },
+  { "name": "brand", "text": "Copper Cart" },
+  { "name": "tagline", "text": "Office lunches, packed hot" },
+  { "name": "eyebrow", "text": "Catering" },
+  { "name": "title", "html": "Feed the<br>whole team" },
+  { "name": "subtitle", "text": "Boxed lunches and pop-up bars built for weekday office events." },
+  { "name": "hero_image", "src": "./assets/food-truck-catering-street-unsplash.jpg", "fit": "cover", "anchor": "47% 45%" },
+  { "name": "route_label", "text": "Packages" },
+  { "name": "route_one", "text": "25 person lunch drop" },
+  { "name": "route_two", "text": "Market table buffet" },
+  { "name": "route_three", "text": "Late-night snack bar" },
+  { "name": "offer_label", "text": "Starts" },
+  { "name": "offer_value", "text": "$18 per guest" },
+  { "name": "cta", "text": "Request dates at coppercart.example/catering" }
+]
