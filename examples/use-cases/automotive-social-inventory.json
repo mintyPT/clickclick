@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-inventory" },
+  { "name": "brand", "text": "Apex Auto Co." },
+  { "name": "tagline", "text": "Sales + detailing studio" },
+  { "name": "hero_image", "src": "./assets/automotive-showroom-unsplash.jpg", "fit": "cover", "anchor": "52% 58%" },
+  { "name": "inset_image", "src": "./assets/automotive-trade-in-unsplash.jpg", "fit": "cover", "anchor": "50% 45%" },
+  { "name": "kicker", "text": "Weekend inventory drop" },
+  { "name": "title", "text": "Certified sedans detailed before delivery" },
+  { "name": "subtitle", "text": "Book a walkaround, reserve online, and leave with a ceramic-safe maintenance plan." },
+  { "name": "stat_one_label", "text": "Starting at" },
+  { "name": "stat_one_value", "text": "$289/mo" },
+  { "name": "stat_two_label", "text": "Detail credit" },
+  { "name": "stat_two_value", "text": "$350" },
+  { "name": "cta", "text": "Schedule a test drive" },
+  { "name": "url", "text": "apexauto.example" }
+]

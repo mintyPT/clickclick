@@ -807,6 +807,100 @@ Result:
 
 ![Pawspring nutrition bundle product post result](./examples/use-cases/pet-services-social-nutrition.png)
 
+### Render Apex Auto Social Posts
+
+Use a reusable template for automotive sales and detailing social posts with a fictional
+dealership/detailing studio, original conversion copy, photo-led service and inventory variants, and
+intentional CSS geometry for badges, panels, and trade-in graphics. Source-neutral Unsplash photos
+are passed through JSON image layers instead of being hardcoded into the template.
+
+#### Certified Inventory Sales Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-inventory.json \
+  --out examples/use-cases/automotive-social-inventory.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-inventory.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-inventory.png" },
+});
+```
+
+Result:
+
+![Apex Auto certified inventory sales post result](./examples/use-cases/automotive-social-inventory.png)
+
+#### Detailing Appointment Promo Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-detailing.json \
+  --out examples/use-cases/automotive-social-detailing.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-detailing.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-detailing.png" },
+});
+```
+
+Result:
+
+![Apex Auto detailing appointment promo post result](./examples/use-cases/automotive-social-detailing.png)
+
+#### Trade-In Event Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-trade-in.json \
+  --out examples/use-cases/automotive-social-trade-in.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-trade-in.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-trade-in.png" },
+});
+```
+
+Result:
+
+![Apex Auto trade-in event post result](./examples/use-cases/automotive-social-trade-in.png)
+
 ## Advanced Usage
 
 The README keeps quick-start material and the complete built-in preset reference. Longer examples
@@ -816,6 +910,100 @@ live in [docs/examples.md](./docs/examples.md):
 - use-case galleries for template-driven social image sets;
 - local templates, image layers, custom fonts, debug bundles, config recipes, and multi-size sets;
 - extra preset variations that demonstrate alternate option combinations.
+
+### Render Food Truck Catering Social Posts
+
+Use a reusable mixed photo-and-graphic template for a fictional food truck monetization campaign:
+route preorders, office catering inquiries, and private event deposits. Source-neutral Unsplash
+photos are passed through JSON image layers, while the route cards, offer badges, borders, and
+pattern work are intentional CSS geometry.
+
+#### Route Preorder Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-schedule.json \
+  --out examples/use-cases/food-truck-catering-schedule.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-schedule.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-schedule.png" },
+});
+```
+
+Result:
+
+![Food truck route preorder social post result](./examples/use-cases/food-truck-catering-schedule.png)
+
+#### Office Catering Inquiry Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-catering.json \
+  --out examples/use-cases/food-truck-catering-catering.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-catering.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-catering.png" },
+});
+```
+
+Result:
+
+![Food truck office catering inquiry social post result](./examples/use-cases/food-truck-catering-catering.png)
+
+#### Private Event Booking Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/food-truck-catering.html \
+  --css examples/use-cases/food-truck-catering.css \
+  --modify-file examples/use-cases/food-truck-catering-booking.json \
+  --out examples/use-cases/food-truck-catering-booking.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/food-truck-catering.html",
+  cssPath: "examples/use-cases/food-truck-catering.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/food-truck-catering-booking.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/food-truck-catering-booking.png" },
+});
+```
+
+Result:
+
+![Food truck private event booking social post result](./examples/use-cases/food-truck-catering-booking.png)
 
 ## Package Release
 

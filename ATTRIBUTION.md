@@ -10,6 +10,26 @@ The Pawspring example set uses source-neutral Unsplash photos passed through tem
 
 Unsplash License: https://unsplash.com/license
 
+## Apex Auto Social Posts
+
+The Apex Auto example set uses source-neutral Unsplash photos passed through template modification JSON files:
+
+- `examples/use-cases/assets/automotive-showroom-unsplash.jpg` - Photo by Chelaxy Designs on Unsplash: https://unsplash.com/photos/9rdfLAZXW2E
+- `examples/use-cases/assets/automotive-detailing-unsplash.jpg` - Photo by Matt Reiter on Unsplash: https://unsplash.com/photos/f0UG8TQS2SM
+- `examples/use-cases/assets/automotive-trade-in-unsplash.jpg` - Photo by Rana Singh on Unsplash: https://unsplash.com/photos/InZmV1fb72k
+
+Unsplash License: https://unsplash.com/license
+
+## Food Truck Catering Social Posts
+
+The Food Truck Catering example set uses source-neutral Unsplash photos passed through template modification JSON files:
+
+- `examples/use-cases/assets/food-truck-catering-truck-unsplash.jpg` - Photo by Zhivko Dimitrov on Unsplash: https://unsplash.com/photos/oI9pFRh5mXM
+- `examples/use-cases/assets/food-truck-catering-street-unsplash.jpg` - Photo by Jon Tyson on Unsplash: https://unsplash.com/photos/EhxhCueTZAk
+- `examples/use-cases/assets/food-truck-catering-event-unsplash.jpg` - Photo by Sebastian Schuster on Unsplash: https://unsplash.com/photos/HUyOmTCIQTc
+
+Unsplash License: https://unsplash.com/license
+
 ## Weave Home Retail Social Posts
 
 The Weave Home example set uses source-neutral Unsplash photos passed through template modification JSON files:

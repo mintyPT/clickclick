@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-detailing" },
+  { "name": "brand", "text": "Apex Auto Co." },
+  { "name": "tagline", "text": "Paint-safe care plans" },
+  { "name": "hero_image", "src": "./assets/automotive-detailing-unsplash.jpg", "fit": "cover", "anchor": "57% 50%" },
+  { "name": "inset_image", "src": "./assets/automotive-showroom-unsplash.jpg", "fit": "cover", "anchor": "50% 62%" },
+  { "name": "kicker", "text": "Detail bay openings" },
+  { "name": "title", "text": "Gloss reset appointments all week" },
+  { "name": "subtitle", "text": "Foam wash, iron removal, paint sealant, and interior refresh bundled for daily drivers." },
+  { "name": "stat_one_label", "text": "Express slots" },
+  { "name": "stat_one_value", "text": "6 left" },
+  { "name": "stat_two_label", "text": "From" },
+  { "name": "stat_two_value", "text": "$149" },
+  { "name": "cta", "text": "Book the bay" },
+  { "name": "url", "text": "apexauto.example/detail" }
+]
