@@ -5,7 +5,7 @@ import type { Page } from "playwright";
 import { resolveRenderCacheOptions, writeCachedResult } from "../cache/index.js";
 import { brandFonts, brandTemplateCss, brandTemplateModifications, resolveBrandKitSources, validateBrandKit } from "../brand-kit/index.js";
 import { ClickClickError } from "../errors.js";
-import { serializeMediaSource } from "../media/index.js";
+import { resolveAssetSource } from "../media/index.js";
 import { renderImage } from "../renderer/index.js";
 import type {
   ClickClickConfig,
@@ -33,7 +33,7 @@ export async function renderTemplate(input: TemplateInput, options: RenderTempla
   const template = await prepareTemplate(input);
   const warnings: TemplateWarning[] = [];
   const css = [fontFaceCss([...(brandFonts(input.brand)), ...(input.fonts ?? [])]), brandTemplateCss(input.brand), template.css].filter(Boolean).join("\n");
-  const modifications = serializeLayerModificationSources([...brandTemplateModifications(input.brand), ...(input.modifications ?? [])], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
+  const { modifications, warnings: assetWarnings } = await serializeLayerModificationSources([...brandTemplateModifications(input.brand), ...(input.modifications ?? [])], input.htmlPath ? dirname(resolve(input.htmlPath)) : undefined);
   const cache = options.renderer || input.render?.beforeScreenshot ? undefined : templateCacheOptions(input.cache, {
     kind: "template",
     modifications,
@@ -64,7 +64,7 @@ export async function renderTemplate(input: TemplateInput, options: RenderTempla
   };
   const result = options.renderer ? await options.renderer.render(renderInput) : await renderImage(renderInput, { cache });
 
-  const combined = { ...result, warnings: [...warnings, ...result.warnings] };
+  const combined = { ...result, warnings: [...assetWarnings, ...warnings, ...result.warnings] };
   const resolvedCache = resolveRenderCacheOptions(cache);
   if (resolvedCache && combined.cache?.key && !combined.cache.hit) {
     await writeCachedResult(resolvedCache, combined.cache.key, combined);
@@ -262,15 +262,22 @@ const APPLY_LAYER_MODIFICATIONS_SCRIPT = `({ modifications, behavior }) => {
   return warnings;
 }`;
 
-function serializeLayerModificationSources(modifications: LayerModification[], baseDir: string | undefined): LayerModification[] {
-  return modifications.map((modification) => {
+async function serializeLayerModificationSources(modifications: LayerModification[], baseDir: string | undefined): Promise<{ modifications: LayerModification[]; warnings: TemplateWarning[] }> {
+  const warnings: TemplateWarning[] = [];
+  const resolved = await Promise.all(modifications.map(async (modification) => {
     const src = modification.src ?? modification.image_url;
     if (!src) return modification;
-    const serialized = serializeMediaSource(src, baseDir);
+    const asset = await resolveAssetSource(src, { baseDir });
+    warnings.push(...asset.diagnostics.map((diagnostic) => ({
+      code: "ASSET_DIAGNOSTIC" as const,
+      layer: modification.name,
+      message: `${diagnostic.code}: ${diagnostic.message}`,
+    })));
     return modification.src !== undefined
-      ? { ...modification, src: serialized }
-      : { ...modification, image_url: serialized };
-  });
+      ? { ...modification, src: asset.url }
+      : { ...modification, image_url: asset.url };
+  }));
+  return { modifications: resolved, warnings };
 }
 
 function fontFaceCss(fonts: TemplateInput["fonts"] = []): string {

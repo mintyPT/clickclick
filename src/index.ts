@@ -3,7 +3,7 @@ export { applyBrandToPresetOptions, brandFonts, brandKitJsonSchema, brandTemplat
 export { createContactSheet } from "./composition/contact-sheet.js";
 export { ClickClickError } from "./errors.js";
 export { barChart, collage, contactSheet, imageGrid, qrCode } from "./composition/index.js";
-export { serializeMediaSource } from "./media/index.js";
+export { resolveAssetSource, serializeMediaSource } from "./media/index.js";
 export { dataRowToLayerModifications, generateTemplateBatch, interpolateOutputPattern } from "./generate/index.js";
 export { createRenderer, renderImage, screenshotUrl } from "./renderer/index.js";
 export { listConfigTemplates, loadConfig, renderRecipe, renderTemplate, renderTemplateSet } from "./template/index.js";
@@ -79,6 +79,11 @@ export type {
   RenderOutputOptions,
   RenderQualityInput,
   RenderWarning,
+  AssetDiagnostic,
+  AssetDiagnosticCode,
+  AssetPipelineOptions,
+  AssetTransformOptions,
+  ResolvedAsset,
   ScreenshotUrlInput,
   ScreenshotUrlLifecycleOptions,
   ScreenshotUrlOptions,
