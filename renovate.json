@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "timezone": "Europe/Zurich",
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Group runtime npm dependency updates.",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"],
+      "groupName": "runtime dependencies",
+      "commitMessageTopic": "runtime dependencies"
+    },
+    {
+      "description": "Group development npm dependency updates.",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "development dependencies",
+      "commitMessageTopic": "development dependencies"
+    },
+    {
+      "description": "Keep TypeScript, build, and test tooling updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@types/node",
+        "@types/pngjs",
+        "tsup",
+        "tsx",
+        "typescript",
+        "vite",
+        "vite-node",
+        "vitest"
+      ],
+      "groupName": "TypeScript test/build tooling",
+      "commitMessageTopic": "TypeScript test/build tooling"
+    },
+    {
+      "description": "Keep Playwright packages together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["playwright", "playwright-core"],
+      "groupName": "Playwright",
+      "commitMessageTopic": "Playwright"
+    },
+    {
+      "description": "Group GitHub Actions updates.",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "commitMessageTopic": "GitHub Actions"
+    }
+  ]
+}
