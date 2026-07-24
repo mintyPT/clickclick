@@ -56,6 +56,46 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("initializes a starter project without overwriting existing files", async () => {
+    const projectDir = join(tempDir, "starter-project");
+    const configPath = join(projectDir, "clickclick.config.json");
+
+    await runCli(["init", "--dir", projectDir]);
+
+    const config = JSON.parse(await readFile(configPath, "utf8"));
+    expect(config).toMatchObject({
+      templates: {
+        social: {
+          htmlPath: "templates/social-card.html",
+          cssPath: "templates/social-card.css",
+        },
+      },
+      recipes: {
+        launch: {
+          template: "social",
+          modifications: expect.arrayContaining([
+            expect.objectContaining({ name: "logo", src: "../assets/logo.svg" }),
+          ]),
+        },
+      },
+      templateSets: {
+        social: expect.arrayContaining([
+          expect.objectContaining({ name: "og", template: "social" }),
+        ]),
+      },
+    });
+    await expect(readFile(join(projectDir, "templates", "social-card.html"), "utf8")).resolves.toContain('data-layer="title"');
+    await expect(readFile(join(projectDir, "templates", "social-card.css"), "utf8")).resolves.toContain(".card");
+    await expect(readFile(join(projectDir, "assets", "logo.svg"), "utf8")).resolves.toContain("<svg");
+
+    const templates = await runCli(["config", "templates", configPath]);
+    expect(templates.stdout).toContain("social");
+    await expect(runCli(["init", "--dir", projectDir])).rejects.toMatchObject({
+      stderr: expect.stringContaining("Refusing to overwrite existing files"),
+    });
+    await runCli(["init", "--dir", projectDir, "--force"]);
+  });
+
   it("generates a contact sheet from local image paths", async () => {
     const pngPath = join(tempDir, "contact-source.png");
     const jpegPath = join(tempDir, "contact-source.jpg");
