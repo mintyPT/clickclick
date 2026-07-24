@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-hotels-resorts-unsplash.jpg", "fit": "cover", "anchor": "50% 50%" },
+  { "name": "brand", "text": "Tidepool House" },
+  { "name": "eyebrow", "text": "Weekend rate" },
+  { "name": "title", "text": "Sell the slow season." },
+  { "name": "body", "text": "A resort-ready post for packages, spa add-ons, and direct booking perks." },
+  { "name": "offer", "text": "Two nights, breakfast credit, and late checkout" },
+  { "name": "price", "text": "$289" },
+  { "name": "cta", "text": "Book direct" }
+]

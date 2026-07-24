@@ -1,0 +1,11 @@
+{
+  "name": "Northgate Real Estate Social Post",
+  "description": "Use a listing-card template for a fictional real estate agency. The house photo is passed through JSON; the appointment card and status pill are CSS geometry.",
+  "template": "./real-estate-social.html",
+  "css": "./real-estate-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "listing-appointment", "title": "Real Estate Listing Appointment Post", "modifyFile": "./real-estate-social.json", "output": "./real-estate-social.png", "alt": "Real estate listing appointment social post result" }
+  ]
+}

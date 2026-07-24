@@ -1,0 +1,11 @@
+{
+  "name": "Pulsehall Music and Entertainment Social Post",
+  "description": "Use a dark event-ticket template for a fictional live venue. The concert photo is passed through JSON; the ticket panel and stub are intentional CSS geometry.",
+  "template": "./music-entertainment-social.html",
+  "css": "./music-entertainment-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "ticket-drop", "title": "Music and Entertainment Ticket Post", "modifyFile": "./music-entertainment-social.json", "output": "./music-entertainment-social.png", "alt": "Music and entertainment ticket social post result" }
+  ]
+}

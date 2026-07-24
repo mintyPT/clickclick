@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-event-planning-unsplash.jpg", "fit": "cover", "anchor": "50% 48%" },
+  { "name": "brand", "text": "Gathercraft" },
+  { "name": "eyebrow", "text": "Q4 events" },
+  { "name": "title", "text": "Fill the inquiry form." },
+  { "name": "body", "text": "Show planners how to promote corporate mixers, launches, and private events." },
+  { "name": "offer", "text": "Venue shortlist, run-of-show, and catering estimate" },
+  { "name": "price", "text": "$250" },
+  { "name": "cta", "text": "Plan an event" }
+]

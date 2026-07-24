@@ -49,3 +49,18 @@ The Velora example set uses source-neutral Unsplash photos passed through templa
 - `examples/use-cases/assets/velora-textile-unsplash.jpg` - Photo by Oscar Salgado on Unsplash: https://unsplash.com/photos/NA_lOSxbQHY
 
 Unsplash License: https://unsplash.com/license
+
+## Service Industry Social Posts
+
+The Service Industry example set uses source-neutral Unsplash photos passed through template modification JSON files:
+
+- `examples/use-cases/assets/service-health-wellness-unsplash.jpg` - Photo by Margaret Young on Unsplash: https://unsplash.com/photos/TKyBEqQGfCM
+- `examples/use-cases/assets/service-interior-design-unsplash.jpg` - Photo by Kam Idris on Unsplash: https://unsplash.com/photos/L9-sfN04jdk
+- `examples/use-cases/assets/service-real-estate-unsplash.jpg` - Photo by Point3D Commercial Imaging Ltd. on Unsplash: https://unsplash.com/photos/hfXcKWPGxQs
+- `examples/use-cases/assets/service-music-entertainment-unsplash.jpg` - Photo by Marcel Strauß on Unsplash: https://unsplash.com/photos/qyFI3y3mNK0
+- `examples/use-cases/assets/service-photography-video-unsplash.jpg` - Photo by engin akyurt on Unsplash: https://unsplash.com/photos/8MqEezeOb9w
+- `examples/use-cases/assets/service-wedding-services-unsplash.jpg` - Photo by Ben Atkins on Unsplash: https://unsplash.com/photos/zjJiX9txwRU
+- `examples/use-cases/assets/service-event-planning-unsplash.jpg` - Photo by Fotógrafo Samuel Cruz on Unsplash: https://unsplash.com/photos/0q6S9kDKqCc
+- `examples/use-cases/assets/service-hotels-resorts-unsplash.jpg` - Photo by Eric Soubeyrand de Saint Prix on Unsplash: https://unsplash.com/photos/4mBlowNrbxI
+
+Unsplash License: https://unsplash.com/license

@@ -1,0 +1,14 @@
+body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.post { box-sizing: border-box; width: 1080px; height: 1080px; padding: 58px; background: #f5efe6; color: #251d18; display: flex; flex-direction: column; overflow: hidden; }
+header { display: flex; justify-content: space-between; align-items: center; font-size: 28px; font-weight: 900; }
+header p { margin: 0; }
+header p:last-child { padding: 14px 20px; border: 2px solid #251d18; border-radius: 999px; text-transform: uppercase; font-size: 22px; }
+.grid { margin-top: 42px; flex: 1; display: grid; grid-template-columns: 410px 1fr; grid-template-rows: 1fr 220px; gap: 22px; }
+.copy { padding: 38px; background: #fffaf2; border-radius: 12px; }
+h1 { margin: 0; font-size: 78px; line-height: .92; letter-spacing: 0; }
+.copy p { margin: 28px 0 0; color: #76685f; font-size: 30px; line-height: 1.1; font-weight: 700; }
+img { grid-row: span 2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; border-radius: 160px 12px 12px 12px; }
+aside { display: grid; grid-template-columns: 1fr 130px; gap: 18px; align-items: stretch; }
+aside p { margin: 0; padding: 24px; background: #fffaf2; border: 2px solid #d8c8bc; font-size: 25px; line-height: 1.03; font-weight: 850; }
+aside strong { display: grid; place-items: center; background: #b76e4d; color: #fff; border-radius: 12px; font-size: 32px; }
+.cta { align-self: end; margin: 24px 0 0; padding: 17px 28px; background: #251d18; color: #fff; font-size: 24px; font-weight: 900; }

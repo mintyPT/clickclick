@@ -1,0 +1,11 @@
+{
+  "name": "Gathercraft Event Planning Social Post",
+  "description": "Use an agenda-card template for a fictional event planning studio. The venue photo is passed through JSON; the agenda and inquiry blocks are CSS geometry.",
+  "template": "./event-planning-social.html",
+  "css": "./event-planning-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "inquiry", "title": "Event Planning Inquiry Post", "modifyFile": "./event-planning-social.json", "output": "./event-planning-social.png", "alt": "Event planning inquiry social post result" }
+  ]
+}

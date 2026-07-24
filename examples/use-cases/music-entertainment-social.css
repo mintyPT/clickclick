@@ -1,0 +1,14 @@
+body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.post { width: 1080px; height: 1080px; position: relative; overflow: hidden; background: #0d0b10; color: #fffdf7; }
+img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; filter: saturate(1.12) contrast(1.05); }
+.shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(13 11 16 / 86%), rgb(13 11 16 / 24%)); }
+.ticket { position: absolute; left: 64px; top: 64px; bottom: 64px; width: 480px; box-sizing: border-box; padding: 44px; border: 2px solid rgb(255 255 255 / 20%); background: rgb(20 10 24 / 84%); display: flex; flex-direction: column; }
+.brand, .eyebrow { margin: 0; font-weight: 900; }
+.brand { font-size: 30px; }
+.eyebrow { align-self: start; margin-top: 38px; padding: 13px 17px; border-radius: 999px; background: #e04f8a; text-transform: uppercase; font-size: 21px; }
+h1 { margin: 72px 0 0; font-size: 80px; line-height: .91; letter-spacing: 0; }
+.ticket > p:not(.brand):not(.eyebrow):not(.offer) { margin: 24px 0 0; color: rgb(255 253 247 / 72%); font-size: 29px; line-height: 1.08; font-weight: 760; }
+.offer { margin: auto 0 20px; padding: 22px; border: 2px solid rgb(255 255 255 / 20%); font-size: 24px; line-height: 1.03; font-weight: 850; }
+.stub { display: grid; grid-template-columns: 128px 1fr; min-height: 84px; }
+.stub strong { display: grid; place-items: center; background: #e04f8a; font-size: 31px; }
+.stub span { display: grid; place-items: center; background: #fffdf7; color: #0d0b10; font-size: 24px; font-weight: 900; }

@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-music-entertainment-unsplash.jpg", "fit": "cover", "anchor": "50% 50%" },
+  { "name": "brand", "text": "Pulsehall" },
+  { "name": "eyebrow", "text": "Friday drop" },
+  { "name": "title", "text": "Move the last tickets." },
+  { "name": "body", "text": "Give promoters a direct sales post for late-release seats and table upgrades." },
+  { "name": "offer", "text": "General admission plus balcony bundles available tonight" },
+  { "name": "price", "text": "$24+" },
+  { "name": "cta", "text": "Get tickets" }
+]

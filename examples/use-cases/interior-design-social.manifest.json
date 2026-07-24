@@ -1,0 +1,11 @@
+{
+  "name": "Roomline Interior Design Social Post",
+  "description": "Use a magazine-grid template for a fictional interior design studio. The interior photo is passed through JSON; the editorial blocks and price tile are CSS geometry.",
+  "template": "./interior-design-social.html",
+  "css": "./interior-design-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "consultation", "title": "Interior Design Consultation Post", "modifyFile": "./interior-design-social.json", "output": "./interior-design-social.png", "alt": "Interior design consultation social post result" }
+  ]
+}

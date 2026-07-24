@@ -1,0 +1,11 @@
+{
+  "name": "Rootline Health and Wellness Social Post",
+  "description": "Use a photo-led membership template for a fictional wellness studio. The real studio image is passed through the JSON modification file, while the pill label and program card are intentional CSS geometry.",
+  "template": "./health-wellness-social.html",
+  "css": "./health-wellness-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "membership", "title": "Health and Wellness Membership Post", "modifyFile": "./health-wellness-social.json", "output": "./health-wellness-social.png", "alt": "Health and wellness membership social post result" }
+  ]
+}

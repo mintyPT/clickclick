@@ -1,0 +1,11 @@
+{
+  "name": "Frameworks Photography and Videography Social Post",
+  "description": "Use a studio-brief template for a fictional photography and videography business. The camera photo is passed through JSON; the label strip and rate block are CSS geometry.",
+  "template": "./photography-videography-social.html",
+  "css": "./photography-videography-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "package", "title": "Photography and Videography Package Post", "modifyFile": "./photography-videography-social.json", "output": "./photography-videography-social.png", "alt": "Photography and videography package social post result" }
+  ]
+}
