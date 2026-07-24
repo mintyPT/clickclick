@@ -81,7 +81,7 @@ export interface TextFitWarning {
 }
 
 export interface TemplateWarning {
-  code: "MISSING_LAYER" | "DUPLICATE_LAYER";
+  code: "MISSING_LAYER" | "DUPLICATE_LAYER" | "ASSET_DIAGNOSTIC";
   message: string;
   layer: string;
 }
@@ -115,6 +115,52 @@ export interface RenderCacheInfo {
   key?: string;
   dir?: string;
   skippedReason?: "disabled" | "beforeScreenshot";
+}
+
+export type AssetDiagnosticCode =
+  | "ASSET_MISSING"
+  | "ASSET_TOO_LARGE"
+  | "ASSET_UNSUPPORTED_FORMAT"
+  | "ASSET_REMOTE_ERROR"
+  | "ASSET_INVALID_DATA_URL"
+  | "ASSET_TRANSFORM_UNSUPPORTED";
+
+export interface AssetDiagnostic {
+  code: AssetDiagnosticCode;
+  severity: "warning" | "error";
+  message: string;
+  source: string;
+  details?: Record<string, unknown>;
+}
+
+export interface AssetTransformOptions {
+  width?: number;
+  height?: number;
+  resize?: { width?: number; height?: number };
+  crop?: { x: number; y: number; width: number; height: number };
+  fit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+  focalPoint?: { x: number; y: number };
+  format?: ImageFormat | "svg";
+}
+
+export interface AssetPipelineOptions {
+  baseDir?: string;
+  cacheDir?: string;
+  maxBytes?: number;
+  transform?: AssetTransformOptions;
+}
+
+export interface ResolvedAsset {
+  source: string;
+  url: string;
+  mimeType: string;
+  bytes?: Buffer;
+  cache?: {
+    hit: boolean;
+    key?: string;
+    path?: string;
+  };
+  diagnostics: AssetDiagnostic[];
 }
 
 export interface FontRegistryEntry {
