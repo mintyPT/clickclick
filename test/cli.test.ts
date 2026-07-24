@@ -56,6 +56,34 @@ describe("CLI", () => {
     await expect(readFile(presetOut)).resolves.toHaveProperty("length");
   });
 
+  it("prints parseable JSON for render and preset outputs", async () => {
+    const htmlPath = join(tempDir, "json-card.html");
+    const renderOut = join(tempDir, "json-render.png");
+    const presetOut = join(tempDir, "json-preset.png");
+
+    await writeFile(htmlPath, "<main>JSON</main><style>html,body,main{margin:0;width:100%;height:100%;background:#00ff00;}</style>");
+
+    const render = await runCli(["render", htmlPath, "--out", renderOut, "--width", "64", "--height", "64", "--json"]);
+    const preset = await runCli(["preset", "solid", "--title", "JSON", "--out", presetOut, "--width", "64", "--height", "64", "--json"]);
+
+    expect(JSON.parse(render.stdout)).toMatchObject({
+      path: renderOut,
+      format: "png",
+      width: 64,
+      height: 64,
+      warnings: [],
+      durationMs: expect.any(Number),
+    });
+    expect(JSON.parse(preset.stdout)).toMatchObject({
+      path: presetOut,
+      format: "png",
+      width: 64,
+      height: 64,
+      warnings: expect.any(Array),
+      durationMs: expect.any(Number),
+    });
+  }, 60000);
+
   it("generates a contact sheet from local image paths", async () => {
     const pngPath = join(tempDir, "contact-source.png");
     const jpegPath = join(tempDir, "contact-source.jpg");
@@ -603,6 +631,40 @@ describe("CLI", () => {
     await expect(readFile(out)).resolves.toHaveProperty("length");
     expect(multi.stdout).toContain(join(multiOutDir, "card-64x64.png"));
     expect(PNG.sync.read(await readFile(join(multiOutDir, "card-96x48.png")))).toMatchObject({ width: 96, height: 48 });
+  }, 60000);
+
+  it("prints all config set outputs as JSON", async () => {
+    const htmlPath = join(tempDir, "config-set-json-template.html");
+    const configPath = join(tempDir, "clickclick-set-json.config.json");
+    const outDir = join(tempDir, "config-set-json-out");
+
+    await writeFile(htmlPath, '<main data-layer="card">Set</main>');
+    await writeFile(configPath, JSON.stringify({
+      templates: {
+        card: {
+          htmlPath,
+          css: "html,body,main{margin:0;width:100%;height:100%;background:#ffffff}",
+        },
+      },
+      templateSets: {
+        social: [
+          { name: "square", template: "card", output: { width: 32, height: 32 }, modifications: [{ name: "card", background: "#ff0000" }] },
+          { name: "wide", template: "card", output: { width: 64, height: 32 }, modifications: [{ name: "card", background: "#00ff00" }] },
+        ],
+      },
+    }));
+
+    const result = await runCli(["config", "set", configPath, "social", "--out-dir", outDir, "--json"]);
+    const summary = JSON.parse(result.stdout);
+
+    expect(summary).toMatchObject({
+      ok: true,
+      durationMs: expect.any(Number),
+      outputs: [
+        { path: join(outDir, "square.png"), format: "png", width: 32, height: 32, warnings: [] },
+        { path: join(outDir, "wide.png"), format: "png", width: 64, height: 32, warnings: [] },
+      ],
+    });
   }, 60000);
 
   it("screenshots a URL", async () => {

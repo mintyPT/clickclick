@@ -1,16 +1,22 @@
 import { join, resolve } from "node:path";
 import type { Command } from "commander";
-import { ClickClickError, loadBrandKit, presets, renderTemplate } from "../index.js";
+import { ClickClickError, loadBrandKit, presets, renderImage, renderTemplate } from "../index.js";
 import { presetMetadata } from "../presets/index.js";
 import { coercePresetOption, loadLocalPresetConfig, loadLocalPresetModule, renderLocalPreset, resolvePresetValues, validatePresetSchema } from "../presets/schema.js";
 import type { LocalPresetSchema, PresetModuleDefinition, PresetOptionSchema, PresetSchema } from "../presets/schema.js";
 import type { PresetLogoOptions, PresetWatermarkOptions } from "../presets/index.js";
-import type { RenderImageInput } from "../types.js";
+import type { RenderImageInput, RenderImageResult } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseSizeOptions } from "./options.js";
 import type { ParsedRenderSize } from "./options.js";
 
 interface PresetCliDependencies {
-  runRender: (input: RenderImageInput, strict: boolean, cache?: ReturnType<typeof parseCacheOptions>) => Promise<void>;
+  runRender: (input: RenderImageInput, options: RenderReportOptions | boolean, cache?: ReturnType<typeof parseCacheOptions>) => Promise<void>;
+}
+
+interface RenderReportOptions {
+  strict: boolean;
+  cacheInfo: boolean;
+  json: boolean;
 }
 
 interface PresetCommandOption {
@@ -528,18 +534,32 @@ async function runPresetCommand(definition: PresetCommandDefinition, options: Re
     await dependencies.runRender({
       ...definition.render(brandedOptions),
       output: parseOutputOptions(options),
-    }, Boolean(options.strict), parseCacheOptions(options));
+    }, renderReportOptions(options), parseCacheOptions(options));
     return;
   }
 
   const outDir = multiSizeOutDir(options);
+  if (options.json) {
+    const startedAt = performance.now();
+    const results: RenderImageResult[] = [];
+    for (const size of requestedSizes) {
+      const renderOptions = { ...brandedOptions, width: size.width, height: size.height, output: multiSizeOutputPath(outDir, definition.command, size, options) };
+      results.push(await renderImage({
+        ...definition.render(renderOptions),
+        output: parseOutputOptions(renderOptions),
+      }, { cache: parseCacheOptions(options) }));
+    }
+    reportJsonResults(results, startedAt, Boolean(options.strict));
+    return;
+  }
+
   for (const size of requestedSizes) {
     const renderOptions = { ...brandedOptions, width: size.width, height: size.height, output: multiSizeOutputPath(outDir, definition.command, size, options) };
     await dependencies.runRender({
       ...definition.render(renderOptions),
       output: parseOutputOptions(renderOptions),
-    }, Boolean(options.strict), parseCacheOptions(options));
-    console.log(renderOptions.output);
+    }, renderReportOptions(options), parseCacheOptions(options));
+    if (!options.json) console.log(renderOptions.output);
   }
 }
 
@@ -564,6 +584,24 @@ function registerLocalPresetCommand(parent: Command, dependencies: PresetCliDepe
     }
 
     const outDir = multiSizeOutDir(options);
+    if (options.json) {
+      const startedAt = performance.now();
+      const results: RenderImageResult[] = [];
+      for (const size of requestedSizes) {
+        const output = multiSizeOutputPath(outDir, name, size, options);
+        const input = renderLocalPreset({
+          ...schema,
+          viewport: { ...schema.viewport, width: size.width, height: size.height },
+        }, values, parseOutputOptions({ ...options, output }));
+        results.push(await renderTemplate({
+          ...input,
+          cache: parseCacheOptions(options),
+        }));
+      }
+      reportJsonResults(results, startedAt, Boolean(options.strict));
+      return;
+    }
+
     for (const size of requestedSizes) {
       const output = multiSizeOutputPath(outDir, name, size, options);
       const input = renderLocalPreset({
@@ -571,7 +609,7 @@ function registerLocalPresetCommand(parent: Command, dependencies: PresetCliDepe
         viewport: { ...schema.viewport, width: size.width, height: size.height },
       }, values, parseOutputOptions({ ...options, output }));
       await runLocalPreset(input, options, dependencies);
-      console.log(output);
+      if (!options.json) console.log(output);
     }
   });
 }
@@ -609,10 +647,15 @@ function schemaWithViewportOverrides(schema: LocalPresetSchema, options: Record<
 }
 
 async function runLocalPreset(input: ReturnType<typeof renderLocalPreset>, options: Record<string, unknown>, dependencies: PresetCliDependencies) {
+  const startedAt = performance.now();
   const result = await renderTemplate({
     ...input,
     cache: parseCacheOptions(options),
   });
+  if (options.json) {
+    console.log(JSON.stringify(renderJsonSummary(result, startedAt), null, 2));
+    return;
+  }
   for (const warning of result.warnings) {
     console.warn(warning.message);
   }
@@ -625,7 +668,7 @@ async function runModulePreset(definition: PresetModuleDefinition, values: Recor
   await dependencies.runRender({
     ...definition.render(values),
     output: parseOutputOptions(options),
-  }, Boolean(options.strict), parseCacheOptions(options));
+  }, renderReportOptions(options), parseCacheOptions(options));
 }
 
 function parseModulePresetArgs(schema: PresetModuleDefinition, args: string[]): Record<string, string | number | boolean> {
@@ -771,7 +814,47 @@ function addPresetRenderOptions(command: Command): Command {
     .option("--cache", "Reuse cached output for identical deterministic input")
     .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
     .option("--cache-info", "Print cache hit/miss information")
+    .option("--json", "Print a JSON summary")
     .option("--strict", "Exit non-zero when renderer warnings are produced");
+}
+
+function renderReportOptions(options: Record<string, unknown>): RenderReportOptions {
+  return {
+    strict: Boolean(options.strict),
+    cacheInfo: Boolean(options.cacheInfo),
+    json: Boolean(options.json),
+  };
+}
+
+function renderJsonSummary(result: RenderImageResult, startedAt: number) {
+  return {
+    path: result.path,
+    format: result.format,
+    width: result.width,
+    height: result.height,
+    warnings: result.warnings,
+    cache: result.cache
+      ? {
+        hit: result.cache.hit,
+        status: result.cache.hit ? "hit" : "miss",
+        key: result.cache.key,
+        dir: result.cache.dir,
+        skippedReason: result.cache.skippedReason,
+      }
+      : undefined,
+    durationMs: Math.round((performance.now() - startedAt) * 100) / 100,
+  };
+}
+
+function reportJsonResults(results: RenderImageResult[], startedAt: number, strict: boolean) {
+  console.log(JSON.stringify({
+    ok: results.every((result) => result.warnings.length === 0),
+    outputs: results.map((result) => renderJsonSummary(result, startedAt)),
+    durationMs: Math.round((performance.now() - startedAt) * 100) / 100,
+  }, null, 2));
+  if (strict && results.some((result) => result.warnings.length > 0)) {
+    process.exitCode = 1;
+  }
 }
 
 function multiSizeOutDir(options: Record<string, unknown>): string {
