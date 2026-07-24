@@ -1,0 +1,13 @@
+{
+  "name": "Pawspring Pet Services Social Posts",
+  "description": "Use a reusable template for pet services and products social posts with a fictional care studio, original conversion copy, photo-led service and retail variants, and intentional CSS geometry for badges, pricing panels, and source-neutral brand marks. Unsplash photos are passed through JSON image layers instead of being hardcoded into the template.",
+  "template": "./pet-services-social.html",
+  "css": "./pet-services-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "care-plan", "title": "Monthly Care Plan Post", "modifyFile": "./pet-services-social-care-plan.json", "output": "./pet-services-social-care-plan.png", "alt": "Pawspring monthly care plan social post result" },
+    { "id": "grooming", "title": "Grooming Appointment Promo Post", "modifyFile": "./pet-services-social-grooming.json", "output": "./pet-services-social-grooming.png", "alt": "Pawspring grooming appointment promo post result" },
+    { "id": "nutrition", "title": "Nutrition Bundle Product Post", "modifyFile": "./pet-services-social-nutrition.json", "output": "./pet-services-social-nutrition.png", "alt": "Pawspring nutrition bundle product post result" }
+  ]
+}

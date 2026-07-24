@@ -1,0 +1,12 @@
+[
+  { "name": "post", "className": "post post-grooming" },
+  { "name": "brand", "html": "<span class=\"brand-mark\" aria-hidden=\"true\"></span>Pawspring" },
+  { "name": "site", "text": "pawspring.example" },
+  { "name": "grooming_image", "src": "./assets/pet-services-grooming-unsplash.jpg", "fit": "cover", "anchor": "58% center" },
+  { "name": "grooming_eyebrow", "text": "GROOMING STUDIO" },
+  { "name": "grooming_title", "html": "Fresh coat,<br>clear calendar." },
+  { "name": "grooming_body", "text": "A thoughtful wash, trim and reset for busy dogs." },
+  { "name": "grooming_cta", "text": "Reserve a wash + trim" },
+  { "name": "grooming_note", "text": "Appointments open this week" },
+  { "name": "grooming_price", "text": "from $58" }
+]

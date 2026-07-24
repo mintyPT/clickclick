@@ -1,5 +1,15 @@
 # Attribution
 
+## Pawspring Pet Services Social Posts
+
+The Pawspring example set uses source-neutral Unsplash photos passed through template modification JSON files:
+
+- `examples/use-cases/assets/pet-services-care-unsplash.jpg` - Photo by Lucas Doddema on Unsplash: https://unsplash.com/photos/a-person-petting-a-happy-dog-outdoors-mN2O7C51NwE
+- `examples/use-cases/assets/pet-services-grooming-unsplash.jpg` - Photo by Buddy AN on Unsplash: https://unsplash.com/photos/a-small-white-dog-being-cut-with-a-pair-of-scissors-LpK2xddrElI
+- `examples/use-cases/assets/pet-services-nutrition-unsplash.jpg` - Photo by Ayla Verschueren on Unsplash: https://unsplash.com/photos/a-brown-and-white-dog-eating-food-out-of-a-bowl-Qvbr5Uxgz_Q
+
+Unsplash License: https://unsplash.com/license
+
 ## Apex Auto Social Posts
 
 The Apex Auto example set uses source-neutral Unsplash photos passed through template modification JSON files:

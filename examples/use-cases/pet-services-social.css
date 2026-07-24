@@ -1,0 +1,51 @@
+body { margin: 0; background: #f1eee6; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.post { position: relative; box-sizing: border-box; width: 1080px; height: 1080px; overflow: hidden; background: #f1eee6; color: #17342b; }
+.masthead { position: absolute; top: 48px; left: 58px; right: 58px; z-index: 5; display: flex; align-items: center; justify-content: space-between; }
+.brand, .site, .eyebrow, .body-copy, .price, .offer-detail, .cta, .grooming-cta, .grooming-note, .grooming-price, .bundle-label, .bundle-detail, .nutrition-cta, .nutrition-price { margin: 0; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; font-weight: 800; line-height: 1; }
+.brand-mark { position: relative; box-sizing: border-box; width: 20px; height: 20px; border: 3px solid currentColor; border-radius: 50%; }
+.brand-mark::after { position: absolute; top: -7px; left: 4px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; content: ""; }
+.site { font-size: 14px; font-weight: 700; }
+.care-layout, .grooming-layout, .nutrition-layout { position: absolute; inset: 0; display: none; }
+.eyebrow { font-size: 14px; font-weight: 800; line-height: 1.2; }
+h1 { margin: 0; font-weight: 760; letter-spacing: 0; }
+.body-copy { font-size: 21px; font-weight: 530; line-height: 1.35; }
+.post-care-plan { color: #f8f4e9; background: #153e36; }
+.post-care-plan .care-layout { display: block; }
+.post-care-plan .care-image, .post-care-plan .care-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.post-care-plan .care-image { object-fit: cover; object-position: 56% center; }
+.care-shade { background: linear-gradient(90deg, rgb(6 29 24 / 0.82), rgb(6 29 24 / 0.33) 61%, rgb(6 29 24 / 0.08)), linear-gradient(0deg, rgb(6 29 24 / 0.46), transparent 54%); }
+.post-care-plan .masthead { color: #f8f4e9; }
+.care-copy { position: absolute; left: 58px; bottom: 62px; z-index: 2; width: 488px; }
+.care-copy h1 { margin-top: 24px; font-size: 79px; line-height: 0.96; }
+.care-copy .body-copy { width: 390px; margin-top: 26px; }
+.care-offer { display: flex; align-items: center; gap: 23px; margin-top: 32px; }
+.price { font-size: 49px; font-weight: 760; line-height: 1; }
+.price span, .nutrition-price span { font-size: 20px; font-weight: 700; }
+.offer-detail { padding-left: 23px; border-left: 1px solid rgb(248 244 233 / 0.55); font-size: 15px; font-weight: 650; line-height: 1.38; }
+.cta, .grooming-cta, .nutrition-cta { display: inline-flex; align-items: center; justify-content: center; min-height: 49px; box-sizing: border-box; font-size: 16px; font-weight: 800; }
+.cta { min-width: 214px; margin-top: 29px; padding: 0 23px; background: #edba5a; color: #153e36; }
+.post-grooming { background: #f5b9a6; color: #18392f; }
+.post-grooming .grooming-layout { display: block; }
+.grooming-copy { position: absolute; top: 187px; left: 58px; z-index: 2; width: 460px; }
+.grooming-copy h1 { margin-top: 23px; font-size: 75px; line-height: 0.98; }
+.grooming-copy .body-copy { width: 365px; margin-top: 28px; }
+.grooming-cta { min-width: 244px; margin-top: 30px; padding: 0 20px; background: #18392f; color: #f8f3e9; }
+.grooming-note { margin-top: 18px; font-size: 14px; font-weight: 700; }
+.grooming-image-wrap { position: absolute; top: 0; right: 0; width: 500px; height: 100%; overflow: hidden; }
+.grooming-image { width: 100%; height: 100%; object-fit: cover; object-position: 58% center; }
+.grooming-image-wrap::after { position: absolute; inset: 0; border-left: 12px solid #f8f3e9; box-shadow: inset 0 0 0 18px rgb(24 57 47 / 0.1); content: ""; }
+.grooming-price { position: absolute; right: 45px; bottom: 48px; z-index: 2; padding: 17px 20px; background: #edba5a; color: #18392f; font-size: 22px; font-weight: 800; }
+.post-nutrition { background: #edf1e7; color: #17342b; }
+.post-nutrition .nutrition-layout { display: block; }
+.nutrition-copy { position: absolute; top: 188px; left: 58px; z-index: 2; width: 523px; }
+.nutrition-copy h1 { margin-top: 22px; font-size: 73px; line-height: 0.98; }
+.nutrition-copy .body-copy { width: 405px; margin-top: 28px; }
+.bundle-card { width: 360px; margin-top: 34px; padding: 18px 20px; border-top: 2px solid #17342b; border-bottom: 2px solid #17342b; }
+.bundle-label { font-size: 17px; font-weight: 820; }
+.bundle-detail { margin-top: 5px; font-size: 15px; font-weight: 650; }
+.nutrition-cta { min-width: 178px; margin-top: 29px; padding: 0 20px; background: #dd7759; color: #fff8ef; }
+.nutrition-image-wrap { position: absolute; right: 0; bottom: 0; width: 475px; height: 744px; overflow: hidden; border-top-left-radius: 238px; background: #d7d6c9; }
+.nutrition-image { width: 100%; height: 100%; object-fit: cover; object-position: 42% center; }
+.nutrition-image-wrap::after { position: absolute; inset: 16px; border: 1px solid rgb(255 255 255 / 0.62); border-top-left-radius: 220px; content: ""; }
+.nutrition-price { position: absolute; left: 58px; bottom: 59px; z-index: 3; font-size: 34px; font-weight: 800; }
