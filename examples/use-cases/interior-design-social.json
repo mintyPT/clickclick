@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-interior-design-unsplash.jpg", "fit": "cover", "anchor": "50% 52%" },
+  { "name": "brand", "text": "Roomline" },
+  { "name": "eyebrow", "text": "Room refresh" },
+  { "name": "title", "text": "Sell the room edit." },
+  { "name": "body", "text": "Turn saved posts into consultation bookings with a clear, scoped design package." },
+  { "name": "offer", "text": "90-minute layout edit with shoppable source list" },
+  { "name": "price", "text": "$175" },
+  { "name": "cta", "text": "Book an edit" }
+]

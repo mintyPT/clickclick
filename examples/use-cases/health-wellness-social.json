@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-health-wellness-unsplash.jpg", "fit": "cover", "anchor": "50% 40%" },
+  { "name": "eyebrow", "text": "7-day reset" },
+  { "name": "brand", "text": "Rootline Studio" },
+  { "name": "title", "text": "Fill your next class." },
+  { "name": "body", "text": "Promote a paid trial that turns local followers into first-time members." },
+  { "name": "offer", "text": "Starter week: classes, recovery room, and habit consult" },
+  { "name": "price", "text": "$39" },
+  { "name": "cta", "text": "Reserve a mat" }
+]

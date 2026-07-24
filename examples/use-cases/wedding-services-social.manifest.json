@@ -1,0 +1,11 @@
+{
+  "name": "Vow and Vale Wedding Services Social Post",
+  "description": "Use an editorial booking template for a fictional wedding services studio. The reception photo is passed through JSON; the arched panels and booking strip are CSS geometry.",
+  "template": "./wedding-services-social.html",
+  "css": "./wedding-services-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "booking", "title": "Wedding Services Booking Post", "modifyFile": "./wedding-services-social.json", "output": "./wedding-services-social.png", "alt": "Wedding services booking social post result" }
+  ]
+}

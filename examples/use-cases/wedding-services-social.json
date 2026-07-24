@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-wedding-services-unsplash.jpg", "fit": "cover", "anchor": "50% 44%" },
+  { "name": "brand", "text": "Vow & Vale" },
+  { "name": "eyebrow", "text": "Spring dates" },
+  { "name": "title", "text": "Turn saves into consults." },
+  { "name": "body", "text": "A booking post for planners, florists, stylists, and day-of coordinators." },
+  { "name": "offer", "text": "Design call, vendor map, and day-of timeline review" },
+  { "name": "price", "text": "$95" },
+  { "name": "cta", "text": "Start planning" }
+]

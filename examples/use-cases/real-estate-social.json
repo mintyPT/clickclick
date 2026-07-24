@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-real-estate-unsplash.jpg", "fit": "cover", "anchor": "50% 48%" },
+  { "name": "brand", "text": "Northgate Realty" },
+  { "name": "eyebrow", "text": "Listing week" },
+  { "name": "title", "text": "Book seller valuations." },
+  { "name": "body", "text": "A neighborhood-ready post for agents promoting free seller appointments." },
+  { "name": "offer", "text": "Prep checklist, pricing range, and local demand review" },
+  { "name": "price", "text": "free" },
+  { "name": "cta", "text": "Schedule a valuation" }
+]

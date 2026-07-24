@@ -1005,6 +1005,279 @@ Result:
 
 ![Food truck private event booking social post result](./examples/use-cases/food-truck-catering-booking.png)
 
+### Render Rootline Health and Wellness Social Post
+
+Use a photo-led membership template for a fictional wellness studio. The real studio image is passed
+through the JSON modification file, while the pill label and program card are intentional CSS
+geometry.
+
+#### Health and Wellness Membership Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/health-wellness-social.html \
+  --css examples/use-cases/health-wellness-social.css \
+  --modify-file examples/use-cases/health-wellness-social.json \
+  --out examples/use-cases/health-wellness-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/health-wellness-social.html",
+  cssPath: "examples/use-cases/health-wellness-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/health-wellness-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/health-wellness-social.png" },
+});
+```
+
+Result:
+
+![Health and wellness membership social post result](./examples/use-cases/health-wellness-social.png)
+
+### Render Roomline Interior Design Social Post
+
+Use a magazine-grid template for a fictional interior design studio. The interior photo is passed
+through JSON; the editorial blocks and price tile are CSS geometry.
+
+#### Interior Design Consultation Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/interior-design-social.html \
+  --css examples/use-cases/interior-design-social.css \
+  --modify-file examples/use-cases/interior-design-social.json \
+  --out examples/use-cases/interior-design-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/interior-design-social.html",
+  cssPath: "examples/use-cases/interior-design-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/interior-design-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/interior-design-social.png" },
+});
+```
+
+Result:
+
+![Interior design consultation social post result](./examples/use-cases/interior-design-social.png)
+
+### Render Northgate Real Estate Social Post
+
+Use a listing-card template for a fictional real estate agency. The house photo is passed through
+JSON; the appointment card and status pill are CSS geometry.
+
+#### Real Estate Listing Appointment Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/real-estate-social.html \
+  --css examples/use-cases/real-estate-social.css \
+  --modify-file examples/use-cases/real-estate-social.json \
+  --out examples/use-cases/real-estate-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/real-estate-social.html",
+  cssPath: "examples/use-cases/real-estate-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/real-estate-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/real-estate-social.png" },
+});
+```
+
+Result:
+
+![Real estate listing appointment social post result](./examples/use-cases/real-estate-social.png)
+
+### Render Pulsehall Music and Entertainment Social Post
+
+Use a dark event-ticket template for a fictional live venue. The concert photo is passed through
+JSON; the ticket panel and stub are intentional CSS geometry.
+
+#### Music and Entertainment Ticket Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/music-entertainment-social.html \
+  --css examples/use-cases/music-entertainment-social.css \
+  --modify-file examples/use-cases/music-entertainment-social.json \
+  --out examples/use-cases/music-entertainment-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/music-entertainment-social.html",
+  cssPath: "examples/use-cases/music-entertainment-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/music-entertainment-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/music-entertainment-social.png" },
+});
+```
+
+Result:
+
+![Music and entertainment ticket social post result](./examples/use-cases/music-entertainment-social.png)
+
+### Render Frameworks Photography and Videography Social Post
+
+Use a studio-brief template for a fictional photography and videography business. The camera photo
+is passed through JSON; the label strip and rate block are CSS geometry.
+
+#### Photography and Videography Package Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/photography-videography-social.html \
+  --css examples/use-cases/photography-videography-social.css \
+  --modify-file examples/use-cases/photography-videography-social.json \
+  --out examples/use-cases/photography-videography-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/photography-videography-social.html",
+  cssPath: "examples/use-cases/photography-videography-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/photography-videography-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/photography-videography-social.png" },
+});
+```
+
+Result:
+
+![Photography and videography package social post result](./examples/use-cases/photography-videography-social.png)
+
+### Render Vow and Vale Wedding Services Social Post
+
+Use an editorial booking template for a fictional wedding services studio. The reception photo is
+passed through JSON; the arched panels and booking strip are CSS geometry.
+
+#### Wedding Services Booking Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/wedding-services-social.html \
+  --css examples/use-cases/wedding-services-social.css \
+  --modify-file examples/use-cases/wedding-services-social.json \
+  --out examples/use-cases/wedding-services-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/wedding-services-social.html",
+  cssPath: "examples/use-cases/wedding-services-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/wedding-services-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/wedding-services-social.png" },
+});
+```
+
+Result:
+
+![Wedding services booking social post result](./examples/use-cases/wedding-services-social.png)
+
+### Render Gathercraft Event Planning Social Post
+
+Use an agenda-card template for a fictional event planning studio. The venue photo is passed through
+JSON; the agenda and inquiry blocks are CSS geometry.
+
+#### Event Planning Inquiry Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/event-planning-social.html \
+  --css examples/use-cases/event-planning-social.css \
+  --modify-file examples/use-cases/event-planning-social.json \
+  --out examples/use-cases/event-planning-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/event-planning-social.html",
+  cssPath: "examples/use-cases/event-planning-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/event-planning-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/event-planning-social.png" },
+});
+```
+
+Result:
+
+![Event planning inquiry social post result](./examples/use-cases/event-planning-social.png)
+
+### Render Tidepool Hotels and Resorts Social Post
+
+Use a resort booking-panel template for a fictional hotel. The pool photo is passed through JSON;
+the booking panel and rate chip are CSS geometry.
+
+#### Hotels and Resorts Getaway Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/hotels-resorts-social.html \
+  --css examples/use-cases/hotels-resorts-social.css \
+  --modify-file examples/use-cases/hotels-resorts-social.json \
+  --out examples/use-cases/hotels-resorts-social.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/hotels-resorts-social.html",
+  cssPath: "examples/use-cases/hotels-resorts-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/hotels-resorts-social.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/hotels-resorts-social.png" },
+});
+```
+
+Result:
+
+![Hotels and resorts getaway social post result](./examples/use-cases/hotels-resorts-social.png)
+
 ## Package Release
 
 The npm package is prepared as `@maurogoncalo/clickclick` with MIT licensing, public npm access,

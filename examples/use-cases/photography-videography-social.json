@@ -1,0 +1,10 @@
+[
+  { "name": "image", "src": "./assets/service-photography-video-unsplash.jpg", "fit": "cover", "anchor": "50% 50%" },
+  { "name": "eyebrow", "text": "Content day" },
+  { "name": "brand", "text": "Frameworks Studio" },
+  { "name": "title", "text": "Sell a shoot day." },
+  { "name": "body", "text": "Package photo and video deliverables so small teams can book in one tap." },
+  { "name": "offer", "text": "Half-day studio session with 20 edits and 6 reels" },
+  { "name": "price", "text": "$690" },
+  { "name": "cta", "text": "Hold a date" }
+]

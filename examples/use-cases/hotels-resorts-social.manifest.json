@@ -1,0 +1,11 @@
+{
+  "name": "Tidepool Hotels and Resorts Social Post",
+  "description": "Use a resort booking-panel template for a fictional hotel. The pool photo is passed through JSON; the booking panel and rate chip are CSS geometry.",
+  "template": "./hotels-resorts-social.html",
+  "css": "./hotels-resorts-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    { "id": "getaway", "title": "Hotels and Resorts Getaway Post", "modifyFile": "./hotels-resorts-social.json", "output": "./hotels-resorts-social.png", "alt": "Hotels and resorts getaway social post result" }
+  ]
+}
