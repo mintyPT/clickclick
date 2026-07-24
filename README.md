@@ -713,6 +713,100 @@ Results:
 
 ![Brand kit gradient preset result](./examples/presets/brand-kit-gradient.png)
 
+### Render Apex Auto Social Posts
+
+Use a reusable template for automotive sales and detailing social posts with a fictional
+dealership/detailing studio, original conversion copy, photo-led service and inventory variants, and
+intentional CSS geometry for badges, panels, and trade-in graphics. Source-neutral Unsplash photos
+are passed through JSON image layers instead of being hardcoded into the template.
+
+#### Certified Inventory Sales Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-inventory.json \
+  --out examples/use-cases/automotive-social-inventory.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-inventory.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-inventory.png" },
+});
+```
+
+Result:
+
+![Apex Auto certified inventory sales post result](./examples/use-cases/automotive-social-inventory.png)
+
+#### Detailing Appointment Promo Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-detailing.json \
+  --out examples/use-cases/automotive-social-detailing.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-detailing.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-detailing.png" },
+});
+```
+
+Result:
+
+![Apex Auto detailing appointment promo post result](./examples/use-cases/automotive-social-detailing.png)
+
+#### Trade-In Event Post
+
+CLI:
+
+```bash
+npm run dev -- template examples/use-cases/automotive-social.html \
+  --css examples/use-cases/automotive-social.css \
+  --modify-file examples/use-cases/automotive-social-trade-in.json \
+  --out examples/use-cases/automotive-social-trade-in.png \
+  --width 1080 \
+  --height 1080
+```
+
+Library:
+
+```ts
+await renderTemplate({
+  htmlPath: "examples/use-cases/automotive-social.html",
+  cssPath: "examples/use-cases/automotive-social.css",
+  modifications: JSON.parse(await readFile("examples/use-cases/automotive-social-trade-in.json", "utf8")),
+  viewport: { width: 1080, height: 1080 },
+  output: { path: "examples/use-cases/automotive-social-trade-in.png" },
+});
+```
+
+Result:
+
+![Apex Auto trade-in event post result](./examples/use-cases/automotive-social-trade-in.png)
+
 ## Advanced Usage
 
 The README keeps quick-start material and the complete built-in preset reference. Longer examples

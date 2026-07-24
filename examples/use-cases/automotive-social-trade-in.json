@@ -1,0 +1,16 @@
+[
+  { "name": "post", "className": "post post-trade-in" },
+  { "name": "brand", "text": "Apex Auto Co." },
+  { "name": "tagline", "text": "Upgrade week" },
+  { "name": "hero_image", "src": "./assets/automotive-trade-in-unsplash.jpg", "fit": "cover", "anchor": "50% 46%" },
+  { "name": "inset_image", "src": "./assets/automotive-showroom-unsplash.jpg", "fit": "cover", "anchor": "56% 56%" },
+  { "name": "kicker", "text": "Trade-in event" },
+  { "name": "title", "text": "Get an appraisal before Saturday" },
+  { "name": "subtitle", "text": "Bring your current car in clean or book a pre-appraisal wash, then roll the value into any certified model." },
+  { "name": "stat_one_label", "text": "Bonus value" },
+  { "name": "stat_one_value", "text": "+$750" },
+  { "name": "stat_two_label", "text": "Appraisal" },
+  { "name": "stat_two_value", "text": "20 min" },
+  { "name": "cta", "text": "Start valuation" },
+  { "name": "url", "text": "apexauto.example/value" }
+]

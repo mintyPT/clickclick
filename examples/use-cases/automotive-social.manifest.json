@@ -1,0 +1,31 @@
+{
+  "name": "Apex Auto Social Posts",
+  "description": "Use a reusable template for automotive sales and detailing social posts with a fictional dealership/detailing studio, original conversion copy, photo-led service and inventory variants, and intentional CSS geometry for badges, panels, and trade-in graphics. Source-neutral Unsplash photos are passed through JSON image layers instead of being hardcoded into the template.",
+  "template": "./automotive-social.html",
+  "css": "./automotive-social.css",
+  "width": 1080,
+  "height": 1080,
+  "variants": [
+    {
+      "id": "inventory",
+      "title": "Certified Inventory Sales Post",
+      "modifyFile": "./automotive-social-inventory.json",
+      "output": "./automotive-social-inventory.png",
+      "alt": "Apex Auto certified inventory sales post result"
+    },
+    {
+      "id": "detailing",
+      "title": "Detailing Appointment Promo Post",
+      "modifyFile": "./automotive-social-detailing.json",
+      "output": "./automotive-social-detailing.png",
+      "alt": "Apex Auto detailing appointment promo post result"
+    },
+    {
+      "id": "trade-in",
+      "title": "Trade-In Event Post",
+      "modifyFile": "./automotive-social-trade-in.json",
+      "output": "./automotive-social-trade-in.png",
+      "alt": "Apex Auto trade-in event post result"
+    }
+  ]
+}

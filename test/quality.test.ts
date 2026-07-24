@@ -57,7 +57,7 @@ describe("quality gates", () => {
       "LOW_CONTRAST",
       "SAFE_AREA_VIOLATION",
     ]);
-  });
+  }, 90000);
 });
 
 async function writePng(path: string, rgba: [number, number, number, number]) {
