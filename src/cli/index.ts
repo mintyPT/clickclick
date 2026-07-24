@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-import { mkdir, readFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { createInterface } from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 import { Command } from "commander";
 import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, contactSheet, createContactSheet, createRenderer, dataRowToLayerModifications, generateTemplateBatch, imageGrid, interpolateOutputPattern, listConfigTemplates, loadBrandKit, presets, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
@@ -16,6 +19,17 @@ program
   .name("clickclick")
   .description("Generate PNG and JPEG social images from HTML.")
   .version("0.1.0");
+
+program
+  .command("init")
+  .description("Create a starter ClickClick project")
+  .option("--dir <dir>", "Target project directory", ".")
+  .option("--force", "Overwrite existing starter files")
+  .action(async (options) => {
+    const targetDir = resolve(typeof options.dir === "string" ? options.dir : ".");
+    await initProject(targetDir, Boolean(options.force));
+    console.log(`Created ClickClick starter project in ${targetDir}`);
+  });
 
 program
   .command("render")
@@ -898,6 +912,204 @@ function compositionImages(options: Record<string, unknown>) {
 
 function stringOption(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
+}
+
+interface StarterFile {
+  path: string;
+  contents: string;
+}
+
+async function initProject(targetDir: string, force: boolean) {
+  const files = starterFiles(targetDir);
+  const existing = await existingFiles(files);
+  if (existing.length > 0 && !force) {
+    const confirmed = await confirmOverwrite(existing);
+    if (!confirmed) {
+      throw new ClickClickError("INVALID_INPUT", `Refusing to overwrite existing files: ${existing.map((file) => file.path).join(", ")}`);
+    }
+  }
+
+  await Promise.all([...new Set(files.map((file) => dirname(file.path)))].map((dir) => mkdir(dir, { recursive: true })));
+  for (const file of files) {
+    await writeFile(file.path, file.contents);
+  }
+}
+
+function starterFiles(targetDir: string): StarterFile[] {
+  const config = {
+    templates: {
+      social: {
+        htmlPath: "templates/social-card.html",
+        cssPath: "templates/social-card.css",
+        onMissingLayer: "warn",
+      },
+    },
+    recipes: {
+      launch: {
+        template: "social",
+        output: {
+          path: "dist/launch-og.png",
+          width: 1200,
+          height: 630,
+        },
+        modifications: [
+          { name: "eyebrow", text: "Launch Kit" },
+          { name: "title", text: "Your next announcement" },
+          { name: "subtitle", text: "Edit clickclick.config.json to generate production social images." },
+          { name: "logo", src: "../assets/logo.svg" },
+        ],
+      },
+    },
+    templateSets: {
+      social: [
+        {
+          name: "og",
+          template: "social",
+          output: { width: 1200, height: 630 },
+          modifications: [
+            { name: "eyebrow", text: "Open Graph" },
+            { name: "title", text: "A wide social card" },
+            { name: "subtitle", text: "Generated from the starter template set." },
+            { name: "logo", src: "../assets/logo.svg" },
+          ],
+        },
+        {
+          name: "square",
+          template: "social",
+          output: { width: 1080, height: 1080 },
+          modifications: [
+            { name: "eyebrow", text: "Square" },
+            { name: "title", text: "A reusable image workflow" },
+            { name: "subtitle", text: "Swap text and asset paths in config or CLI options." },
+            { name: "logo", src: "../assets/logo.svg" },
+          ],
+        },
+      ],
+    },
+  };
+
+  return [
+    {
+      path: join(targetDir, "clickclick.config.json"),
+      contents: `${JSON.stringify(config, null, 2)}\n`,
+    },
+    {
+      path: join(targetDir, "templates", "social-card.html"),
+      contents: `<main class="card">
+  <img data-layer="logo" class="logo" alt="" />
+  <p data-layer="eyebrow" class="eyebrow">Launch Kit</p>
+  <h1 data-layer="title">Your next announcement</h1>
+  <p data-layer="subtitle" class="subtitle">Edit clickclick.config.json to generate production social images.</p>
+</main>
+`,
+    },
+    {
+      path: join(targetDir, "templates", "social-card.css"),
+      contents: `html,
+body,
+.card {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.card {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 28px;
+  padding: 86px 92px;
+  background: #111827;
+  color: #f9fafb;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(34, 197, 94, 0.28), transparent 42%),
+    linear-gradient(315deg, rgba(59, 130, 246, 0.24), transparent 45%);
+}
+
+.logo,
+.eyebrow,
+h1,
+.subtitle {
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  position: absolute;
+  top: 72px;
+  left: 92px;
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #86efac;
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 860px;
+  margin: 0;
+  font-size: 86px;
+  line-height: 0.98;
+}
+
+.subtitle {
+  max-width: 760px;
+  margin: 0;
+  color: #d1d5db;
+  font-size: 34px;
+  line-height: 1.22;
+}
+`,
+    },
+    {
+      path: join(targetDir, "assets", "logo.svg"),
+      contents: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Starter logo">
+  <rect width="96" height="96" rx="18" fill="#22c55e"/>
+  <path d="M24 58 43 28h14L38 58h34v10H24z" fill="#052e16"/>
+</svg>
+`,
+    },
+  ];
+}
+
+async function existingFiles(files: StarterFile[]): Promise<StarterFile[]> {
+  const result: StarterFile[] = [];
+  for (const file of files) {
+    try {
+      await access(file.path);
+      result.push(file);
+    } catch {
+      // Missing files are safe to create.
+    }
+  }
+  return result;
+}
+
+async function confirmOverwrite(files: StarterFile[]): Promise<boolean> {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
+  const rl = createInterface({ input, output });
+  try {
+    const answer = await rl.question(`Overwrite ${files.length} existing ClickClick starter file${files.length === 1 ? "" : "s"}? [y/N] `);
+    return answer.trim().toLowerCase() === "y" || answer.trim().toLowerCase() === "yes";
+  } finally {
+    rl.close();
+  }
 }
 
 async function parseChartData(value: unknown) {
