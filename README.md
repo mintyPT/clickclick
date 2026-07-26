@@ -11,6 +11,9 @@ The v1 surface is intentionally small:
 - screenshot arbitrary URLs to PNG or JPEG;
 - render built-in social image presets;
 - discover and render local schema-backed presets from project config files;
+- discover `clickclick.config.json` from the current directory upward for config commands;
+- inspect templates and validate local config/template wiring;
+- preview template renders in a browser-backed local UI;
 - opt in to text fitting for elements that should shrink to fit;
 - opt in to a local render cache for deterministic HTML, template, config, and preset renders;
 - report structured warnings and stable error codes.
@@ -204,6 +207,34 @@ Generate a built-in preset:
 
 ```bash
 clickclick preset gradient --title "Hello" --subtitle "From ClickClick" --out og.png
+```
+
+Inspect and validate a project:
+
+```bash
+clickclick doctor
+clickclick validate
+clickclick inspect ./examples/card.html --css ./examples/card.css
+```
+
+Render from the nearest `clickclick.config.json` without repeating the config path:
+
+```bash
+clickclick config templates
+clickclick config recipe launch --out dist/launch.png
+clickclick config set social --out-dir dist/social
+```
+
+Explicit config paths still work:
+
+```bash
+clickclick config recipe ./examples/use-cases/clickclick.config.json launch --out dist/launch.png
+```
+
+Open a live browser preview while authoring a template:
+
+```bash
+clickclick preview ./examples/card.html --css ./examples/card.css --open --watch
 ```
 
 Generate several sizes in one command:

@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execa } from "execa";
@@ -604,6 +604,8 @@ describe("CLI", () => {
 
     expect(screenshotHelp.stdout).not.toContain("--cache");
     expect(previewHelp.stdout).not.toContain("--cache");
+    expect(previewHelp.stdout).toContain("--open");
+    expect(previewHelp.stdout).toContain("--port");
   });
 
   it("renders transparent PNG output", async () => {
@@ -671,6 +673,77 @@ describe("CLI", () => {
     expect(multi.stdout).toContain(join(multiOutDir, "card-64x64.png"));
     expect(PNG.sync.read(await readFile(join(multiOutDir, "card-96x48.png")))).toMatchObject({ width: 96, height: 48 });
   }, 60000);
+
+  it("autodiscovers config files from the current and parent directories", async () => {
+    const projectDir = join(tempDir, "autodiscovery-project");
+    const childDir = join(projectDir, "nested");
+    const htmlPath = join(projectDir, "config-template.html");
+    const configPath = join(projectDir, "clickclick.config.json");
+    const out = join(projectDir, "autodiscovered.png");
+    await mkdir(childDir, { recursive: true });
+
+    await writeFile(htmlPath, '<main data-layer="card">Recipe</main>');
+    await writeFile(configPath, JSON.stringify({
+      templates: {
+        card: {
+          htmlPath,
+          css: "html,body,main{margin:0;width:100%;height:100%;background:#00ff00}",
+        },
+      },
+      recipes: {
+        card: {
+          template: "card",
+          output: { path: out },
+          modifications: [{ name: "card", text: "Autodiscovered" }],
+        },
+      },
+    }));
+
+    const list = await runCli(["config", "templates"], { cwd: childDir });
+    await runCli(["config", "recipe", "card", "--width", "64", "--height", "64"], { cwd: childDir });
+
+    expect(list.stdout).toContain("card");
+    await expect(readFile(out)).resolves.toHaveProperty("length");
+  }, 60000);
+
+  it("reports a clear error when config autodiscovery fails", async () => {
+    const emptyDir = join(tempDir, "no-config-here");
+    await mkdir(emptyDir, { recursive: true });
+
+    await expect(runCli(["config", "templates"], { cwd: emptyDir })).rejects.toMatchObject({
+      stderr: expect.stringContaining("INVALID_INPUT: Config file not found. Searched for clickclick.config.json"),
+    });
+  });
+
+  it("validates configs and inspects templates with stable diagnostics", async () => {
+    const htmlPath = join(tempDir, "inspect-template.html");
+    const cssPath = join(tempDir, "inspect-template.css");
+    const badConfigPath = join(tempDir, "bad-clickclick.config.json");
+
+    await writeFile(htmlPath, '<main data-layer="title"><img src="./hero.png"><h1 data-layer="title" data-fit-text>Title</h1></main>');
+    await writeFile(cssPath, "main{width:320px;height:180px;background-image:url('./bg.png')}");
+    await writeFile(badConfigPath, JSON.stringify({
+      templates: {
+        card: { htmlPath: "missing.html" },
+      },
+      recipes: {
+        launch: { template: "missing-template" },
+      },
+    }));
+
+    const inspect = await runCli(["inspect", htmlPath, "--css", cssPath, "--json"]);
+    const report = JSON.parse(inspect.stdout);
+    expect(report).toMatchObject({
+      layers: [{ name: "title", count: 2 }],
+      fitText: ["data-fit-text"],
+      assets: ["./bg.png", "./hero.png"],
+      dimensions: { width: 320, height: 180 },
+    });
+
+    await expect(runCli(["validate", badConfigPath, "--json"])).rejects.toMatchObject({
+      stdout: expect.stringContaining("RECIPE_TEMPLATE_MISSING"),
+    });
+  });
 
   it("prints all config set outputs as JSON", async () => {
     const htmlPath = join(tempDir, "config-set-json-template.html");
@@ -860,9 +933,9 @@ describe("CLI", () => {
   });
 });
 
-function runCli(args: string[]) {
-  return execa("node", ["--import", "tsx", "src/cli/index.ts", ...args], {
-    cwd: process.cwd(),
+function runCli(args: string[], options: { cwd?: string } = {}) {
+  return execa("node", ["--import", join(process.cwd(), "node_modules/tsx/dist/loader.mjs"), join(process.cwd(), "src/cli/index.ts"), ...args], {
+    cwd: options.cwd ?? process.cwd(),
     timeout: 60_000,
     killSignal: "SIGKILL",
   });

@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-import { access } from "node:fs/promises";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createServer, type ServerResponse } from "node:http";
+import { spawn } from "node:child_process";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { Command } from "commander";
-import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, contactSheet, createContactSheet, createRenderer, dataRowToLayerModifications, generateTemplateBatch, imageGrid, interpolateOutputPattern, listConfigTemplates, loadBrandKit, presets, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
+import { ClickClickError, barChart, checkImageQuality, checkRenderQuality, clearCache, collage, contactSheet, createContactSheet, createRenderer, dataRowToLayerModifications, generateTemplateBatch, imageGrid, interpolateOutputPattern, listConfigTemplates, loadBrandKit, loadConfig, presets, qrCode, renderImage, renderRecipe, renderTemplate, renderTemplateSet, screenshotUrl } from "../index.js";
 import type { BatchDataRow } from "../index.js";
 import type { BrandKit, LayerModification, QualityResult, QualitySafeArea, RenderCacheOptions, RenderImageInput, RenderImageResult, RenderWarning, TemplateInput } from "../types.js";
 import { collectOption, parseCacheOptions, parseInteger, parseNumber, parseOutputOptions, parseRenderOptions, parseSizeOptions } from "./options.js";
@@ -564,18 +565,19 @@ const config = program.command("config").description("Render local templates fro
 
 config
   .command("templates")
-  .argument("<config-file>", "ClickClick config JSON file")
+  .argument("[config-file]", "ClickClick config JSON file; defaults to nearest clickclick.config.json")
   .description("List templates registered in a config file")
-  .action(async (configFile: string) => {
-    for (const name of await listConfigTemplates(resolve(configFile))) {
+  .action(async (configFile: string | undefined) => {
+    const configPath = await resolveConfigPath(configFile);
+    for (const name of await listConfigTemplates(configPath)) {
       console.log(name);
     }
   });
 
 config
   .command("recipe")
-  .argument("<config-file>", "ClickClick config JSON file")
-  .argument("<name>", "Recipe name")
+  .argument("[config-file]", "ClickClick config JSON file; omit to use nearest clickclick.config.json")
+  .argument("[name]", "Recipe name")
   .option("--modify-json <json>", "Additional layer modifications as JSON")
   .option("--modify-file <file>", "Additional layer modifications JSON file")
   .option("--brand <file>", "Brand kit JSON file")
@@ -592,7 +594,8 @@ config
   .option("--cache-dir <dir>", "Cache directory", ".clickclick-cache")
   .option("--cache-info", "Print cache hit/miss information")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (configFile: string, name: string, options) => {
+  .action(async (configFile: string | undefined, name: string | undefined, options) => {
+    const target = await resolveConfigCommandTarget(configFile, name, "Recipe name is required.");
     const input = {
       modifications: await parseModifications(options),
       brand: await parseBrandKitOption(options),
@@ -603,18 +606,18 @@ config
     };
     const sizes = parseSizeOptions(options);
     if (sizes.length > 0) {
-      await runMultiSizeRecipe(resolve(configFile), name, input, sizes, multiSizeOutputOptions(options, name), renderReportOptions(options));
+      await runMultiSizeRecipe(target.configPath, target.name, input, sizes, multiSizeOutputOptions(options, target.name), renderReportOptions(options));
       return;
     }
     const startedAt = performance.now();
-    const result = await renderRecipe(resolve(configFile), name, input);
+    const result = await renderRecipe(target.configPath, target.name, input);
     reportRenderResult(result, renderReportOptions(options), startedAt);
   });
 
 config
   .command("set")
-  .argument("<config-file>", "ClickClick config JSON file")
-  .argument("<name>", "Template set name")
+  .argument("[config-file]", "ClickClick config JSON file; omit to use nearest clickclick.config.json")
+  .argument("[name]", "Template set name")
   .option("--out-dir <dir>", "Directory for generated images")
   .option("--brand <file>", "Brand kit JSON file")
   .option("--cache", "Reuse cached output for identical deterministic input")
@@ -622,11 +625,12 @@ config
   .option("--cache-info", "Print cache hit/miss information")
   .option("--json", "Print a JSON summary")
   .option("--strict", "Exit non-zero when renderer warnings are produced")
-  .action(async (configFile: string, name: string, options) => {
+  .action(async (configFile: string | undefined, name: string | undefined, options) => {
+    const target = await resolveConfigCommandTarget(configFile, name, "Template set name is required.");
     const startedAt = performance.now();
     const outDir = typeof options.outDir === "string" ? resolve(options.outDir) : undefined;
     if (outDir) await mkdir(outDir, { recursive: true });
-    const results = await renderTemplateSet(resolve(configFile), name, outDir, {
+    const results = await renderTemplateSet(target.configPath, target.name, outDir, {
       cache: parseCacheOptions(options),
       brand: await parseBrandKitOption(options),
     });
@@ -649,11 +653,48 @@ config
   });
 
 program
+  .command("doctor")
+  .description("Check local ClickClick rendering prerequisites")
+  .option("--json", "Print a JSON summary")
+  .action(async (options) => {
+    const diagnostics = await runDoctor();
+    reportDiagnostics(diagnostics, Boolean(options.json));
+  });
+
+program
+  .command("validate")
+  .argument("[config-or-template]", "Config JSON file or HTML template; defaults to nearest clickclick.config.json")
+  .description("Validate a config file or template references")
+  .option("--css <file>", "CSS file to validate with an HTML template")
+  .option("--json", "Print a JSON summary")
+  .action(async (target: string | undefined, options) => {
+    const diagnostics = await validateTarget(target, typeof options.css === "string" ? resolve(options.css) : undefined);
+    reportDiagnostics(diagnostics, Boolean(options.json));
+  });
+
+program
+  .command("inspect")
+  .argument("<template>", "HTML template file to inspect")
+  .description("Inspect template layers, assets, fit-text targets, and likely dimensions")
+  .option("--css <file>", "Optional CSS file to include in the report")
+  .option("--json", "Print a JSON summary")
+  .action(async (template: string, options) => {
+    const report = await inspectTemplate(resolve(template), typeof options.css === "string" ? resolve(options.css) : undefined);
+    if (options.json) {
+      writeJson(report);
+    } else {
+      printTemplateInspection(report);
+    }
+  });
+
+program
   .command("preview")
   .argument("<html-file>", "HTML template file to preview")
   .option("--css <file>", "Optional CSS file to inject")
   .option("--out-dir <dir>", "Directory for preview image", ".clickclick-preview")
   .option("--watch", "Keep watching files and re-render on changes")
+  .option("--open", "Serve the preview in a local browser UI")
+  .option("--port <port>", "Port for --open preview UI", parseInteger)
   .option("--width <px>", "Viewport width", parseInteger)
   .option("--height <px>", "Viewport height", parseInteger)
   .action(async (htmlFile: string, options) => {
@@ -672,11 +713,19 @@ program
       console.log(output.path);
     };
     await renderOnce();
+    let previewServer: Awaited<ReturnType<typeof startPreviewServer>> | undefined;
+    if (options.open) {
+      previewServer = await startPreviewServer(output.path, typeof options.port === "number" ? options.port : undefined);
+      console.log(previewServer.url);
+      openBrowser(previewServer.url);
+    }
     if (options.watch) {
       const { watch } = await import("node:fs");
       const rerender = () => { void renderOnce().catch(reportError); };
       watch(htmlPath, rerender);
       if (cssPath) watch(cssPath, rerender);
+      await new Promise(() => undefined);
+    } else if (previewServer) {
       await new Promise(() => undefined);
     }
   });
@@ -1253,6 +1302,274 @@ function normalizeReportOptions(options: RenderReportOptions | boolean, cache: R
     ? { strict: options, cacheInfo: isCacheInfoEnabled(cache), json: false }
     : { ...options, cacheInfo: options.cacheInfo || isCacheInfoEnabled(cache) };
 }
+
+async function resolveConfigPath(configFile?: string): Promise<string> {
+  if (configFile) return resolve(configFile);
+
+  let dir = process.cwd();
+  while (true) {
+    const candidate = join(dir, "clickclick.config.json");
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  }
+
+  throw new ClickClickError("INVALID_INPUT", "Config file not found. Searched for clickclick.config.json from the current directory upward.");
+}
+
+async function resolveConfigCommandTarget(first: string | undefined, second: string | undefined, missingNameMessage: string): Promise<{ configPath: string; name: string }> {
+  if (second) {
+    return { configPath: await resolveConfigPath(first), name: second };
+  }
+  if (!first) {
+    throw new ClickClickError("INVALID_INPUT", missingNameMessage);
+  }
+  if (looksLikeConfigPath(first)) {
+    await resolveConfigPath(first);
+    throw new ClickClickError("INVALID_INPUT", missingNameMessage);
+  }
+  return { configPath: await resolveConfigPath(), name: first };
+}
+
+function looksLikeConfigPath(value: string): boolean {
+  return /\.json$/i.test(value) || value.includes("/") || value.includes("\\");
+}
+
+interface Diagnostic {
+  code: string;
+  severity: "ok" | "warning" | "error";
+  message: string;
+}
+
+async function runDoctor(): Promise<Diagnostic[]> {
+  const diagnostics: Diagnostic[] = [];
+  const major = Number(process.versions.node.split(".")[0] ?? 0);
+  diagnostics.push({
+    code: "NODE_VERSION",
+    severity: major >= 20 ? "ok" : "error",
+    message: `Node ${process.versions.node}${major >= 20 ? " satisfies" : " does not satisfy"} the >=20 requirement.`,
+  });
+
+  try {
+    const renderer = await createRenderer();
+    try {
+      await renderer.render({
+        document: { html: "<main>doctor</main><style>html,body,main{margin:0;width:100%;height:100%;}</style>" },
+        viewport: { width: 16, height: 16 },
+      });
+      diagnostics.push({ code: "RENDERER_STARTUP", severity: "ok", message: "Playwright Chromium rendered a smoke image." });
+    } finally {
+      await renderer.close();
+    }
+  } catch (error) {
+    diagnostics.push({ code: "RENDERER_STARTUP", severity: "error", message: `Playwright Chromium could not render: ${errorMessage(error)}` });
+  }
+
+  return diagnostics;
+}
+
+async function validateTarget(target: string | undefined, cssPath: string | undefined): Promise<Diagnostic[]> {
+  const path = target ? resolve(target) : await resolveConfigPath();
+  if (/\.html?$/i.test(path)) return validateTemplatePath(path, cssPath);
+  return validateConfigPath(path);
+}
+
+async function validateConfigPath(configPath: string): Promise<Diagnostic[]> {
+  const diagnostics: Diagnostic[] = [];
+  const config = await loadConfig(configPath);
+  const baseDir = dirname(configPath);
+  const templates = config.templates ?? {};
+
+  for (const [name, template] of Object.entries(templates)) {
+    if (template.htmlPath) await pushFileDiagnostic(diagnostics, resolve(baseDir, template.htmlPath), "TEMPLATE_HTML", `Template ${name} HTML exists.`);
+    if (template.cssPath) await pushFileDiagnostic(diagnostics, resolve(baseDir, template.cssPath), "TEMPLATE_CSS", `Template ${name} CSS exists.`);
+    if (!template.html && !template.htmlPath) diagnostics.push({ code: "TEMPLATE_HTML_MISSING", severity: "error", message: `Template ${name} needs html or htmlPath.` });
+  }
+
+  for (const [name, recipe] of Object.entries(config.recipes ?? {})) {
+    if (!templates[recipe.template]) diagnostics.push({ code: "RECIPE_TEMPLATE_MISSING", severity: "error", message: `Recipe ${name} references missing template ${recipe.template}.` });
+  }
+
+  for (const [setName, set] of Object.entries(config.templateSets ?? {})) {
+    for (const item of set) {
+      if (!templates[item.template]) diagnostics.push({ code: "SET_TEMPLATE_MISSING", severity: "error", message: `Template set ${setName}/${item.name} references missing template ${item.template}.` });
+    }
+  }
+
+  diagnostics.push({ code: "CONFIG_PARSE", severity: "ok", message: `Config parsed: ${configPath}` });
+  return diagnostics;
+}
+
+async function validateTemplatePath(htmlPath: string, cssPath: string | undefined): Promise<Diagnostic[]> {
+  const diagnostics: Diagnostic[] = [];
+  await pushFileDiagnostic(diagnostics, htmlPath, "TEMPLATE_HTML", "Template HTML exists.");
+  if (cssPath) await pushFileDiagnostic(diagnostics, cssPath, "TEMPLATE_CSS", "Template CSS exists.");
+  const report = await inspectTemplate(htmlPath, cssPath);
+  for (const duplicate of report.layers.filter((layer) => layer.count > 1)) {
+    diagnostics.push({ code: "DUPLICATE_LAYER", severity: "warning", message: `Layer ${duplicate.name} appears ${duplicate.count} times.` });
+  }
+  diagnostics.push({ code: "TEMPLATE_INSPECT", severity: "ok", message: `${report.layers.length} layer name(s) discovered.` });
+  return diagnostics;
+}
+
+async function pushFileDiagnostic(diagnostics: Diagnostic[], path: string, code: string, okMessage: string) {
+  try {
+    await access(path);
+    diagnostics.push({ code, severity: "ok", message: okMessage });
+  } catch {
+    diagnostics.push({ code, severity: "error", message: `File could not be read: ${path}` });
+  }
+}
+
+function reportDiagnostics(diagnostics: Diagnostic[], asJson: boolean) {
+  const ok = diagnostics.every((diagnostic) => diagnostic.severity !== "error");
+  if (asJson) {
+    writeJson({ ok, diagnostics });
+  } else {
+    for (const diagnostic of diagnostics) {
+      console.log(`${diagnostic.severity.toUpperCase()} ${diagnostic.code}: ${diagnostic.message}`);
+    }
+  }
+  if (!ok) process.exitCode = 1;
+}
+
+interface TemplateInspection {
+  template: string;
+  css?: string;
+  layers: Array<{ name: string; count: number }>;
+  fitText: string[];
+  assets: string[];
+  dimensions: { width?: number; height?: number };
+}
+
+async function inspectTemplate(htmlPath: string, cssPath: string | undefined): Promise<TemplateInspection> {
+  const html = await readFileChecked(htmlPath, "HTML");
+  const css = cssPath ? await readFileChecked(cssPath, "CSS") : undefined;
+  const layerCounts = new Map<string, number>();
+  for (const match of html.matchAll(/\bdata-layer\s*=\s*["']([^"']+)["']/gi)) {
+    const name = match[1] ?? "";
+    layerCounts.set(name, (layerCounts.get(name) ?? 0) + 1);
+  }
+
+  return {
+    template: htmlPath,
+    css: cssPath,
+    layers: [...layerCounts.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, count]) => ({ name, count })),
+    fitText: discoverFitTextTargets(html),
+    assets: discoverTemplateAssets(html, css),
+    dimensions: discoverTemplateDimensions(html, css),
+  };
+}
+
+function discoverFitTextTargets(html: string): string[] {
+  const targets: string[] = [];
+  for (const match of html.matchAll(/\bdata-fit-text(?:\s*=\s*["']([^"']*)["'])?/gi)) {
+    targets.push(match[1] || "data-fit-text");
+  }
+  return targets;
+}
+
+function discoverTemplateAssets(html: string, css?: string): string[] {
+  const assets = new Set<string>();
+  for (const match of html.matchAll(/\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)) {
+    const source = match[1];
+    if (source && !source.startsWith("#")) assets.add(source);
+  }
+  for (const match of (css ?? "").matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) {
+    const source = match[1];
+    if (source) assets.add(source);
+  }
+  return [...assets].sort();
+}
+
+function discoverTemplateDimensions(html: string, css?: string): { width?: number; height?: number } {
+  const source = `${html}\n${css ?? ""}`;
+  const width = /(?:width|min-width)\s*:\s*(\d+)px/i.exec(source)?.[1] ?? /\bwidth\s*=\s*["']?(\d+)/i.exec(html)?.[1];
+  const height = /(?:height|min-height)\s*:\s*(\d+)px/i.exec(source)?.[1] ?? /\bheight\s*=\s*["']?(\d+)/i.exec(html)?.[1];
+  return {
+    width: width ? Number(width) : undefined,
+    height: height ? Number(height) : undefined,
+  };
+}
+
+function printTemplateInspection(report: TemplateInspection) {
+  console.log(`template: ${report.template}`);
+  if (report.css) console.log(`css: ${report.css}`);
+  console.log(`layers: ${report.layers.length === 0 ? "(none)" : report.layers.map((layer) => `${layer.name}${layer.count > 1 ? ` (${layer.count})` : ""}`).join(", ")}`);
+  console.log(`fit-text: ${report.fitText.length === 0 ? "(none)" : report.fitText.join(", ")}`);
+  console.log(`assets: ${report.assets.length === 0 ? "(none)" : report.assets.join(", ")}`);
+  console.log(`dimensions: ${report.dimensions.width ?? "unknown"}x${report.dimensions.height ?? "unknown"}`);
+}
+
+async function startPreviewServer(imagePath: string, port?: number): Promise<{ url: string; close: () => Promise<void> }> {
+  const server = createServer(async (request, response) => {
+    if (request.url === "/preview.png") {
+      await sendFile(response, imagePath, "image/png");
+      return;
+    }
+    response.setHeader("content-type", "text/html; charset=utf-8");
+    response.end(PREVIEW_HTML);
+  });
+  await new Promise<void>((resolvePromise, reject) => {
+    server.once("error", reject);
+    server.listen(port ?? 0, "127.0.0.1", () => {
+      server.off("error", reject);
+      resolvePromise();
+    });
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new ClickClickError("RENDER_FAILED", "Preview server did not expose a local port.");
+  return {
+    url: `http://127.0.0.1:${address.port}/`,
+    close: () => new Promise((resolvePromise, reject) => server.close((error) => error ? reject(error) : resolvePromise())),
+  };
+}
+
+async function sendFile(response: ServerResponse, path: string, contentType: string) {
+  try {
+    response.setHeader("content-type", contentType);
+    response.setHeader("cache-control", "no-store");
+    response.end(await readFile(path));
+  } catch {
+    response.statusCode = 404;
+    response.end("Not found");
+  }
+}
+
+function openBrowser(url: string) {
+  const command = process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open";
+  const args = process.platform === "win32" ? ["/c", "start", "", url] : [url];
+  const child = spawn(command, args, { stdio: "ignore", detached: true });
+  child.on("error", () => undefined);
+  child.unref();
+}
+
+const PREVIEW_HTML = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ClickClick Preview</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #111; color: #f5f5f5; font-family: system-ui, sans-serif; }
+      body { display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+      img { max-width: 100%; height: auto; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+    </style>
+  </head>
+  <body>
+    <img id="preview" src="/preview.png" alt="ClickClick preview">
+    <script>
+      setInterval(() => {
+        document.getElementById("preview").src = "/preview.png?t=" + Date.now();
+      }, 800);
+    </script>
+  </body>
+</html>`;
 
 function durationMs(startedAt: number): number {
   return Math.round((performance.now() - startedAt) * 100) / 100;
