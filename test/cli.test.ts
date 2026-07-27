@@ -707,12 +707,14 @@ describe("CLI", () => {
   }, 60000);
 
   it("reports a clear error when config autodiscovery fails", async () => {
-    const emptyDir = join(tempDir, "no-config-here");
-    await mkdir(emptyDir, { recursive: true });
-
-    await expect(runCli(["config", "templates"], { cwd: emptyDir })).rejects.toMatchObject({
-      stderr: expect.stringContaining("INVALID_INPUT: Config file not found. Searched for clickclick.config.json"),
-    });
+    const emptyDir = await mkdtemp(join(tmpdir(), "clickclick-no-config-"));
+    try {
+      await expect(runCli(["config", "templates"], { cwd: emptyDir })).rejects.toMatchObject({
+        stderr: expect.stringContaining("INVALID_INPUT: Config file not found. Searched for clickclick.config.json"),
+      });
+    } finally {
+      await rm(emptyDir, { recursive: true, force: true });
+    }
   });
 
   it("validates configs and inspects templates with stable diagnostics", async () => {
